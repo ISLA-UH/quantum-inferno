@@ -1,5 +1,6 @@
 """
 This module contains general utilities that can work with values containing nans.
+TODO: Break up into smaller modules
 """
 
 import os

@@ -1,6 +1,6 @@
 """
-This module contains constants and helper functions for converting between different time bases. All time based
-functions take inputs and output in UTC.
+This RedVox SDK module contains constants and helper functions for converting between different time bases.
+All time-based functions take inputs and output in UTC.
 """
 
 from datetime import datetime, tzinfo, timedelta

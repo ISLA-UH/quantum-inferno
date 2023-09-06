@@ -7,7 +7,7 @@ import scipy.signal as signal
 import scipy.fft
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-from libquantum_ops import info
+from quantum_inferno import info
 
 
 def plot_fft_compare(sig_in,

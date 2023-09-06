@@ -10,7 +10,7 @@ from matplotlib.colorbar import Colorbar
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable, AxesDivider
 from dataclasses import dataclass
-import quantum_inferno.date_time_utils as dt
+import quantum_inferno.utils_date_time as dt
 # TODO: Find libquantum scales
 # import quantum_inferno.scales_dyadic as scales
 
