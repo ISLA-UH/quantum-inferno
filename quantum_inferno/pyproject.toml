@@ -1,0 +1,38 @@
+# See:
+# - https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+# - https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
+
+[project]
+name = "quantum_inferno"
+version = "2023.09.06"
+authors = [
+    { name = "ISLA, UH", email = "" }
+]
+description = "Quantized Information Entropy, Nth Octave (INFERNO)"
+readme = "README.md"
+requires-python = ">=3.8,<=3.11"
+license = {file = "LICENSE"}
+
+# Please specify dependencies in alphabetical order
+dependencies = [
+    "librosa=0.10.1",
+    "matplotlib==3.7.1",
+    "numpy==1.23.5",
+    "pyproj~=3.6.0",
+    "scipy==1.10.1",
+    "setuptools==60.2.0",
+    "tftb==0.1.4"
+]
+
+#dependencies_dev = [
+#    "pdoc3 >= 0.8.1",
+#    "twine >= 3.7.1",
+#    "wheel >= 0.37.0"
+#]
+
+[project.urls]
+homepage = "https://github.com/ISLA-UH/quantum-inferno.git"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
