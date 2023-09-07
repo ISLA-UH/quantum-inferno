@@ -5,7 +5,7 @@ No-chirp/sweep (index_shift=0, variable removed), simplified for the base stockw
 
 import numpy as np
 import scipy.signal as signal
-from libquantum_ops import scales_dyadic as scales
+from quantum_inferno import scales_dyadic as scales
 from typing import Tuple, Union
 
 """

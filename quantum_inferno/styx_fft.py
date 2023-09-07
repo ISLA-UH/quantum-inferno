@@ -4,7 +4,7 @@ This module calculates spectra: STFT, FFT
 
 import numpy as np
 import scipy.signal as signal
-from libquantum_ops import scales_dyadic as scales
+from quantum_inferno import scales_dyadic as scales
 from typing import Union, Tuple
 
 

@@ -1,11 +1,11 @@
 """
-libquantum example: s07_grain_tfr
+libquantum example: s00_grain_tfr
 
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from libquantum_ops import styx_fft, styx_cwt, scales_dyadic
-import libquantum_ops.plot_templates.plot_time_frequency_reps_black as pltq
+from quantum_inferno import styx_fft, styx_cwt, scales_dyadic
+import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 print(__doc__)
 
 
@@ -17,19 +17,15 @@ if __name__ == "__main__":
 
     EVENT_NAME = 'grain test'
     station_id_str = 'synth'
-    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window inside the cosine tapered region.
-    # If zero, the Tukey window is equivalent to a rectangular window.
-    # If one, the Tukey window is equivalent to a Hann window.
-    alpha = 0.25
 
     # Specifying the grain parameters requires some forethought
-    frequency_center_hz = 100
-    frequency_sample_rate_hz = 800
-    order_number_input = 12
+    frequency_center_hz = 5
+    frequency_sample_rate_hz = 80
+    order_number_input = 6
 
     # TODO: ADD Averaging frequency for fft_nd
-    time_nd = 2**11
-    time_fft_nd = 2**7
+    time_nd = 2**9
+    time_fft_nd = 2**6
 
     # The CWX and STX will be evaluated from the number of points in FFT of the signal
     frequency_cwt_pos_hz = np.fft.rfftfreq(time_nd, d=1/frequency_sample_rate_hz)
@@ -102,17 +98,17 @@ if __name__ == "__main__":
     welch_information_bits, welch_information_bits_per_band, welch_information_bits_per_sample, \
     welch_information_bits_total, welch_information_scaled = styx_fft.power_and_information_shannon_welch(psd_welch_power)
     
-    # STFT with 25% Tukey window
-    frequency_stft_hz, time_stft_s, stft_complex = \
-        styx_fft.stft_complex_pow2(sig_wf=mic_sig,
-                                   frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                   segment_points=time_fft_nd)
-
-    # # STFT with Gaussian window
+    # # STFT with 25% Tukey window
     # frequency_stft_hz, time_stft_s, stft_complex = \
-    #     styx_fft.gtx_complex_pow2(sig_wf=mic_sig,
-    #                               frequency_sample_rate_hz=frequency_sample_rate_hz,
-    #                               segment_points=time_fft_nd)
+    #     styx_fft.stft_complex_pow2(sig_wf=mic_sig,
+    #                                frequency_sample_rate_hz=frequency_sample_rate_hz,
+    #                                segment_points=time_fft_nd)
+
+    # STFT with Gaussian window
+    frequency_stft_hz, time_stft_s, stft_complex = \
+        styx_fft.gtx_complex_pow2(sig_wf=mic_sig,
+                                  frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                  segment_points=time_fft_nd)
 
     # Information overload methods
     stft_power, stft_power_per_band, stft_power_per_sample, stft_power_total, stft_power_scaled, \
@@ -130,7 +126,7 @@ if __name__ == "__main__":
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
-    ax1.set_title('Synthetic CW, with taper')
+    ax1.set_title('Synthetic Gabor wavelet with taper')
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
     ax2.semilogx(frequency_welch_hz, welch_over_var, label='Welch')
@@ -148,10 +144,10 @@ if __name__ == "__main__":
     # plt.plot(cwt_information_bits_per_sample)
 
     # Select plot frequencies
-    fmin = 2 * frequency_resolution_stft_hz
+    fmin = frequency_resolution_stft_hz
     fmax = frequency_sample_rate_hz/2  # Nyquist
 
-    pltq.plot_wf_mesh_vert(redvox_id='00',
+    pltq.plot_wf_mesh_vert(station_id='00',
                            wf_panel_a_sig=mic_sig,
                            wf_panel_a_time=time_s,
                            mesh_time=time_stft_s,

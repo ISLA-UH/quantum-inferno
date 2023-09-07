@@ -11,8 +11,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable, AxesDivider
 from dataclasses import dataclass
 import quantum_inferno.utils_date_time as dt
-# TODO: Find libquantum scales
-# import quantum_inferno.scales_dyadic as scales
+
 
 # TODO: Add native color stylings
 #  https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html
@@ -56,31 +55,6 @@ class FigureAttributes:
         self.legend_label_size = self.font_size_2nd_level
 
         self.fig = None
-
-
-class FigureAttributesBackInBlack(FigureAttributes):
-    """
-    This is the most basic parent class -- sets the plot canvas as well as figure handling functions. This is where
-    figure size, font style and sizes, line weights and colors, etc. are established. All subsequent plot classes
-    will inherit these attributes, overriding them if necessary.
-
-    Attributes
-    __________
-
-    fig_size_ratio: 2d array of figure width, height ratio
-    fontsize1_scale: int, scale for fontsize level 1 (titles, axes labels...)
-    fontsize2: int, scale for fontsize level 2 (legend labels, ticks...)
-    line_color: string, color for line in plot
-    line_style: string, style of line in plot
-    """
-
-    def __init__(self, fig_size_ratio=np.array([640, 400]), fontsize1_scale=5, fontsize2_scale=4, line_color='w',
-                 line_style='-'):
-
-        super().__init__(fig_size_ratio, fontsize1_scale, fontsize2_scale, line_color, line_style)
-        self.fig_face_color = "k"
-        self.fig_edge_color = self.fig_face_color
-        self.font_color = "w"
 
 
 class AspectRatioType(enum.Enum):
@@ -140,10 +114,10 @@ def origin_time_correction(time_input: np.ndarray,
                            start_time_sanitized: bool = True) -> Tuple[str, np.ndarray]:
     """
     Sanitize time
-
     :param time_input: array with timestamps
     :param start_time_epoch: start time in epoch UTC
     :param units_time: units of time
+    :param start_time_sanitized: True or False
     :return: time label and time elapsed from start
     """
     # Sanitizing/scrubbing time is a key function.
@@ -243,7 +217,7 @@ def mesh_colormap_limits(mesh_array: np.ndarray,
 
 
 # # BEGIN PLOTS: THESE ARE THE MAIN TEMPLATES
-def plot_wf_wf_wf_vert(redvox_id: str,
+def plot_wf_wf_wf_vert(station_id: str,
                        wf_panel_a_sig: np.ndarray,
                        wf_panel_a_time: np.ndarray,
                        wf_panel_b_sig: np.ndarray,
@@ -256,7 +230,6 @@ def plot_wf_wf_wf_vert(redvox_id: str,
                        wf_panel_b_units: str = "Norm",
                        wf_panel_c_units: str = "Norm",
                        params_tfr=AudioParams(),
-                       waveform_color: str = "midnightblue",
                        units_time: str = "s",
                        figure_title: str = "Time Domain Representation",
                        figure_title_show: bool = True,
@@ -264,12 +237,11 @@ def plot_wf_wf_wf_vert(redvox_id: str,
                        labels_panel_a: str = "(a)",
                        labels_panel_b: str = "(b)",
                        labels_panel_c: str = "(c)",
-                       labels_fontweight: str = None,
-                       attributes_tfr = FigureAttributes()) -> None:
+                       labels_fontweight: str = None) -> None:
     """
     Template for aligned time-series display
 
-    :param redvox_id: name of station
+    :param station_id: name of station
     :param wf_panel_c_sig: array with signal waveform for top panel
     :param wf_panel_c_time: array with signal timestamps for top panel
     :param wf_panel_b_sig: array with signal waveform for middle panel
@@ -294,9 +266,9 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     """
 
     if start_time_epoch == 0:
+        time_label: str = f"Time ({units_time})"
         if start_time_sanitized:
             # Time sanitized if no input provided
-            time_label: str = f"Time ({units_time})"
             wf_panel_c_time_zero = wf_panel_c_time - wf_panel_a_time[0]
             wf_panel_b_time_zero = wf_panel_b_time - wf_panel_a_time[0]
             wf_panel_a_time_zero = wf_panel_a_time - wf_panel_a_time[0]
@@ -309,9 +281,6 @@ def plot_wf_wf_wf_vert(redvox_id: str,
         start_datetime_epoch = dt.datetime.utcfromtimestamp(start_time_epoch)
         dt_str: str = start_datetime_epoch.strftime("%Y-%m-%d %H:%M:%S")
         time_label: str = f"Time ({units_time}) from UTC {dt_str}"
-        # top_time -= top_time[0]
-        # mid_time -= mid_time[0]
-        # low_time -= low_time[0]
         wf_panel_c_time_zero = wf_panel_c_time - start_time_epoch
         wf_panel_b_time_zero = wf_panel_b_time - start_time_epoch
         wf_panel_a_time_zero = wf_panel_a_time - start_time_epoch
@@ -343,9 +312,9 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     wf_panel_a: plt.Axes = axes[2]
 
     if figure_title_show:
-        wf_panel_c.set_title(f"{figure_title} at Station {redvox_id}")
+        wf_panel_c.set_title(f"{figure_title} at Station {station_id}")
 
-    wf_panel_c.plot(wf_panel_c_time_zero, wf_panel_c_sig, color=waveform_color)
+    wf_panel_c.plot(wf_panel_c_time_zero, wf_panel_c_sig)
     if label_panel_show:
         wf_panel_c.text(0.01, 0.95, labels_panel_c, transform=wf_panel_c.transAxes,
                         fontsize=params_tfr.figure_parameters.text_size, fontweight=labels_fontweight, va='top')
@@ -357,7 +326,7 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     wf_panel_c.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
     wf_panel_c.yaxis.get_offset_text().set_x(-0.034)
 
-    wf_panel_b.plot(wf_panel_b_time_zero, wf_panel_b_sig, color=waveform_color)
+    wf_panel_b.plot(wf_panel_b_time_zero, wf_panel_b_sig)
     if label_panel_show:
         wf_panel_b.text(0.01, 0.95, labels_panel_b, transform=wf_panel_b.transAxes,
                         fontsize=params_tfr.figure_parameters.text_size, fontweight=labels_fontweight, va='top')
@@ -369,7 +338,7 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     wf_panel_b.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
     wf_panel_b.yaxis.get_offset_text().set_x(-0.034)
 
-    wf_panel_a.plot(wf_panel_a_time_zero, wf_panel_a_sig, color=waveform_color)
+    wf_panel_a.plot(wf_panel_a_time_zero, wf_panel_a_sig)
     if label_panel_show:
         wf_panel_a.text(0.01, 0.95, labels_panel_a, transform=wf_panel_a.transAxes,
                         fontsize=params_tfr.figure_parameters.text_size, fontweight=labels_fontweight, va='top')
@@ -388,7 +357,7 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     fig.subplots_adjust(bottom=.1, hspace=0.13)
 
 
-def plot_wf_mesh_mesh_vert(redvox_id: str,
+def plot_wf_mesh_mesh_vert(station_id: str,
                            wf_panel_a_sig: np.ndarray,
                            wf_panel_a_time: np.ndarray,
                            mesh_time: np.ndarray,
@@ -407,9 +376,8 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                            mesh_panel_c_color_range: float = 15,
                            mesh_panel_c_color_min: float = 0,
                            start_time_epoch: float = 0,
-                           frequency_hz_ymin: float = scales.Slice.FU,
-                           frequency_hz_ymax: float = scales.Slice.F0,
-                           waveform_color: str = "midnightblue",
+                           frequency_hz_ymin: float = None,
+                           frequency_hz_ymax: float = None,
                            mesh_colormap: str = "inferno",
                            units_time: str = "s",
                            units_frequency: str = "Hz",
@@ -422,7 +390,7 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     """
     Plot 3 vertical panels - mesh (top panel), mesh (middle panel) and signal waveform (bottom panel)
 
-    :param redvox_id: name of station
+    :param station_id: name of station
     :param wf_panel_a_sig: array with signal waveform for bottom panel
     :param wf_panel_a_time: array with signal timestamps for bottom panel
     :param mesh_time: array with mesh time
@@ -459,7 +427,11 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     :return: plot
     """
 
-    # This is the template for the TFR workhorse. Creating a TFR class would be practical.
+    # Autoscale to mesh frequency range
+    if frequency_hz_ymax is None:
+        frequency_hz_ymax = mesh_frequency[-1]
+    if frequency_hz_ymin is None:
+        frequency_hz_ymin = mesh_frequency[0]
 
     # Time zeroing and scrubbing, if needed
     time_label, wf_panel_a_elapsed_time = \
@@ -565,9 +537,9 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     mesh_panel_c_cbar.set_label(mesh_panel_c_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_c_cax.tick_params(labelsize='large')
     # if figure_title_show:
-    #     mesh_panel_c.set_title(f"{figure_title} at Station {redvox_id}")
+    #     mesh_panel_c.set_title(f"{figure_title} at Station {station_id}")
     if figure_title_show:
-        mesh_panel_c.set_title(f"{figure_title} ({redvox_id})")
+        mesh_panel_c.set_title(f"{figure_title} ({station_id})")
     mesh_panel_c.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
     mesh_panel_c.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
     mesh_panel_c.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
@@ -622,7 +594,7 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     mesh_panel_b.tick_params(axis='y', labelsize='large')
 
     # Waveform panel
-    wf_panel_a.plot(wf_panel_a_elapsed_time, wf_panel_a_sig, color=waveform_color)
+    wf_panel_a.plot(wf_panel_a_elapsed_time, wf_panel_a_sig)
     wf_panel_a.set_ylabel(wf_panel_a_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_a.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
     wf_panel_a.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
@@ -647,7 +619,7 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     return fig
 
 
-def plot_wf_mesh_vert(redvox_id: str,
+def plot_wf_mesh_vert(station_id: str,
                       wf_panel_a_sig: np.ndarray,
                       wf_panel_a_time: np.ndarray,
                       mesh_time: np.ndarray,
@@ -663,9 +635,8 @@ def plot_wf_mesh_vert(redvox_id: str,
                       mesh_panel_b_color_min: float = 0,
                       start_time_epoch: float = 0,
                       start_time_sanitized: bool = True,
-                      frequency_hz_ymin: float = scales.Slice.FU,
-                      frequency_hz_ymax: float = scales.Slice.F0,
-                      waveform_color: str = "midnightblue",
+                      frequency_hz_ymin: float = None,
+                      frequency_hz_ymax: float = None,
                       mesh_colormap: str = "inferno",
                       units_time: str = "s",
                       units_frequency: str = "Hz",
@@ -677,7 +648,7 @@ def plot_wf_mesh_vert(redvox_id: str,
     Plot 2 vertical panels - mesh (top panel) and signal waveform (bottom panel)
 
     :param wf_panel_a_yscaling: 'auto', 'symmetric', 'positive'
-    :param redvox_id: name of station
+    :param station_id: name of station
     :param wf_panel_a_sig: array with signal waveform for bottom panel
     :param wf_panel_a_time: array with signal timestamps for bottom panel
     :param mesh_time: array with mesh time
@@ -706,7 +677,11 @@ def plot_wf_mesh_vert(redvox_id: str,
     :return: plot
     """
 
-    # This is the template for the TFR workhorse. Creating a TFR class may be practical.
+    # Autoscale to mesh frequency range
+    if frequency_hz_ymax is None:
+        frequency_hz_ymax = mesh_frequency[-1]
+    if frequency_hz_ymin is None:
+        frequency_hz_ymin = mesh_frequency[0]
 
     # Time zeroing and scrubbing, if needed
     time_label, wf_panel_a_elapsed_time = \
@@ -799,7 +774,7 @@ def plot_wf_mesh_vert(redvox_id: str,
     mesh_panel_b_cbar.set_label(mesh_panel_b_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_b_cax.tick_params(labelsize='large')
     if figure_title_show:
-        mesh_panel_b.set_title(f"{figure_title} at Station {redvox_id}")
+        mesh_panel_b.set_title(f"{figure_title} at Station {station_id}")
     mesh_panel_b.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
     mesh_panel_b.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
     mesh_panel_b.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
@@ -809,7 +784,7 @@ def plot_wf_mesh_vert(redvox_id: str,
     mesh_panel_b.tick_params(axis='y', labelsize='large')
 
     # Waveform panel
-    wf_panel_a.plot(wf_panel_a_elapsed_time, wf_panel_a_sig, color=waveform_color)
+    wf_panel_a.plot(wf_panel_a_elapsed_time, wf_panel_a_sig)
     wf_panel_a.set_ylabel(wf_panel_a_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_a.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
 

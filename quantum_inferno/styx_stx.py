@@ -6,8 +6,7 @@ Rederivation in preparation, Garces et al. 2022; last updated 9 May 2022
 """
 import numpy as np
 from scipy.fft import fft, ifft, fftfreq
-# from libquantum_ops import styx_cwt
-from libquantum_ops import scales_dyadic as scales
+from quantum_inferno import scales_dyadic as scales
 from typing import Tuple
 
 
