@@ -44,6 +44,7 @@ While in T&E:
 4) Issue the command `pip install .`
 
 The next doc elements are placeholders:
+TODO: UPDATE
 
 More details in the [Installation guide](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/intallation.md).
 
