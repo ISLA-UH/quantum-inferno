@@ -77,37 +77,6 @@ def power_dynamics_scaled_bits(tfr_power: np.ndarray) -> [np.ndarray, np.ndarray
     return [tfr_power_bits, tfr_power_per_freq_bits, tfr_power_per_time_bits]
 
 
-# def shannon_orig(tfr_power):
-#     """
-#     Shannon information and entropy
-#     :param tfr_power:
-#     :return:
-#     """
-#     atom_bits = 3
-#     num_freq = tfr_power.shape[0]
-#     num_time = tfr_power.shape[1]
-#     num_dof = num_freq*num_time  # Degrees of freedom
-#     ref_shannon_bits = np.log2(num_dof)/num_dof
-#     # ref_shannon_bits = (np.log2(num_freq)+3)/num_dof
-#
-#     # Normalized power pdf, information, and entropy over whole distribution
-#     tfr_power_pdf = tfr_power/np.sum(tfr_power)
-#     # Shannon information; NOT ADDITIVE, but already normalized
-#     tfr_info = -np.log2(tfr_power_pdf + scales.EPSILON64)
-#     tfr_isnr = np.log2(num_dof) - tfr_info
-#     # Shannon entropy per bin
-#     # This is the expected value of the information
-#     tfr_shannon_bits = tfr_power_pdf * tfr_info
-#     # tfr_shannon_total_bits = np.sum(tfr_shannon_bits)
-#     # # tfr_esnr = num_dof*tfr_shannon_bits/tfr_shannon_total_bits
-#     # Relative to ref_bits
-#     # tfr_esnr = (tfr_shannon_bits - ref_shannon_bits)*num_dof
-#     # tfr_esnr = tfr_shannon_bits/ref_shannon_bits
-#     tfr_esnr = tfr_shannon_bits/ref_shannon_bits/atom_bits
-#
-#     return [tfr_info, tfr_shannon_bits, tfr_isnr, tfr_esnr]
-
-
 def shannon(tfr_power):
     """
     Shannon information and entropy

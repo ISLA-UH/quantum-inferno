@@ -1,7 +1,7 @@
 """
-Inferno example e00_logon_spectral_canvas.
+Inferno example e00_tone_spectral_canvas.
 Define the cyberspectral canvas from a knowledge of the signal center frequency and passband.
-Compute a periodogram and a spectrogram of a Gabor wavelet (logon, grain) over sliding windows.
+Compute a periodogram and a spectrogram of a tone over sliding windows.
 The Welch method is equivalent to averaging the spectrogram over the columns.
 """
 
@@ -18,15 +18,15 @@ if __name__ == "__main__":
     The Welch method is equivalent to averaging the spectrogram over the columns.
     """
 
-    EVENT_NAME = 'Example e00'
-    station_id_str = 'e00'
+    EVENT_NAME = 'Example e01'
+    station_id_str = 'e01'
 
     # Specify a Gaussian wavelet as a prototype band-limited transient signal
     # with a well-defined center frequency
     frequency_center_hz = 5
     # A very tight wavelet would have a single cycle. Due to the inevitability of window tapering,
     # one should generally include more than one cycle in the analysis window.
-    logon_number_of_cycles = 1
+    logon_number_of_cycles = 3
     # The order scales with the number of cycles in a wavelet
     logon_order = scales_dyadic.order_from_cycles(logon_number_of_cycles)
 
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         utils.duration_ceil(sample_rate_hz=frequency_sample_rate_hz, time_s=duration_fft_s)
     time_fft_nd = 2**ave_points_ceil_log2
     # Scale the total number of points to the averaging window
-    time_nd = time_fft_nd * 2
+    time_nd = time_fft_nd * 8
 
     # The CWX and STX will be evaluated from the number of points in FFT of the signal
     frequency_cwt_pos_hz = np.fft.rfftfreq(time_nd, d=1/frequency_sample_rate_hz)
@@ -82,12 +82,8 @@ if __name__ == "__main__":
     print('Center STFT FFT frequency, Hz:', frequency_center_stft_hz)
 
     # Construct test wavelet
-    mic_sig_complex, time_s, scale, omega, amp = \
-        styx_cwt.wavelet_centered_4cwt(band_order_Nth=logon_order,
-                                       duration_points=time_nd,
-                                       scale_frequency_center_hz=frequency_center_stft_hz,
-                                       frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                       dictionary_type="norm")
+    time_s = np.arange(time_nd)/frequency_sample_rate_hz
+    mic_sig_complex = np.exp(1j*2*np.pi*frequency_center_hz*time_s)
     mic_sig_real = np.real(mic_sig_complex)
     mic_sig_imag = np.imag(mic_sig_complex)
 
@@ -96,10 +92,8 @@ if __name__ == "__main__":
     mic_sig_imag_var = np.var(mic_sig_imag)
 
     # Theoretical variance TODO: construct function
-    mic_sig_real_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
-                               (1 + np.exp(-(scale*omega)**2))
-    mic_sig_imag_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
-                               (1 - np.exp(-(scale*omega)**2))
+    mic_sig_real_var_nominal = 1/2
+    mic_sig_imag_var_nominal = 1/2
 
     # Mathematical integral ~ computed Variance * Number of Samples. The dictionary type = "norm" returns 1/2.
     mic_sig_real_integral = np.var(mic_sig_real)*len(mic_sig_real)
@@ -129,7 +123,7 @@ if __name__ == "__main__":
     print('\nChoose imaginary part as signal:')
     print('var/nominal var:', mic_sig_var/mic_sig_var_nominal)
 
-    fractional_overlap = 0.95
+    fractional_overlap = 0.5
     overlap_pts = np.round(fractional_overlap*time_fft_nd)
     tukey_alpha = 1
     # Compute the Welch PSD; averaged spectrum over sliding windows
