@@ -60,7 +60,7 @@ if __name__ == "__main__":
         utils.duration_ceil(sample_rate_hz=frequency_sample_rate_hz, time_s=duration_fft_s)
     time_fft_nd = 2**ave_points_ceil_log2
     # Scale the total number of points to the averaging window
-    time_nd = time_fft_nd * 8
+    time_nd = time_fft_nd * 4
 
     # The CWX and STX will be evaluated from the number of points in FFT of the signal
     frequency_cwt_pos_hz = np.fft.rfftfreq(time_nd, d=1/frequency_sample_rate_hz)
