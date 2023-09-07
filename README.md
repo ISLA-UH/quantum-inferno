@@ -38,11 +38,11 @@ Eventually, will install through
 pip install quantum-inferno
 ```
 While in T&E:
-0) Clone the repo
-1) Open a terminal
-2) Navigate to the root directory of the project you want to install
-3) Issue the command " pip install . "
-4) There is a . (period) on the above command. Do not forget the period.
+
+1) Clone the repo
+2) Open a terminal
+3) Navigate to the root directory of the project you want to install
+4) Issue the command `pip install .`
 
 The next doc elements are placeholders:
 
@@ -54,7 +54,9 @@ Full examples can be found in the [examples documentation](https://github.com/Re
 ### API Documentation
 Check the [API Documentation](https://redvoxinc.github.io/libquantum).
 
+TODO: fix placeholder links.
+
 ### Resources
 
-- Found an issue? Submit a [bug report](https://github.com/RedVoxInc/libquantum/issues).
-- [Apache License](https://github.com/RedVoxInc/libquantum/blob/master/LICENSE)
+- Found an issue? Submit a [bug report](https://github.com/ISLA-UH/quantum-inferno/issues).
+- [MIT License](https://github.com/ISLA_UH/quantum-inferno/blob/main/LICENSE)

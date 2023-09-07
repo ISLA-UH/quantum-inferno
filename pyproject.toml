@@ -6,7 +6,7 @@
 name = "quantum_inferno"
 version = "2023.09.06"
 authors = [
-    { name = "ISLA, UH", email = "" }
+    { name = "ISLA, UH", email = "milton@isla.hawaii.edu" }
 ]
 description = "Quantized Information Entropy, Nth Octave (INFERNO)"
 readme = "README.md"
