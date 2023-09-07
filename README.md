@@ -59,4 +59,4 @@ TODO: fix placeholder links.
 ### Resources
 
 - Found an issue? Submit a [bug report](https://github.com/ISLA-UH/quantum-inferno/issues).
-- [MIT License](https://github.com/ISLA_UH/quantum-inferno/blob/main/LICENSE)
+- [MIT License](https://github.com/ISLA-UH/quantum-inferno/blob/main/LICENSE)
