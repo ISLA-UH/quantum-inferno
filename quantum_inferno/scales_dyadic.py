@@ -118,6 +118,19 @@ def cycles_from_order(scale_order: float) -> float:
     return cycles_per_scale
 
 
+def order_from_cycles(cycles_per_scale: float) -> float:
+    """
+    Compute the number of cycles M for a specified band order N
+    N is the quantization parameter for the constant Q wavelet filters
+
+    :param cycles_per_scale: Should be greater than or equal than one
+    :return: cycles_M, number of cycled per normalized angular frequency
+    """
+    if np.abs(cycles_per_scale) < 1:
+        cycles_per_scale = 1.
+    return cycles_per_scale/M_OVER_N
+
+
 def base_multiplier(scale_order: float = default_scale_order,
                     scale_base: float = default_scale_base):
     """

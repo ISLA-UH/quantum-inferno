@@ -1,36 +1,69 @@
 """
-libquantum example: s00_grain_tfr
-
+Inferno example e00_logon_spectral_canvas.
+Define the cyberspectral canvas from a knowledge of the signal center frequency and passband.
+Compute a periodogram and a spectrogram of a Gabor wavelet (logon, grain) over sliding windows.
+The Welch method is equivalent to averaging the spectrogram over the columns.
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
-from quantum_inferno import styx_fft, styx_cwt, scales_dyadic
+from quantum_inferno import styx_fft, styx_cwt, scales_dyadic, utils
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 print(__doc__)
 
 
 if __name__ == "__main__":
     """
-    Compute the spectrogram over sliding windows.
+    Compute a spectrogram of a Gabor wavelet (logon, grain) over sliding windows.
     The Welch method is equivalent to averaging the spectrogram over the columns.
     """
 
-    EVENT_NAME = 'grain test'
-    station_id_str = 'synth'
+    EVENT_NAME = 'Example e00'
+    station_id_str = 'e00'
 
-    # Specifying the grain parameters requires some forethought
+    # Specify a Gaussian wavelet as a prototype band-limited transient signal
+    # with a well-defined center frequency
     frequency_center_hz = 5
-    frequency_sample_rate_hz = 80
-    order_number_input = 6
+    # A very tight wavelet would have a single cycle. Due to the inevitability of window tapering,
+    # one should generally include more than one cycle in the analysis window.
+    logon_number_of_cycles = 1
+    # The order scales with the number of cycles in a wavelet
+    logon_order = scales_dyadic.order_from_cycles(logon_number_of_cycles)
 
-    # TODO: ADD Averaging frequency for fft_nd
-    time_nd = 2**9
-    time_fft_nd = 2**6
+    print(f"Wavelets containing {str(logon_number_of_cycles)} "
+          f"cycles of the center frequency would have order {str(logon_order)}")
+    print('Recommend analysis using only standardized orders 1, 3, 6, 12, 24 '
+          'tuned to the signal (transients to continuous)')
 
+    # Since the transient is well centered in frequency, we can define the passband.
+
+    # Let's set the Nyquist four octaves above center. This is the upper limit of the spectral canvas.
+    octaves_above_center = 4
+    frequency_nyquist_hz = frequency_center_hz * octaves_above_center
+    # Which sets the sample rate.
+    frequency_sample_rate_hz = 2*frequency_nyquist_hz
+
+    # Let's set the averaging frequency to be four octaves below center
+    octaves_below_center = 4
+    frequency_averaging_hz = frequency_center_hz / octaves_below_center
+
+    # The spectral canvas passband is set
+    print(f"The spectral analysis is constrained to {str(frequency_averaging_hz)} "
+          f" - {str(frequency_nyquist_hz)} Hz")
+
+    # Spectral cyberspace is defined is sample points and scaled frequencies
+    ave_points_ceil_log2, ave_points_ceil_pow2, ave_time_ceil_pow2_s = \
+        utils.duration_ceil(sample_rate_hz=frequency_sample_rate_hz, time_s=1/frequency_averaging_hz)
+    time_fft_nd = 2**ave_points_ceil_log2
+    # Scale the total number of points to the averaging window
+    time_nd = time_fft_nd * 2**2
+
+
+    # exit()
     # The CWX and STX will be evaluated from the number of points in FFT of the signal
     frequency_cwt_pos_hz = np.fft.rfftfreq(time_nd, d=1/frequency_sample_rate_hz)
     # Want to evaluate the CWX and STX at the NFFT frequencies of the sliding-window Welch/STFT spectra
-    frequency_stft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
+    frequency_stft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
 
     # CWT
     cwt_fft_index = np.argmin(np.abs(frequency_cwt_pos_hz - frequency_center_hz))
@@ -52,7 +85,7 @@ if __name__ == "__main__":
     # frequency_inferno_hz = frequency_cwt_pos_hz[1:]
 
     mic_sig_complex, time_s, scale, omega, amp = \
-        styx_cwt.wavelet_centered_4cwt(band_order_Nth=order_number_input,
+        styx_cwt.wavelet_centered_4cwt(band_order_Nth=logon_order,
                                        duration_points=time_nd,
                                        scale_frequency_center_hz=frequency_center_stft_hz,
                                        frequency_sample_rate_hz=frequency_sample_rate_hz,
@@ -81,7 +114,7 @@ if __name__ == "__main__":
     print('imag_variance_nominal:', mic_sig_imag_var_nominal)
 
     # Choose the real component as the test signal
-    mic_sig = np.copy(mic_sig_real)
+    mic_sig = np.copy(-mic_sig_imag)
     mic_sig_var = mic_sig_real_var
     mic_sig_var_nominal = mic_sig_real_var_nominal
     print('\nChoose real part as signal:')
@@ -93,11 +126,6 @@ if __name__ == "__main__":
                                   frequency_sample_rate_hz=frequency_sample_rate_hz,
                                   segment_points=time_fft_nd)
 
-    # Information overload methods
-    welch_power, welch_power_per_band, welch_power_per_sample, welch_power_total, welch_power_scaled, \
-    welch_information_bits, welch_information_bits_per_band, welch_information_bits_per_sample, \
-    welch_information_bits_total, welch_information_scaled = styx_fft.power_and_information_shannon_welch(psd_welch_power)
-    
     # # STFT with 25% Tukey window
     # frequency_stft_hz, time_stft_s, stft_complex = \
     #     styx_fft.stft_complex_pow2(sig_wf=mic_sig,
@@ -110,7 +138,11 @@ if __name__ == "__main__":
                                   frequency_sample_rate_hz=frequency_sample_rate_hz,
                                   segment_points=time_fft_nd)
 
-    # Information overload methods
+    # Welch information overload methods
+    welch_power, welch_power_per_band, welch_power_per_sample, welch_power_total, welch_power_scaled, \
+    welch_information_bits, welch_information_bits_per_band, welch_information_bits_per_sample, \
+    welch_information_bits_total, welch_information_scaled = styx_fft.power_and_information_shannon_welch(psd_welch_power)
+    # STFT information overload
     stft_power, stft_power_per_band, stft_power_per_sample, stft_power_total, stft_power_scaled, \
     stft_information_bits, stft_information_bits_per_band, stft_information_bits_per_sample, \
     stft_information_bits_total, stft_information_scaled = styx_fft.power_and_information_shannon_stft(stft_complex)
@@ -157,7 +189,7 @@ if __name__ == "__main__":
                            wf_panel_a_units="Norm",
                            mesh_panel_b_cbar_units="bits",
                            start_time_epoch=0,
-                           figure_title="stft for " + EVENT_NAME,
+                           figure_title="STFT for " + EVENT_NAME,
                            frequency_hz_ymin=fmin,
                            frequency_hz_ymax=fmax)
 
