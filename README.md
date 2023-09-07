@@ -4,12 +4,11 @@ Quantized Information Entropy, Nth Octave
 ### Description
 Computes standardized time-frequency representations (TFRs) for power, information, and entropy, 
 built on the Gabor wavelets with minimal time-frequency uncertainty with 
-logarithmic constant-Q base 2 (binary) scales and frequency bands 
-of quantized order N.
+logarithmic constant-Q base 2 (binary) scales and frequency bands of quantized order N.
 
 All algorithms are based on FFTs for computational efficiency. 
 The short-term Fourier transform (STFT) is included as the baseline TFR.
-Algortithms for the Continuous Wavelet Transform (CWT), Discrete Wavelet Transform (DWT), 
+Algorithms for the Continuous Wavelet Transform (CWT), Discrete Wavelet Transform (DWT), 
 and Stockwell Transform (STX) are provided.
 
 Refer to the open access publications:
