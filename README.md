@@ -1,5 +1,7 @@
 # quantum-inferno
-Quantized Information Entropy, Nth Octave
+## Quantized Information Entropy, Nth Octave
+
+### Caveat Emptor: Early Release Dev Version
 
 ### Description
 Computes standardized time-frequency representations (TFRs) for power, information, and entropy, 
@@ -31,28 +33,17 @@ Recommended background reading in chronological order:
 
 
 ### Installation
-
-Eventually, will install through
 ```shell script
 pip install quantum-inferno
 ```
-While in T&E:
 
-1) Clone the repo
-2) Open a terminal
-3) Navigate to the root directory of the project you want to install
-4) Issue the command `pip install .`
-
-The next doc elements are placeholders:
-TODO: UPDATE
-
-More details in the [Installation guide](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/intallation.md).
+More details will be placed in the [Installation guide](https://github.com/ISLA-UH/quantum-inferno/docs/installation.md).
 
 ### Examples
-Full examples can be found in the [examples documentation](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/examples.md#examples-using-libquantum).
+Full examples can be found in the [examples documentation](https://github.com/ISLA-UH/quantum-inferno/docs/examples_tutorial).
 
 ### API Documentation
-Check the [API Documentation](https://redvoxinc.github.io/libquantum).
+Check the [API Documentation](https://redvoxinc.github.io/quantum-inferno).
 
 TODO: fix placeholder links.
 
