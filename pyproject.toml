@@ -15,7 +15,7 @@ license = {file = "LICENSE"}
 
 # Please specify dependencies in alphabetical order
 dependencies = [
-    "librosa=0.10.1",
+    "librosa==0.10.1",
     "matplotlib==3.7.1",
     "numpy==1.23.5",
     "pyproj~=3.6.0",
