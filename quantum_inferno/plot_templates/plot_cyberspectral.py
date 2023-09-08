@@ -15,8 +15,8 @@ import quantum_inferno.utils_date_time as dt
 
 # TODO: Add native color stylings
 #  https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html
-# Modify: waveform_color: str = "midnightblue",
-
+# TODO: For dark background
+#  plt.style.use('dark_background')
 
 class FigureAttributes:
     """
@@ -629,6 +629,8 @@ def plot_wf_mesh_vert(station_id: str,
                       frequency_scaling: str = "log",
                       mesh_shading: str = "auto",
                       wf_panel_a_yscaling: str = "auto",
+                      wf_panel_a_ytick_style: str = "plain",
+                      mesh_panel_b_ytick_style: str = 'sci',
                       mesh_panel_b_colormap_scaling: str = "auto",
                       mesh_panel_b_color_max: float = 15,
                       mesh_panel_b_color_range: float = 15,
@@ -637,7 +639,8 @@ def plot_wf_mesh_vert(station_id: str,
                       start_time_sanitized: bool = True,
                       frequency_hz_ymin: float = None,
                       frequency_hz_ymax: float = None,
-                      mesh_colormap: str = "inferno",
+                      mesh_colormap: str = None,
+                      waveform_color: str = None,
                       units_time: str = "s",
                       units_frequency: str = "Hz",
                       wf_panel_a_units: str = "Norm",
@@ -667,10 +670,12 @@ def plot_wf_mesh_vert(station_id: str,
     :param frequency_hz_ymin: minimum frequency for y-axis
     :param frequency_hz_ymax: maximum frequency for y-axis
     :param waveform_color: color of waveform for bottom panel. Default is "midnightblue"
-    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
+    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. If None, inherits style sheet spec
     :param units_time: units of time. Default is "s"
     :param units_frequency: units of frequency. Default is "Hz"
     :param wf_panel_a_units: units of waveform plot (bottom panel). Default is "Norm"
+    :param wf_panel_a_ytick_style: 'plain' or 'sci'. Default is "plain"
+    :param mesh_panel_b_ytick_style: 'plain' or 'sci'. Default is "sci"
     :param mesh_panel_b_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
     :param figure_title: title of figure. Default is "Time-Frequency Representation"
     :param figure_title_show: show title if True. Default is True
@@ -782,9 +787,11 @@ def plot_wf_mesh_vert(station_id: str,
     mesh_panel_b.set_yscale(frequency_scaling)
     mesh_panel_b.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
     mesh_panel_b.tick_params(axis='y', labelsize='large')
-
+    if frequency_scaling == "linear":
+        # Only works for linear range
+        mesh_panel_b.ticklabel_format(style=mesh_panel_b_ytick_style, scilimits=(0, 0), axis="y")
     # Waveform panel
-    wf_panel_a.plot(wf_panel_a_elapsed_time, wf_panel_a_sig)
+    wf_panel_a.plot(wf_panel_a_elapsed_time, wf_panel_a_sig, color=waveform_color)
     wf_panel_a.set_ylabel(wf_panel_a_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_a.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
 
@@ -801,8 +808,7 @@ def plot_wf_mesh_vert(station_id: str,
         wf_panel_a.set_ylim(0, np.max(np.abs(wf_panel_a_sig)))
     else:
         wf_panel_a.set_ylim(-10, 10)
-    # wf_panel_a.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
-    # wf_panel_a.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
+    wf_panel_a.ticklabel_format(style=wf_panel_a_ytick_style, scilimits=(0, 0), axis="y")
     wf_panel_a.yaxis.get_offset_text().set_x(-0.034)
 
     wf_panel_a_div: AxesDivider = make_axes_locatable(wf_panel_a)

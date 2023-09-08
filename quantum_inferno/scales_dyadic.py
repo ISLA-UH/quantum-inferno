@@ -87,11 +87,13 @@ def scale_order_check(scale_order: float = default_scale_order):
     Standard orders are scale_order = [1, 3, 6, 12, 24]. Order must be >= 0.75 or reverts to N=3
     :param scale_order: Band order,
     """
+    # TODO: Refine
     # I'm confident there are better admissibility tests
     scale_order = np.abs(scale_order)  # Should be real, positive float
     if scale_order < default_scale_order_min:
-        print('N<0.75 specified, overriding using N = ', default_scale_order)
-        scale_order = default_scale_order
+        print('** Warning in scales_dyadic.scale_order_check')
+        print('N<0.75 specified, overriding using N = ', default_scale_order_min)
+        scale_order = default_scale_order_min
     return scale_order
 
 
@@ -101,7 +103,7 @@ def scale_multiplier(scale_order: float = default_scale_order):
     :param scale_order: scale order
     :return:
     """
-    scale_order_check(scale_order)
+    scale_order = scale_order_check(scale_order)
     return M_OVER_N*scale_order
 
 
@@ -110,10 +112,9 @@ def cycles_from_order(scale_order: float) -> float:
     Compute the number of cycles M for a specified band order N
     N is the quantization parameter for the constant Q wavelet filters
 
-    :param scale_order: Band order, must be > 0.75 or reverts to N=3
+    :param scale_order: Band order, must be > 0.75 or reverts to N=0.75
     :return: cycles_M, number of cycled per normalized angular frequency
     """
-    scale_order_check(scale_order)
     cycles_per_scale = scale_multiplier(scale_order)
     return cycles_per_scale
 
@@ -126,9 +127,14 @@ def order_from_cycles(cycles_per_scale: float) -> float:
     :param cycles_per_scale: Should be greater than or equal than one
     :return: cycles_M, number of cycled per normalized angular frequency
     """
+    # A single cycle is the min req
     if np.abs(cycles_per_scale) < 1:
         cycles_per_scale = 1.
-    return cycles_per_scale/M_OVER_N
+    scale_order = cycles_per_scale/M_OVER_N
+    # Order must be greater than min
+    scale_order = scale_order_check(scale_order)
+
+    return scale_order
 
 
 def base_multiplier(scale_order: float = default_scale_order,

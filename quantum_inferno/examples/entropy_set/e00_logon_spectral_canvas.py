@@ -26,15 +26,18 @@ if __name__ == "__main__":
     frequency_center_hz = 5
     # A very tight wavelet would have a single cycle. Due to the inevitability of window tapering,
     # one should generally include more than one cycle in the analysis window.
-    logon_number_of_cycles = 1
+    logon_number_of_cycles = 1.8
     # The order scales with the number of cycles in a wavelet
     logon_order = scales_dyadic.order_from_cycles(logon_number_of_cycles)
 
-    print(f"Wavelets containing {str(logon_number_of_cycles)} "
-          f"cycles of the center frequency would have order {str(logon_order)}")
+    print(f"Wavelets containing less than ~1.8 cycles are not allowed; period metrics break. "
+          f"The lowest stable order is N=0.75 (see Garces, 2023). "
+          f"The request of {str(logon_number_of_cycles)} "
+          f"cycles of the center frequency will return an order {str(logon_order)}")
     print('Recommend analysis using only standardized orders 1, 3, 6, 12, 24 '
           'tuned to the signal (transients to continuous)')
 
+    # exit()
     # Since the transient is well centered in frequency, we can define the passband.
 
     # Let's set the Nyquist four octaves above center. This is the upper limit of the spectral canvas.
@@ -46,7 +49,7 @@ if __name__ == "__main__":
     # Just as Nyquist is the cutoff of a lowpass filter, the averaging frequency can be considered
     # the cutoff of the analysis highpass filter.
     # Let's set the averaging frequency to be four octaves below center.
-    octaves_below_center = 3
+    octaves_below_center = 4
     frequency_averaging_hz = frequency_center_hz / octaves_below_center
     # The FFT duration is set by the averaging period and the number of cycles
     duration_fft_s = logon_number_of_cycles/frequency_averaging_hz
@@ -87,7 +90,7 @@ if __name__ == "__main__":
                                        duration_points=time_nd,
                                        scale_frequency_center_hz=frequency_center_stft_hz,
                                        frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                       dictionary_type="norm")
+                                       dictionary_type="spect")
     mic_sig_real = np.real(mic_sig_complex)
     mic_sig_imag = np.imag(mic_sig_complex)
 
@@ -165,6 +168,11 @@ if __name__ == "__main__":
     print('Sum Welch:', np.sum(welch_over_var))
     print('Sum STFT:', np.sum(stft_over_var))
 
+    # Set the background
+    plt.style.use('dark_background')
+    # plt.style.use('tableau-colorblind10')
+    # plt.style.use('grayscale')
+
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
@@ -189,7 +197,7 @@ if __name__ == "__main__":
     fmin = frequency_averaging_hz
     fmax = frequency_nyquist_hz
     # +EPSILON16 reduces numerical noise artifacts
-
+    plt.style.use('dark_background')
     pltq.plot_wf_mesh_vert(station_id=station_id_str,
                            wf_panel_a_sig=mic_sig,
                            wf_panel_a_time=time_s,
@@ -197,12 +205,15 @@ if __name__ == "__main__":
                            mesh_frequency=frequency_stft_hz,
                            mesh_panel_b_tfr=np.log2(stft_power + scales_dyadic.EPSILON16),
                            mesh_panel_b_colormap_scaling="auto",
+                           frequency_scaling="linear",
                            wf_panel_a_units="Norm",
                            mesh_panel_b_cbar_units="bits",
                            start_time_epoch=0,
                            figure_title="STFT",
                            frequency_hz_ymin=fmin,
-                           frequency_hz_ymax=fmax)
-
+                           frequency_hz_ymax=fmax,
+                           mesh_colormap='inferno',
+                           waveform_color='yellow',
+                           mesh_panel_b_ytick_style='plain')
     plt.show()
 

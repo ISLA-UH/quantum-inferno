@@ -9,7 +9,7 @@ from typing import Tuple, Union
 import numpy as np
 from scipy import interpolate, signal
 from scipy.integrate import cumulative_trapezoid
-from libquantum_ops.scales_dyadic import EPSILON64 as EPSILON
+from quantum_inferno.scales_dyadic import EPSILON64 as EPSILON
 
 # from redvox.common import date_time_utils as dt
 
@@ -211,38 +211,6 @@ def taper_tukey(sig_wf_or_time: np.ndarray,
     :return: tukey taper window amplitude
     """
     return signal.windows.tukey(M=np.size(sig_wf_or_time), alpha=fraction_cosine, sym=True)
-
-
-# def taper_tukey_array(number_signals: int,
-#                       number_samples: int,
-#                       fraction_cosine: float = 0.1) -> np.ndarray:
-#     """
-#     Construct a teper matrix
-#     :param number_signals:
-#     :param number_samples:
-#     :param fraction_cosine:
-#     :return:
-#     """
-#     tukey_nsamples = signal.windows.tukey(M=number_samples, alpha=fraction_cosine, sym=True)
-#     tukey_array = just_tile(tukey_nsamples)
-
-
-# def datetime_now_epoch_s() -> float:
-#     """
-#     Returns the invocation Unix time in seconds
-# 
-#     :return: The current epoch timestamp as seconds since the epoch UTC
-#     """
-#     return dt.datetime_to_epoch_seconds_utc(dt.now())
-# 
-# 
-# def datetime_now_epoch_micros() -> float:
-#     """
-#     Returns the invocation Unix time in microseconds
-# 
-#     :return: The current epoch timestamp as microseconds since the epoch UTC
-#     """
-#     return dt.datetime_to_epoch_microseconds_utc(dt.now())
 
 
 # Integrals and derivatives
@@ -602,7 +570,7 @@ def just_tile_d1(d1_array1d_in: Union[float, np.ndarray],
     """
 
     if len(d0d1_shape) == 1:
-        d1_matrix = np.tile(d1_array1d_in, (d0d1_shape[0]))
+        tiled_matrix = np.tile(d1_array1d_in, (d0d1_shape[0]))
     elif len(d0d1_shape) == 2:
         if d0d1_shape[1] == len(d1_array1d_in):
             tiled_matrix = np.tile(d1_array1d_in, (d0d1_shape[0], 1))

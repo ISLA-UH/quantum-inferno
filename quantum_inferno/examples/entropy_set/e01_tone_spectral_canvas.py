@@ -123,7 +123,7 @@ if __name__ == "__main__":
     print('\nChoose imaginary part as signal:')
     print('var/nominal var:', mic_sig_var/mic_sig_var_nominal)
 
-    fractional_overlap = 0.5
+    fractional_overlap = 0.95
     overlap_pts = np.round(fractional_overlap*time_fft_nd)
     tukey_alpha = 1
     # Compute the Welch PSD; averaged spectrum over sliding windows
@@ -159,6 +159,7 @@ if __name__ == "__main__":
     print('Sum Welch:', np.sum(welch_over_var))
     print('Sum STFT:', np.sum(stft_over_var))
 
+    plt.style.use('dark_background')
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
@@ -184,6 +185,7 @@ if __name__ == "__main__":
     fmax = frequency_nyquist_hz
     # +EPSILON16 reduces numerical noise artifacts
 
+    plt.style.use('dark_background')
     pltq.plot_wf_mesh_vert(station_id=station_id_str,
                            wf_panel_a_sig=mic_sig,
                            wf_panel_a_time=time_s,
@@ -191,12 +193,16 @@ if __name__ == "__main__":
                            mesh_frequency=frequency_stft_hz,
                            mesh_panel_b_tfr=np.log2(stft_power + scales_dyadic.EPSILON16),
                            mesh_panel_b_colormap_scaling="auto",
+                           frequency_scaling="linear",
                            wf_panel_a_units="Norm",
                            mesh_panel_b_cbar_units="bits",
                            start_time_epoch=0,
                            figure_title="STFT",
                            frequency_hz_ymin=fmin,
-                           frequency_hz_ymax=fmax)
+                           frequency_hz_ymax=fmax,
+                           mesh_colormap='inferno',
+                           waveform_color='yellow',
+                           mesh_panel_b_ytick_style='plain')
 
     plt.show()
 

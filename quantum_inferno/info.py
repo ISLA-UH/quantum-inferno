@@ -2,8 +2,8 @@
 
 import numpy as np
 from scipy import signal
-import libquantum_ops.scales_dyadic as scales
-from libquantum_ops import utils
+import quantum_inferno.scales_dyadic as scales
+from quantum_inferno import utils
 import scipy.fft
 
 
