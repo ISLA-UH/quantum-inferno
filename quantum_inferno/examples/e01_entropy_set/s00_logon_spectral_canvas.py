@@ -18,8 +18,9 @@ if __name__ == "__main__":
     The Welch method is equivalent to averaging the spectrogram over the columns.
     """
 
-    EVENT_NAME = 'Example e00'
-    station_id_str = 'e00'
+    EVENT_NAME: str = 'Example e00'
+    station_id_str: str = 'e00'
+    logon_is_real: bool = False  # Real or imaginary component of the logon
 
     # Specify a Gaussian wavelet as a prototype band-limited transient signal
     # with a well-defined center frequency
@@ -39,12 +40,12 @@ if __name__ == "__main__":
     print('Recommend analysis using only standardized orders 1, 3, 6, 12, 24 '
           'tuned to the signal (transients to continuous)')
 
-    # exit()
     # Since the transient is well centered in frequency, we can define the passband.
-
     # Let's set the Nyquist four octaves above center. This is the upper limit of the spectral canvas.
+    # Aliasing for this type of signal is substantially reduced by placing the Nyquist well above the center frequency.
     octaves_above_center = 4
     frequency_nyquist_hz = frequency_center_hz * octaves_above_center
+
     # Which sets the sample rate.
     frequency_sample_rate_hz = 2*frequency_nyquist_hz
 
@@ -63,6 +64,7 @@ if __name__ == "__main__":
     # Spectral cyberspace is defined is sample points and scaled frequencies
     ave_points_ceil_log2, ave_points_ceil_pow2, ave_time_ceil_pow2_s = \
         utils.duration_ceil(sample_rate_hz=frequency_sample_rate_hz, time_s=duration_fft_s)
+    # dyadic number of points
     time_fft_nd = 2**ave_points_ceil_log2
     # Scale the total number of points to the averaging window
     time_nd = time_fft_nd * 2
@@ -93,6 +95,7 @@ if __name__ == "__main__":
                                        scale_frequency_center_hz=frequency_center_stft_hz,
                                        frequency_sample_rate_hz=frequency_sample_rate_hz,
                                        dictionary_type="spect")
+
     mic_sig_real = np.real(mic_sig_complex)
     mic_sig_imag = np.imag(mic_sig_complex)
 
@@ -114,28 +117,33 @@ if __name__ == "__main__":
     print('mic_sig_imag_variance:', mic_sig_imag_var)
     print('imag_variance_nominal:', mic_sig_imag_var_nominal)
 
-    # # Choose the real component as the test signal
-    # mic_sig = np.copy(mic_sig_real)
-    # # In principle, could highpass/bandpass
-    #
-    # mic_sig_var = mic_sig_real_var
-    # mic_sig_var_nominal = mic_sig_real_var_nominal
-    # print('\nChoose real part as signal:')
-    # print('var/nominal var:', mic_sig_var/mic_sig_var_nominal)
+    if logon_is_real:
+        # Choose the real component as the test signal
+        mic_sig = np.copy(mic_sig_real)
+        # In principle, could highpass/bandpass
 
-    # Choose the imaginary component as the test signal
-    mic_sig = np.copy(-mic_sig_imag)
-    # In principle, could highpass/bandpass
+        mic_sig_var = mic_sig_real_var
+        mic_sig_var_nominal = mic_sig_real_var_nominal
+        print('\nChoose real part as signal:')
 
-    mic_sig_var = mic_sig_imag_var
-    mic_sig_var_nominal = mic_sig_imag_var_nominal
-    print('\nChoose imaginary part as signal:')
+    else:
+        # Choose the imaginary component as the test signal
+        mic_sig = np.copy(-mic_sig_imag)
+        # In principle, could highpass/bandpass
+
+        mic_sig_var = mic_sig_imag_var
+        mic_sig_var_nominal = mic_sig_imag_var_nominal
+        print('\nChoose imaginary part as signal:')
+
     print('var/nominal var:', mic_sig_var/mic_sig_var_nominal)
 
+    # The Tukey taper window can be adjusted for smoothness.
+    tukey_alpha = 1
+    # The overlap can make the results prettier at the expense of redundancy and computation cost
     fractional_overlap = 0.95
     overlap_pts = np.round(fractional_overlap*time_fft_nd)
-    tukey_alpha = 1
-    # Compute the Welch PSD; averaged spectrum over sliding windows
+
+    # Compute the Welch PSD; averaged spectrum over sliding Tukey windows
     frequency_welch_hz, psd_welch_power = \
         styx_fft.welch_power_pow2(sig_wf=mic_sig,
                                   frequency_sample_rate_hz=frequency_sample_rate_hz,
@@ -143,7 +151,7 @@ if __name__ == "__main__":
                                   overlap_points=overlap_pts,
                                   alpha=tukey_alpha)
 
-    # STFT with Tukey window
+    # STFT with sliding Tukey window
     frequency_stft_hz, time_stft_s, stft_complex = \
         styx_fft.stft_complex_pow2(sig_wf=mic_sig,
                                    frequency_sample_rate_hz=frequency_sample_rate_hz,
@@ -151,14 +159,15 @@ if __name__ == "__main__":
                                    overlap_points=overlap_pts,
                                    alpha=tukey_alpha)
 
-    # # STFT with Gaussian window
-    # frequency_stft_hz, time_stft_s, stft_complex = \
-    #     styx_fft.gtx_complex_pow2(sig_wf=mic_sig,
-    #                               frequency_sample_rate_hz=frequency_sample_rate_hz,
-    #                               segment_points=time_fft_nd,
-    #                               overlap_points=overlap_pts)
+    # STFT with sliding Gaussian window will have same time and frequency specs
+    _, _, stft_complex_gauss = \
+        styx_fft.gtx_complex_pow2(sig_wf=mic_sig,
+                                  frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                  segment_points=time_fft_nd,
+                                  overlap_points=overlap_pts)
 
     stft_power = 2 * np.abs(stft_complex) ** 2
+    stft_power_gauss = 2 * np.abs(stft_complex_gauss) ** 2
 
     # Scale power by variance
     welch_over_var = psd_welch_power / mic_sig_var
@@ -176,13 +185,13 @@ if __name__ == "__main__":
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
-    ax1.set_title('Synthetic Gabor wavelet with taper')
+    ax1.set_title('Synthetic Gabor Wavelet Input')
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
     ax2.semilogx(frequency_welch_hz, welch_over_var, label='Welch')
     ax2.semilogx(frequency_stft_hz, stft_over_var, '.-', label="STFT")
 
-    ax2.set_title('Welch and Spect FFT (RMS), f = ' + str(round(frequency_center_stft_hz * 100) / 100) + ' Hz')
+    ax2.set_title('Welch and Spect FFT, f = ' + str(round(frequency_center_stft_hz * 100) / 100) + ' Hz')
     ax2.set_xlabel('Frequency, hz')
     ax2.set_ylabel('Power / var(sig)')
     ax2.grid(True)
@@ -198,6 +207,7 @@ if __name__ == "__main__":
     fmax = frequency_nyquist_hz
     # +EPSILON16 reduces numerical noise artifacts
     plt.style.use('dark_background')
+    # Tukey STFT
     pltq.plot_wf_mesh_vert(station_id=station_id_str,
                            wf_panel_a_sig=mic_sig,
                            wf_panel_a_time=time_s,
@@ -215,5 +225,25 @@ if __name__ == "__main__":
                            mesh_colormap='inferno',
                            waveform_color='yellow',
                            mesh_panel_b_ytick_style='plain')
+
+    # Gauss STFT
+    pltq.plot_wf_mesh_vert(station_id=station_id_str,
+                           wf_panel_a_sig=mic_sig,
+                           wf_panel_a_time=time_s,
+                           mesh_time=time_stft_s,
+                           mesh_frequency=frequency_stft_hz,
+                           mesh_panel_b_tfr=np.log2(stft_power_gauss + scales_dyadic.EPSILON16),
+                           mesh_panel_b_colormap_scaling="auto",
+                           frequency_scaling="linear",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="STFT",
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax,
+                           mesh_colormap='inferno',
+                           waveform_color='yellow',
+                           mesh_panel_b_ytick_style='plain')
+
     plt.show()
 
