@@ -40,12 +40,10 @@ pip install quantum-inferno
 More details will be placed in the [Installation guide](https://github.com/ISLA-UH/quantum-inferno/docs/installation.md).
 
 ### Examples
-Full examples can be found in the [examples documentation](https://github.com/ISLA-UH/quantum-inferno/docs/examples_tutorial).
+Full examples can be found in the [examples documentation](https://github.com/ISLA-UH/quantum-inferno/tree/main/docs/examples_tutorial).
 
 ### API Documentation
 Check the [API Documentation](https://redvoxinc.github.io/quantum-inferno).
-
-TODO: fix placeholder links.
 
 ### Resources
 
