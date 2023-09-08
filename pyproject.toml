@@ -4,7 +4,7 @@
 
 [project]
 name = "quantum_inferno"
-version = "2023.09.06"
+version = "0.1"
 authors = [
     { name = "ISLA, UH", email = "milton@isla.hawaii.edu" }
 ]
@@ -24,14 +24,9 @@ dependencies = [
     "tftb==0.1.4"
 ]
 
-#dependencies_dev = [
-#    "pdoc3 >= 0.8.1",
-#    "twine >= 3.7.1",
-#    "wheel >= 0.37.0"
-#]
-
 [project.urls]
 homepage = "https://github.com/ISLA-UH/quantum-inferno.git"
+PyPI = "https://pypi.org/project/quantum-inferno/"
 
 [build-system]
 requires = ["setuptools"]
