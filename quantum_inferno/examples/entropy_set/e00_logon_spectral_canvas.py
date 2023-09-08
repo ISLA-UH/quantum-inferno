@@ -30,6 +30,8 @@ if __name__ == "__main__":
     # The order scales with the number of cycles in a wavelet
     logon_order = scales_dyadic.order_from_cycles(logon_number_of_cycles)
 
+    # Less than 1.8 cycles in a window produce inaccurate FFT period/peak frequency estimates,
+    # as the definition of a 'period' presupposes more than one cycle.
     print(f"Wavelets containing less than ~1.8 cycles are not allowed; period metrics break. "
           f"The lowest stable order is N=0.75 (see Garces, 2023). "
           f"The request of {str(logon_number_of_cycles)} "
@@ -98,11 +100,9 @@ if __name__ == "__main__":
     mic_sig_real_var = np.var(mic_sig_real)
     mic_sig_imag_var = np.var(mic_sig_imag)
 
-    # Theoretical variance TODO: construct function
-    mic_sig_real_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
-                               (1 + np.exp(-(scale*omega)**2))
-    mic_sig_imag_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
-                               (1 - np.exp(-(scale*omega)**2))
+    # Theoretical variance
+    mic_sig_real_var_nominal, mic_sig_imag_var_nominal = \
+        styx_cwt.wavelet_variance_theory(amp, time_s, scale, omega)
 
     # Mathematical integral ~ computed Variance * Number of Samples. The dictionary type = "norm" returns 1/2.
     mic_sig_real_integral = np.var(mic_sig_real)*len(mic_sig_real)

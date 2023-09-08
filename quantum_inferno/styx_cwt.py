@@ -15,6 +15,24 @@ Cleaned up and compartmentalized for debugging
 """
 
 
+def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale, omega):
+    """
+    Theoretical variance of a Gabor wavelet
+    :param amp: wavelet amplitude
+    :param time_s: time support vector
+    :param scale: wavelet scale
+    :param omega: angular frequency
+    :return: wavelet_real_var_nominal, wavelet_imag_var_nominal
+    """
+
+    wavelet_real_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
+                               (1 + np.exp(-(scale*omega)**2))
+    wavelet_imag_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
+                               (1 - np.exp(-(scale*omega)**2))
+
+    return wavelet_real_var_nominal, wavelet_imag_var_nominal
+
+
 def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
