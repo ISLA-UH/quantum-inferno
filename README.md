@@ -37,10 +37,10 @@ Recommended background reading in chronological order:
 pip install quantum-inferno
 ```
 
-More details will be placed in the [Installation guide](https://github.com/ISLA-UH/quantum-inferno/blob/master/docs/quantum-inferno/intallation.md).
+More details will be placed in the [Installation guide](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/installation.md).
 
 ### Examples
-Full examples can be found in the [examples documentation](https://github.com/ISLA-UH/quantum-inferno/blob/master/docs/quantum-inferno/examples.md#examples-using-quantum-inferno).
+Full examples can be found in the [examples documentation](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/quantum-inferno/examples.md#examples-using-quantum-inferno).
 
 ### API Documentation
 Check the [API Documentation](https://redvoxinc.github.io/quantum-inferno).
