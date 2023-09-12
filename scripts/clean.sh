@@ -8,5 +8,5 @@ cd ..
 find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 rm -rf build
 rm -rf dist
-rm -rf libquantum.egg-info
+rm -rf quantum_inferno.egg-info
 rm -rf .mypy_cache

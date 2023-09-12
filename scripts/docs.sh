@@ -14,4 +14,4 @@ set -o xtrace
 
 rm -rf docs/api_docs
 mkdir -p docs/api_docs
-pdoc3 libquantum --overwrite --html --html-dir docs/api_docs -c show_type_annotations=True
+pdoc3 quantum_inferno --overwrite --html --html-dir docs/api_docs -c show_type_annotations=True
