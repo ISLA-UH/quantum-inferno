@@ -7,6 +7,7 @@ Rederivation in preparation, Garces et al. 2022; last updated 9 May 2022
 import numpy as np
 from scipy.fft import fft, ifft, fftfreq
 from quantum_inferno import scales_dyadic as scales
+from quantum_inferno.utils import is_power_of_two
 from typing import Tuple
 
 
@@ -18,19 +19,17 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
     :return:
     """
 
-    # Flatten to 2 D and memorize original shape
+    # Flatten to 2D and memorize original shape
     n_times = sig_wf.shape[-1]
 
-    # Legerdemain
-    def _is_power_of_two(n):
-        return not (n > 0 and (n & (n - 1)))
-
-    if n_fft is None or (not _is_power_of_two(n_fft) and n_times > n_fft):
-        # Compute next power of 2
-        n_fft = 2 ** int(np.ceil(np.log2(n_times)))
-    elif n_fft < n_times:
+    if n_fft < n_times:
         raise ValueError("n_fft cannot be smaller than signal size. "
                          "Got %s < %s." % (n_fft, n_times))
+
+    if n_fft is None or (not is_power_of_two(n_fft) and n_times > n_fft):
+        # Compute next power of 2
+        n_fft = 2 ** int(np.ceil(np.log2(n_times)))
+
     if n_times < n_fft:
         # TODO: Add verbosity
         # print('The input signal is shorter ({}) than "n_fft" ({}). '
@@ -179,13 +178,13 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
 #     return tfr_stx, psd_stx, frequency_stx, frequency_stx_fft, windows_fft
 
 
-def stx_complex_any_scale_pow2(band_order_Nth: float,
+def stx_complex_any_scale_pow2(band_order_nth: float,
                                sig_wf: np.ndarray,
                                frequency_sample_rate_hz: float,
                                frequency_stx_hz: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     With some assumptions and simplifications, and with some vectorization
-    :param band_order_Nth: Fractional octave band - revisit
+    :param band_order_nth: Fractional octave band - revisit
     :param sig_wf: input signal with 2^M points
     :param frequency_sample_rate_hz: sample rate in Hz
     :param frequency_stx_hz: frequency vector in increasing order
@@ -194,7 +193,7 @@ def stx_complex_any_scale_pow2(band_order_Nth: float,
     n_fft_pow2 = len(sig_wf)
     time_stx_s = np.arange(n_fft_pow2)/frequency_sample_rate_hz
     scale_points = len(frequency_stx_hz)
-    cycles_M = scales.cycles_from_order(scale_order=band_order_Nth)
+    cycles_m = scales.cycles_from_order(scale_order=band_order_nth)
     # Take FFT and concatenate. A leaner version could let the fft do the padding.
     sig_fft = fft(sig_wf)
     sig_fft_cat = np.concatenate([sig_fft, sig_fft], axis=-1)
@@ -202,7 +201,7 @@ def stx_complex_any_scale_pow2(band_order_Nth: float,
     frequency_fft = fftfreq(n_fft_pow2, 1/frequency_sample_rate_hz)   # in units of 1/sample interval
     omega_fft = 2 * np.pi * frequency_fft / frequency_sample_rate_hz  # scaled angular frequency
     omega_stx = 2*np.pi*frequency_stx_hz/frequency_sample_rate_hz    # non-dimensional angular stx frequency
-    sigma_stx = cycles_M/omega_stx  # TODO: revisit; manage order vs frequency, use same nomenclature as cwt
+    sigma_stx = cycles_m/omega_stx  # TODO: revisit; manage order vs frequency, use same nomenclature as cwt
 
     # Construct 2d matrices
     # sig_fft_cat_2d = np.tile(sig_fft_cat, (scale_points, 1))

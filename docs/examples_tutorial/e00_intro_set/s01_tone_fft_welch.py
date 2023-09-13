@@ -34,7 +34,8 @@ if __name__ == "__main__":
                                              use_fft_frequency=True,
                                              add_noise_taper_aa=False)
 
-    # alpha: Shape parameter of the Welch Tukey window, representing the fraction of the window inside the cosine tapered region.
+    # alpha: Shape parameter of the Welch Tukey window, representing the fraction of the window
+    # inside the cosine tapered region.
     # If zero, the Tukey window is equivalent to a rectangular window.
     # If one, the Tukey window is equivalent to a Hann window.
     alpha = 0
@@ -120,4 +121,3 @@ if __name__ == "__main__":
     ax2.legend()
 
     plt.show()
-

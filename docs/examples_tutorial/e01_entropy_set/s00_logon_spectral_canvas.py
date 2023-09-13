@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     # Construct test wavelet
     mic_sig_complex, time_s, scale, omega, amp = \
-        styx_cwt.wavelet_centered_4cwt(band_order_Nth=logon_order,
+        styx_cwt.wavelet_centered_4cwt(band_order_nth=logon_order,
                                        duration_points=time_nd,
                                        scale_frequency_center_hz=frequency_center_stft_hz,
                                        frequency_sample_rate_hz=frequency_sample_rate_hz,
@@ -246,4 +246,3 @@ if __name__ == "__main__":
                            mesh_panel_b_ytick_style='plain')
 
     plt.show()
-

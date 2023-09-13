@@ -10,15 +10,15 @@ Example: base10, base2, dB, bits
 import numpy as np
 from typing import Tuple, Union
 
-""" Smallest number for 64-, 32-, and 16-bit floats. Deploy to avoid division by zero or log zero singularities"""
+""" 
+Smallest number > 0 for 64-, 32-, and 16-bit floats.  
+Use to avoid division by zero or log zero singularities
+"""
 EPSILON64 = np.finfo(np.float64).eps
 EPSILON32 = np.finfo(np.float32).eps
 EPSILON16 = np.finfo(np.float16).eps
 
-# Convert microseconds to seconds
-MICROS_TO_S = 1E-6
-
-# 3*pi/4
+# Scale multiplier for scale bands of order N > 0.75
 M_OVER_N = 0.75 * np.pi
 
 """
@@ -70,18 +70,18 @@ class Slice:
 
 
 # DEFAULT CONSTANTS FOR TIME_FREQUENCY CANVAS
-default_scale_base = Slice.G3
-default_scale_order = Slice.ORD3
-default_ref_frequency_hz = Slice.F1HZ
+DEFAULT_SCALE_BASE = Slice.G3
+DEFAULT_SCALE_ORDER = Slice.ORD3
+DEFAULT_REF_FREQUENCY_HZ = Slice.F1HZ
 
-default_scale_order_min: float = 0.75  # Garces (2022)
-default_fft_pow2_points_max: int = 2**15  # Computational FFT limit, tune to computing system
-default_fft_pow2_points_min: int = 2**8  # For a tolerable display
-default_mesh_pow2_pixels: int = 2**19  # Total of pixels per mesh, tune to plotting engine
-default_time_display_s: float = 60.  # Physical time to display; sets display truncation
+DEFAULT_SCALE_ORDER_MIN: float = 0.75  # Garces (2022)
+DEFAULT_FFT_POW2_POINTS_MAX: int = 2 ** 15  # Computational FFT limit, tune to computing system
+DEFAULT_FFT_POW2_POINTS_MIN: int = 2 ** 8  # For a tolerable display
+DEFAULT_MESH_POW2_PIXELS: int = 2**19  # Total of pixels per mesh, tune to plotting engine
+DEFAULT_TIME_DISPLAY_S: float = 60.  # Physical time to display; sets display truncation
 
 
-def scale_order_check(scale_order: float = default_scale_order):
+def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER):
     """
     Ensure no negative, complex, or unreasonably small orders are passed; override to 1/3 octave band
     Standard orders are scale_order = [1, 3, 6, 12, 24]. Order must be >= 0.75 or reverts to N=3
@@ -90,14 +90,14 @@ def scale_order_check(scale_order: float = default_scale_order):
     # TODO: Refine
     # I'm confident there are better admissibility tests
     scale_order = np.abs(scale_order)  # Should be real, positive float
-    if scale_order < default_scale_order_min:
+    if scale_order < DEFAULT_SCALE_ORDER_MIN:
         print('** Warning in scales_dyadic.scale_order_check')
-        print('N<0.75 specified, overriding using N = ', default_scale_order_min)
-        scale_order = default_scale_order_min
+        print('N<0.75 specified, overriding using N = ', DEFAULT_SCALE_ORDER_MIN)
+        scale_order = DEFAULT_SCALE_ORDER_MIN
     return scale_order
 
 
-def scale_multiplier(scale_order: float = default_scale_order):
+def scale_multiplier(scale_order: float = DEFAULT_SCALE_ORDER):
     """
     Scale multiplier for scale bands of order N > 0.75
     :param scale_order: scale order
@@ -122,7 +122,7 @@ def cycles_from_order(scale_order: float) -> float:
 def order_from_cycles(cycles_per_scale: float) -> float:
     """
     Compute the number of cycles M for a specified band order N
-    N is the quantization parameter for the constant Q wavelet filters
+    where N is the quantization parameter for the constant Q wavelet filters
 
     :param cycles_per_scale: Should be greater than or equal than one
     :return: cycles_M, number of cycled per normalized angular frequency
@@ -137,8 +137,8 @@ def order_from_cycles(cycles_per_scale: float) -> float:
     return scale_order
 
 
-def base_multiplier(scale_order: float = default_scale_order,
-                    scale_base: float = default_scale_base):
+def base_multiplier(scale_order: float = DEFAULT_SCALE_ORDER,
+                    scale_base: float = DEFAULT_SCALE_BASE):
     """
     Dyadic (log2) foundation for arbitrary base
     :param scale_order:
@@ -156,6 +156,7 @@ def scale_from_frequency_hz(scale_order: float,
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
     Nondimensional scale and angular frequency for canonical Gabor/Morlet wavelet
+    :param scale_order:
     :param scale_frequency_center_hz: scale frequency in hz
     :param frequency_sample_rate_hz: sample rate in hz
     :return: scale_atom, scaled angular frequency
@@ -167,7 +168,7 @@ def scale_from_frequency_hz(scale_order: float,
 
 def gaussian_sigma_from_frequency(frequency_sample_hz: float,
                                   frequency_hz: np.ndarray,
-                                  scale_order: float = default_scale_order):
+                                  scale_order: float = DEFAULT_SCALE_ORDER):
     """
     Standard deviation (sigma) of Gaussian envelope from frequency (Garces, 2023)
     Use 3/8 = 0.375
@@ -181,9 +182,9 @@ def gaussian_sigma_from_frequency(frequency_sample_hz: float,
 
 def scale_bands_from_ave(frequency_sample_hz: float,
                          frequency_ave_hz: float,
-                         scale_order: float = default_scale_base,
-                         scale_ref_hz: float = default_ref_frequency_hz,
-                         scale_base: float = default_scale_base):
+                         scale_order: float = DEFAULT_SCALE_BASE,
+                         scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
+                         scale_base: float = DEFAULT_SCALE_BASE):
     """
 
     :param frequency_sample_hz:
@@ -222,9 +223,9 @@ def scale_bands_from_ave(frequency_sample_hz: float,
 
 
 def scale_band_from_frequency(frequency_input_hz: float,
-                              scale_order: float = default_scale_base,
-                              scale_ref_hz: float = default_ref_frequency_hz,
-                              scale_base: float = default_scale_base):
+                              scale_order: float = DEFAULT_SCALE_BASE,
+                              scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
+                              scale_base: float = DEFAULT_SCALE_BASE):
     """
     For any one mid frequencies; not meant to be vectorized, only for comparing expectations.
     DOES NOT DEPEND ON SAMPLE RATE
@@ -249,9 +250,9 @@ def scale_band_from_frequency(frequency_input_hz: float,
 
 def scale_bands_from_pow2(frequency_sample_hz: float,
                           log2_ave_life_dyad: int,
-                          scale_order: float = default_scale_base,
-                          scale_ref_hz: float = default_ref_frequency_hz,
-                          scale_base: float = default_scale_base):
+                          scale_order: float = DEFAULT_SCALE_BASE,
+                          scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
+                          scale_base: float = DEFAULT_SCALE_BASE):
     """
 
     :param frequency_sample_hz:
@@ -282,9 +283,9 @@ def scale_bands_from_pow2(frequency_sample_hz: float,
 
 def period_from_bands(band_min: int,
                       band_max: int,
-                      scale_order: float = default_scale_base,
-                      scale_ref_hz: float = default_ref_frequency_hz,
-                      scale_base: float = default_scale_base):
+                      scale_order: float = DEFAULT_SCALE_BASE,
+                      scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
+                      scale_base: float = DEFAULT_SCALE_BASE):
 
     bands = np.arange(band_min, band_max+1)
     # Increasing order
@@ -294,9 +295,9 @@ def period_from_bands(band_min: int,
 
 def frequency_from_bands(band_min: int,
                          band_max: int,
-                         scale_order: float = default_scale_base,
-                         scale_ref_hz: float = default_ref_frequency_hz,
-                         scale_base: float = default_scale_base):
+                         scale_order: float = DEFAULT_SCALE_BASE,
+                         scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
+                         scale_base: float = DEFAULT_SCALE_BASE):
 
     bands = np.arange(band_min, band_max+1)
     # Flip so it increases
@@ -307,9 +308,9 @@ def frequency_from_bands(band_min: int,
 def log_frequency_hz_from_fft_points(
         frequency_sample_hz: float,
         fft_points: int,
-        scale_order: float = default_scale_base,
-        scale_ref_hz: float = default_ref_frequency_hz,
-        scale_base: float = default_scale_base
+        scale_order: float = DEFAULT_SCALE_BASE,
+        scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
+        scale_base: float = DEFAULT_SCALE_BASE
 ) -> np.ndarray:
 
     # TODO: Make function to round to to nearest power of two and perform all-around error checking for pow2
@@ -344,9 +345,9 @@ def log_frequency_hz_from_fft_points(
 def lin_frequency_hz_from_fft_points(
         frequency_sample_hz: float,
         fft_points: int,
-        scale_order: float = default_scale_base,
-        scale_ref_hz: float = default_ref_frequency_hz,
-        scale_base: float = default_scale_base
+        scale_order: float = DEFAULT_SCALE_BASE,
+        scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
+        scale_base: float = DEFAULT_SCALE_BASE
 ) -> np.ndarray:
     """
 
@@ -364,64 +365,3 @@ def lin_frequency_hz_from_fft_points(
     frequency_lin_max = frequency_log_hz[-1]  # Last band
     frequency_linear_hz = np.linspace(start=frequency_lin_min, stop=frequency_lin_max, num=len(frequency_log_hz))
     return frequency_linear_hz
-
-
-# TODO: Turn into a test function
-if __name__ == "__main__":
-    # Framework specs
-    scale_order0 = 6.
-    scale_base0 = Slice.G3
-    scale_ref0 = Slice.F1HZ
-
-    # Sensor specific
-    frequency_sample_hz0 = 100.
-    print('\nNominal Sample Rate, Hz:', frequency_sample_hz0)
-
-    fft_points_max = default_fft_pow2_points_max
-    fft_points_min = default_fft_pow2_points_min
-    max_mesh_pixels = default_mesh_pow2_pixels
-    # Mesh time display limit
-    time_display_s = default_time_display_s
-    # TODO: Minimum number of points in display
-
-    time_display_points_float: float = time_display_s*frequency_sample_hz0
-    time_display_points_pow2: int = int(2**np.ceil(np.log2(time_display_points_float)))
-    print('Display time, s:', time_display_s)
-    print('Display points:', time_display_points_float)
-    print('Display points pow2:', time_display_points_pow2)
-    print('Display pow2 duration:', time_display_points_pow2/frequency_sample_hz0)
-
-    # Works for 60s display window - display window becomes the max averaging lifetime
-    # We have a computational averaging lifetime (~2^16) and a max averaging lifetime (display window)
-    if time_display_points_pow2 > fft_points_max:
-        fft_points0 = fft_points_max
-    else:
-        fft_points0 = time_display_points_pow2
-
-    # Do not drop below stft_fft_points min
-    if fft_points0 < fft_points_min:
-        # 256 points is minimal
-        fft_points0 = fft_points_min
-
-    print('MAX FFT: Order, Base, Reference, log2(FFT points)')
-    print(scale_order0, scale_base0, scale_ref0, np.log2(fft_points0))
-
-    physical_frequency_hz = \
-        log_frequency_hz_from_fft_points(frequency_sample_hz0, fft_points0,
-                                         scale_order0, scale_ref0, scale_base0)
-    number_of_frequencies = len(physical_frequency_hz)
-    reduction_factor_float = number_of_frequencies*fft_points0/max_mesh_pixels
-
-    if reduction_factor_float > 1:
-        reduction_factor_pow2 = 2**np.ceil(np.log2(reduction_factor_float))
-    else:
-        reduction_factor_pow2 = 1.
-
-    print('Physical frequency, Min, Max:', physical_frequency_hz[0], physical_frequency_hz[-1])
-    print('Averaging window duration:', fft_points0/frequency_sample_hz0)
-    print('Number of bands:', number_of_frequencies)
-    print('Mesh reduction factor:', reduction_factor_pow2)
-
-
-
-

@@ -29,7 +29,8 @@ if __name__ == "__main__":
         benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz,
                                              add_noise_taper_aa=True)
 
-    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window inside the cosine tapered region.
+    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window
+    # inside the cosine tapered region.
     # If zero, the Tukey window is equivalent to a rectangular window.
     # If one, the Tukey window is equivalent to a Hann window.
     alpha = 0.25  # 25% Tukey (Cosine) window

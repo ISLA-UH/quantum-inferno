@@ -7,7 +7,7 @@ The Welch method is equivalent to averaging the spectrogram over the columns.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from quantum_inferno import styx_fft, styx_cwt, scales_dyadic, utils
+from quantum_inferno import styx_fft, scales_dyadic, utils
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 print(__doc__)
 
@@ -205,4 +205,3 @@ if __name__ == "__main__":
                            mesh_panel_b_ytick_style='plain')
 
     plt.show()
-

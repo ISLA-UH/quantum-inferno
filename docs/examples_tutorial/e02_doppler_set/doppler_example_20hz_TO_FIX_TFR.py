@@ -150,7 +150,7 @@ sig_wf = synth.sawtooth_doppler_noise_16bit(inv_phase_radians)/inv_range_tau_m +
 sig_wf /= np.abs(np.max(sig_wf))
 
 # Antialias, although it's silly at this junction
-synth.antialias_halfNyquist(sig_wf)
+synth.antialias_half_nyquist(sig_wf)
 
 sample_frequency_hz = 1 * inv_time_sample_rate_hz
 number_points_period_int = int(sample_frequency_hz / center_frequency_hz)

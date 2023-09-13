@@ -1,6 +1,6 @@
 """
 libquantum example: s07_grain_tfr
-
+todo: does not run, missing segment_points arguments for functions like welch_power_pow2()
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,7 +18,8 @@ if __name__ == "__main__":
 
     EVENT_NAME = 'grain test'
     station_id_str = 'synth'
-    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window inside the cosine tapered region.
+    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window
+    # inside the cosine tapered region.
     # If zero, the Tukey window is equivalent to a rectangular window.
     # If one, the Tukey window is equivalent to a Hann window.
     alpha = 0.25
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     # frequency_inferno_hz = frequency_cwt_pos_hz[1:]
 
     mic_sig_complex, time_s, scale, omega, amp = \
-        styx_cwt.wavelet_centered_4cwt(band_order_Nth=order_number_input,
+        styx_cwt.wavelet_centered_4cwt(band_order_nth=order_number_input,
                                        duration_points=time_nd,
                                        scale_frequency_center_hz=frequency_center_stft_hz,
                                        frequency_sample_rate_hz=frequency_sample_rate_hz,
@@ -100,8 +101,9 @@ if __name__ == "__main__":
 
     # Information overload methods
     welch_power, welch_power_per_band, welch_power_per_sample, welch_power_total, welch_power_scaled, \
-    welch_information_bits, welch_information_bits_per_band, welch_information_bits_per_sample, \
-    welch_information_bits_total, welch_information_scaled = styx_fft.power_and_information_shannon_welch(psd_welch_power)
+        welch_information_bits, welch_information_bits_per_band, welch_information_bits_per_sample, \
+        welch_information_bits_total, welch_information_scaled = \
+        styx_fft.power_and_information_shannon_welch(psd_welch_power)
     
     # STFT
     frequency_stft_hz, time_stft_s, stft_complex = \
@@ -119,7 +121,7 @@ if __name__ == "__main__":
         styx_cwt.cwt_complex_any_scale_pow2(sig_wf=mic_sig,
                                             frequency_sample_rate_hz=frequency_sample_rate_hz,
                                             frequency_cwt_hz=frequency_cwt_fft_hz,
-                                            band_order_Nth=order_number_input,
+                                            band_order_nth=order_number_input,
                                             dictionary_type="spect")
 
     # Information overload methods
@@ -132,7 +134,7 @@ if __name__ == "__main__":
         styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_sig,
                                             frequency_sample_rate_hz=frequency_sample_rate_hz,
                                             frequency_stx_hz=frequency_cwt_fft_hz,
-                                            band_order_Nth=order_number_input)
+                                            band_order_nth=order_number_input)
 
     # Information overload methods
     stx_power, stx_power_per_band, stx_power_per_sample, stx_power_total, stx_power_scaled, \

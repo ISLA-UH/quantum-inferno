@@ -1,4 +1,6 @@
-"""Module to return information and entropy from TFR Power"""
+"""
+This module returns information and entropy from a TFR Power array
+"""
 
 import numpy as np
 from scipy import signal

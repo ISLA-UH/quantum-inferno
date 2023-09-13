@@ -1,15 +1,16 @@
 """
 libquantum example: s07_grain_tfr
-
+todo: uses libquantum imports instead of quantum_inferno
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import blast_pulse as kaboom
-from quantum_inferno import utils, atoms
+from quantum_inferno import utils
+from libquantum import atoms
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 # TODO: FIX
-from quantum_inferno.styx_stx import tfr_stx_fft
+from libquantum.styx_stx import tfr_stx_fft
 
 
 print(__doc__)
@@ -201,4 +202,3 @@ if __name__ == "__main__":
                            frequency_hz_ymax=fmax)
 
     plt.show()
-

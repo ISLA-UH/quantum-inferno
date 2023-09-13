@@ -1,4 +1,3 @@
-from tftb.generators import amgauss, fmlin
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal.windows import hamming

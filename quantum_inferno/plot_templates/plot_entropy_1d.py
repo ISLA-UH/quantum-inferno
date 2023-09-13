@@ -2,9 +2,10 @@
 Plot 1D entropy in the time or frequency domain
 """
 
+from typing import Optional
 import numpy as np
-import scipy.signal as signal
-import scipy.fft
+from scipy.signal import welch
+from scipy.fft import rfft, rfftfreq
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from quantum_inferno import info
@@ -17,7 +18,7 @@ def plot_fft_compare(sig_in,
                      overlap_points: int,
                      fmin_hz: float = 2E-5,
                      fmax_hz: float = 1E-2,
-                     station_str: str = None,
+                     station_str: Optional[str] = None,
                      do_show: bool = True,
                      do_save: bool = False,
                      save_path: str = None):
@@ -46,20 +47,20 @@ def plot_fft_compare(sig_in,
     [tdr_sig, _, _, _, tdr_isnr, tdr_esnr] = \
         info.shannon_tdr(sig_in_real=sig_in_no_pad)
 
-    rfft_sig1 = scipy.fft.rfft(x=sig_in_no_pad)
-    rfft_freq1 = scipy.fft.rfftfreq(n=len(sig_in_no_pad), d=1/fs_hz)
+    rfft_sig1 = rfft(x=sig_in_no_pad)
+    rfft_freq1 = rfftfreq(n=len(sig_in_no_pad), d=1/fs_hz)
     [fft_marginal1, fft_angle_rads1, _, _, fft_isnr1, fft_esnr1] = \
         info.shannon_fft(fft_sig=rfft_sig1)
 
-    rfft_sig2 = scipy.fft.rfft(x=sig_in)
-    rfft_freq2 = scipy.fft.rfftfreq(n=len(sig_in), d=1/fs_hz)
+    rfft_sig2 = rfft(x=sig_in)
+    rfft_freq2 = rfftfreq(n=len(sig_in), d=1/fs_hz)
     [fft_marginal2, fft_angle_rads2, _, _, fft_isnr2, fft_esnr2] = \
         info.shannon_fft(fft_sig=rfft_sig2)
 
     # Use zero padding
-    rfft_freq3, welch_power = scipy.signal.welch(x=sig_in_no_pad, fs=fs_hz,
-                                                 nperseg=welch_points, noverlap=overlap_points,
-                                                 nfft=len(sig_in))
+    rfft_freq3, welch_power = welch(x=sig_in_no_pad, fs=fs_hz,
+                                    nperseg=welch_points, noverlap=overlap_points,
+                                    nfft=len(sig_in))
     [fft_marginal3, _, _, _, fft_isnr3, fft_esnr3] = \
         info.shannon_fft(fft_sig=np.sqrt(welch_power))
 

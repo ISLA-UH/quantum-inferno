@@ -1,8 +1,7 @@
-from tftb.generators import amgauss, fmlin
 import numpy as np
 import matplotlib.pyplot as plt
 from tftb.processing.cohen import WignerVilleDistribution
-from tftb.generators import fmlin, sigmerge, noisecg
+from tftb.generators import amgauss, fmlin, sigmerge, noisecg
 # https://tftb.readthedocs.io/en/latest/quickstart/intro_examples_1.html
 
 

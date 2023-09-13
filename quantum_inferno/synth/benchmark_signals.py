@@ -1,10 +1,14 @@
+"""
+This module does something.  todo: what does it do
+"""
 import numpy as np
 import scipy.signal as signal
 from libquantum.scales import EPSILON
 from libquantum import synthetics, utils
-from typing import Optional, Tuple, Union
+from typing import Tuple
 import matplotlib.pyplot as plt
 
+# todo: not used
 """ Quick plotting routines """
 
 
@@ -108,7 +112,7 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
     return fig
 
 
-def plot_st_window_tdr_lin(window, freq_sx, time_fft, signal_time_base: str = 'seconds'):
+def plot_st_window_tdr_lin(window, freq_sx, time_fft):
     plt.figure(figsize=(8, 8))
     for j, freq in enumerate(freq_sx):
         plt.plot(time_fft, np.abs(window[j, :]), label=freq)
@@ -116,7 +120,7 @@ def plot_st_window_tdr_lin(window, freq_sx, time_fft, signal_time_base: str = 's
     plt.title('TDR window, linear')
 
 
-def plot_st_window_tfr_bits(window, frequency_sx, frequency_fft, signal_time_base: str = 'seconds'):
+def plot_st_window_tfr_bits(window, frequency_sx, frequency_fft):
     plt.figure(figsize=(8, 8))
     for j, freq in enumerate(frequency_sx):
         plt.plot(frequency_fft, np.log2(np.abs(window[j, :]) + EPSILON), label=freq)
@@ -124,12 +128,13 @@ def plot_st_window_tfr_bits(window, frequency_sx, frequency_fft, signal_time_bas
     plt.title('TFR window, bits')
 
 
-def plot_st_window_tfr_lin(window, frequency_sx, frequency_fft, signal_time_base: str = 'seconds'):
+def plot_st_window_tfr_lin(window, frequency_sx, frequency_fft):
     plt.figure(figsize=(8, 8))
     for j, freq in enumerate(frequency_sx):
         plt.plot(frequency_fft, np.abs(window[j, :]), label=freq)
     plt.legend()
     plt.title('TFR window, lin')
+# todo: not used
 
 
 def signal_gate(wf, t, tmin, tmax, fraction_cosine: float = 0):
@@ -174,13 +179,14 @@ def quantum_chirp(omega: float,
                   oversample_scale: int = 2):
     """
     Constructs a tone or a sweep with a gaussian window option and a duration of 2^n points
+
     :param omega: center frequency < pi. Resets to pi/4 if >= 1 (Nyquist).
     :param order: fractional octave band, sets the Q and duration. Default of 12 for chromatic scale.
     :param gamma: sweep index, could be positive or negative. Default of zero yields the atom.
     :param gauss: Apply the Gauss envelope, True as default. False constructs constant amplitude CW or sweep
+    :param oversample_scale:
     :return:
     """
-
     if omega >= 0.8*np.pi:
         print("Omega >= 0.8*pi (AA*Nyquist), reset to pi * 2**(-1/N")
         omega = np.pi * 2**(-1/order)
@@ -214,7 +220,7 @@ def quantum_chirp(omega: float,
 
     # Downsample to anti-alias
     chirp_wf = signal.decimate(x=np.real(chirp_wf_oversample), q=oversample_scale) \
-               + 1j * signal.decimate(x=np.imag(chirp_wf_oversample), q=oversample_scale)
+        + 1j * signal.decimate(x=np.imag(chirp_wf_oversample), q=oversample_scale)
 
     return chirp_wf, window_support_pow2
 
@@ -239,11 +245,8 @@ def synth_00(frequency_0: float = 100,
     :param time_sample_interval:
     :param time_duration:
     :param oversample_scale: oversample synthetic, then decimate by scale
-    :param frequency_units:
-    :param time_units:
     :return:
     """
-
     # Oversample, then decimate
     oversample_interval = time_sample_interval / oversample_scale
     number_points = int(time_duration / oversample_interval)
@@ -284,11 +287,10 @@ def synth_01(a: float = 100,
     :param oversample_scale:
     :return:
     """
-
     # Oversample, then decimate, essentially an AA filter
     time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
-    superpose = np.cos(a * np.pi * time_all - b * np.pi * time_all * time_all) + \
-                np.cos(4 * np.pi * np.sin(np.pi * f * time_all) + np.pi * 80 * time_all)
+    superpose = np.cos(a * np.pi * time_all - b * np.pi * time_all * time_all) \
+        + np.cos(4 * np.pi * np.sin(np.pi * f * time_all) + np.pi * 80 * time_all)
     # Taper
     signal_gate(wf=superpose, t=time_all, tmin=0, tmax=1, fraction_cosine=0.05)
     # Decimate by same oversample scale
@@ -320,7 +322,6 @@ def synth_02(t1: float = 0.3,
     :param oversample_scale:
     :return:
     """
-
     t = oversample_time(time_duration, time_sample_interval, oversample_scale)
 
     pulse1 = np.exp(-35 * np.pi * (t - t1) ** 2) * np.cos(np.pi * f1 * t)
@@ -353,11 +354,10 @@ def synth_03(a: float = 30,
     :param oversample_scale:
     :return:
     """
-
     # Oversample, then decimate
     time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
-    superpose = np.cos(20 * np.pi * np.log(a * time_all + 1)) + \
-                np.cos(b * np.pi * time_all + c * np.pi * (time_all ** 2))
+    superpose = np.cos(20 * np.pi * np.log(a * time_all + 1)) \
+        + np.cos(b * np.pi * time_all + c * np.pi * (time_all ** 2))
     signal_gate(wf=superpose, t=time_all, tmin=0, tmax=1, fraction_cosine=0.05)
 
     # Decimate by same oversample scale, essentially an AA filter
@@ -387,7 +387,6 @@ def well_tempered_tone(frequency_sample_rate_hz: float = 800.,
     :param add_noise_taper_aa:
     :return:
     """
-
     # The segments determine the spectral resolution
     frequency_resolution_hz = 1 / time_fft_s
 

@@ -210,8 +210,8 @@ def power_and_information_shannon_stft(stft_complex):
     information_bits_total = np.sum(information_bits) + scales.EPSILON64
     information_scaled = information_bits/information_bits_total
     return power, power_per_band, power_per_sample, power_total, power_scaled, \
-           information_bits, information_bits_per_band, information_bits_per_sample, \
-           information_bits_total, information_scaled
+        information_bits, information_bits_per_band, information_bits_per_sample, \
+        information_bits_total, information_scaled
 
 
 def power_and_information_shannon_welch(welch_power):
@@ -231,8 +231,8 @@ def power_and_information_shannon_welch(welch_power):
     information_bits_total = np.sum(information_bits) + scales.EPSILON64
     information_scaled = information_bits/information_bits_total
     return power, power_per_band, power_per_sample, power_total, power_scaled, \
-           information_bits, information_bits_per_band, information_bits_per_sample, \
-           information_bits_total, information_scaled
+        information_bits, information_bits_per_band, information_bits_per_sample, \
+        information_bits_total, information_scaled
 
 # def stft_from_sig(sig_wf: np.ndarray,
 #                   frequency_sample_rate_hz: float,

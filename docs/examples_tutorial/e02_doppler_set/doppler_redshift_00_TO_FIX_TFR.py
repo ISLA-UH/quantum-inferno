@@ -89,7 +89,7 @@ print('Image time of first arrival, last arrival, and signal duration:',
 print('Duration Ratio, direct:', time_duration_receiver_s / time_duration_source_s)
 print('Duration Ratio, image:', image_time_duration_receiver_s / time_duration_source_s)
 
-# Use smallest overlaping interval. All segments must be calculated separately for source and image.
+# Use smallest overlapping interval. All segments must be calculated separately for source and image.
 
 """INVERSE PROBLEM
 Where the observed time is evenly sampled."""

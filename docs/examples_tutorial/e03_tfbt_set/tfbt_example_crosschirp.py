@@ -1,4 +1,4 @@
-from tftb.generators import amgauss, fmlin
+# todo: this one has a local file path
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
