@@ -7,10 +7,12 @@ Doppler example: source and image from reflecting boundary
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import spectrogram
+from quantum_inferno import scales_dyadic
 import quantum_inferno.synth.synthetics as synth
-import libquantum.synthetics as libsynth
 import quantum_inferno.synth.doppler as doppler
+import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 print(__doc__)
+
 
 if __name__ == "__main__":
     # Define space 3D
@@ -149,17 +151,10 @@ if __name__ == "__main__":
 
     # Spectral analysis parameters
     title = 'Synthetic sound, direct and reflected wave, 1m receiver height'
-    # sig_wf = synth.saw(inv_phase_radians, harmonics)/inv_range_tau_m
+
     sig_wf = synth.sawtooth_doppler_noise_16bit(inv_phase_radians)/inv_range_tau_m + \
         synth.sawtooth_doppler_noise_16bit(image_inv_phase_radians)/image_inv_range_tau_m
-
-    # title = 'Synthetic sound, direct wave'
-    # sig_wf = synth.saw(inv_phase_radians, harmonics) / inv_range_tau_m
-
     sig_wf /= np.abs(np.max(sig_wf))
-
-    # Antialias, although it's silly at this junction
-    libsynth.antialias_halfNyquist(sig_wf)
 
     sample_frequency_hz = 1 * inv_time_sample_rate_hz
     number_points_period_int = int(sample_frequency_hz / center_frequency_hz)
@@ -270,10 +265,22 @@ if __name__ == "__main__":
     dB_colormax = np.max(synth_Sxx_db)
     dB_colormin = dB_colormax - dB_range
 
-    # fig = synth.plot_wf_spect(6, synth_type, title, time_wf_s, sig_wf, nfft,
-    #                           sample_frequency_hz, f_center, time_spect_s, synth_Sxx_db,
-    #                           frequency_yscale,
-    #                           time_s_xmin, time_s_xmax, frequency_hz_ymin, frequency_hz_ymax,
-    #                           dB_colormin, dB_colormax)
-
+    plt.style.use('dark_background')
+    fig = pltq.plot_wf_mesh_vert(station_id='synthetic',
+                                 wf_panel_a_sig=sig_wf,
+                                 wf_panel_a_time=time_wf_s,
+                                 mesh_time=t_center,
+                                 mesh_frequency=f_center,
+                                 mesh_panel_b_tfr=np.log2(synth_Sxx + scales_dyadic.EPSILON32),
+                                 mesh_panel_b_colormap_scaling="auto",
+                                 frequency_scaling=frequency_yscale,
+                                 wf_panel_a_units="Norm",
+                                 mesh_panel_b_cbar_units="bits",
+                                 start_time_epoch=0,
+                                 figure_title="STFT of Doppler Shift",
+                                 frequency_hz_ymin=frequency_hz_ymin,
+                                 frequency_hz_ymax=frequency_hz_ymax,
+                                 mesh_colormap='inferno',
+                                 waveform_color='yellow',
+                                 mesh_panel_b_ytick_style='plain')
     plt.show()

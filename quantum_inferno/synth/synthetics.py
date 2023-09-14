@@ -269,16 +269,16 @@ def taper_tukey(sig_or_time: np.ndarray,
     return signal.windows.tukey(M=np.size(sig_or_time), alpha=fraction_cosine, sym=True)
 
 
-def antialias_half_nyquist(synth: np.ndarray) -> np.ndarray:
+def antialias_half_nyquist(synth: np.ndarray, filter_order: int = 4) -> np.ndarray:
     """
     Antialiasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
 
+    :param filter_order: filter order sets decay rate
     :param synth: array with signal data
     :return: numpy array with anti-aliased signal
     """
     # Antialiasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
     # Signal frequencies are scaled by Nyquist
-    filter_order = 2
     edge_high = 0.5
     [b, a] = signal.butter(filter_order, edge_high, btype='lowpass')
     return signal.filtfilt(b, a, np.copy(synth))
