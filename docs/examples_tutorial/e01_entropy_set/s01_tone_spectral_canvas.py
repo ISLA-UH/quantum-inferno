@@ -1,5 +1,5 @@
 """
-Inferno example e00_tone_spectral_canvas.
+Inferno example s01_tone_spectral_canvas.
 Define the cyberspectral canvas from a knowledge of the signal center frequency and passband.
 Compute a periodogram and a spectrogram of a tone over sliding windows.
 The Welch method is equivalent to averaging the spectrogram over the columns.
