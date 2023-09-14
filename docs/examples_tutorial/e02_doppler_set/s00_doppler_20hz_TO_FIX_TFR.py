@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import spectrogram
 import quantum_inferno.synth.synthetics as synth
+import libquantum.synthetics as libsynth
 import quantum_inferno.synth.doppler as doppler
 print(__doc__)
 
@@ -150,7 +151,7 @@ if __name__ == "__main__":
     title = 'Synthetic sound, direct and reflected wave, 1m receiver height'
     # sig_wf = synth.saw(inv_phase_radians, harmonics)/inv_range_tau_m
     sig_wf = synth.sawtooth_doppler_noise_16bit(inv_phase_radians)/inv_range_tau_m + \
-             synth.sawtooth_doppler_noise_16bit(image_inv_phase_radians)/image_inv_range_tau_m
+        synth.sawtooth_doppler_noise_16bit(image_inv_phase_radians)/image_inv_range_tau_m
 
     # title = 'Synthetic sound, direct wave'
     # sig_wf = synth.saw(inv_phase_radians, harmonics) / inv_range_tau_m
@@ -158,7 +159,7 @@ if __name__ == "__main__":
     sig_wf /= np.abs(np.max(sig_wf))
 
     # Antialias, although it's silly at this junction
-    synth.antialias_halfNyquist(sig_wf)
+    libsynth.antialias_halfNyquist(sig_wf)
 
     sample_frequency_hz = 1 * inv_time_sample_rate_hz
     number_points_period_int = int(sample_frequency_hz / center_frequency_hz)
