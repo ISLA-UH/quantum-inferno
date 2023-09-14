@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import blast_pulse as kaboom
-from quantum_inferno import utils
+from quantum_inferno import utils, utils_picker as up
 from libquantum import atoms
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 # TODO: FIX
@@ -128,9 +128,9 @@ if __name__ == "__main__":
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate CWT and Stockwell first
 
-    mic_stft_bits = utils.log2epsilon(np.sqrt(stft_power))
-    mic_cwt_bits = utils.log2epsilon(np.sqrt(cwt_power))
-    mic_stx_bits = utils.log2epsilon(np.sqrt(stx_power))
+    mic_stft_bits = up.log2epsilon(np.sqrt(stft_power))
+    mic_cwt_bits = up.log2epsilon(np.sqrt(cwt_power))
+    mic_stx_bits = up.log2epsilon(np.sqrt(stx_power))
 
     print('Max stft bits:', np.max(mic_stft_bits))
     print('Max cwt bits:', np.max(mic_cwt_bits))

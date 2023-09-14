@@ -35,15 +35,14 @@ Python files you can individually download and run.
 ### Doppler
 These examples showcase the ability of quantum-inferno to represent Doppler effects and
 are self-contained Python files you can individually download and run.
-1. [doppler example 20hz]()
+1. [doppler 20hz]()
 2. [doppler redshift]()
 
 ### TFTB
 These examples showcase [TFTB](https://tftb.readthedocs.io/en/latest/index.html) implementations
 with quantum-inferno and are self-contained Python files you can individually download and run.
 
-1. [Intro to TFTB](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tfbt_set/tfbt_example_01.py)
-2. [One-sided exponential amplitude modulation](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tfbt_set/tfbt_example_02.py)
-3. [TFTB with noisy signal](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tfbt_set/tfbt_example_03.py)
-4. [TFTB with non-stationary signals](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tfbt_set/tfbt_example_03_stationarity.py)
-5. [Crosschirp](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tfbt_set/tfbt_example_crosschirp.py)
+1. [Intro to TFTB](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tftb_set/tftb_example_01.py)
+2. [One-sided exponential amplitude modulation](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tftb_set/tftb_example_02.py)
+3. [TFTB with noisy signal](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tftb_set/tftb_example_03.py)
+4. [TFTB with stationary and non-stationary signals](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tftb_set/tftb_example_03_stationarity.py)

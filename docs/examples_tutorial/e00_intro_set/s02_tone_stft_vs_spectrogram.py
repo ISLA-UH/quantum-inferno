@@ -13,7 +13,7 @@ RMS amplitude = 1/sqrt(2)
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from quantum_inferno import utils
+from quantum_inferno import utils, utils_picker as up
 from quantum_inferno.synth import benchmark_signals
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 print(__doc__)
@@ -118,8 +118,8 @@ if __name__ == "__main__":
 
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate Stockwell first
-    mic_spect_bits = utils.log2epsilon(np.sqrt(psd_spec_power))
-    mic_stft_bits = utils.log2epsilon(np.sqrt(stft_power))
+    mic_spect_bits = up.log2epsilon(np.sqrt(psd_spec_power))
+    mic_stft_bits = up.log2epsilon(np.sqrt(stft_power))
     print('Max spect bits:', np.max(mic_spect_bits))
     print('Max stft bits:', np.max(mic_stft_bits))
 

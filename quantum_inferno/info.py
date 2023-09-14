@@ -5,8 +5,8 @@ This module returns information and entropy from a TFR Power array
 import numpy as np
 from scipy import signal
 import quantum_inferno.scales_dyadic as scales
-from quantum_inferno import utils
-import scipy.fft
+from quantum_inferno import util_matrix as um
+import scipy.fft as sfft
 
 
 # TODO: Use 'em or lose 'em
@@ -15,53 +15,60 @@ def log2_ceil(x: float, epsilon: float = scales.EPSILON64) -> float:
     Compute ceiling of log2 of a positive input argument.
     Corrects for negative, complex or zero inputs by
     taking the absolute value and adding EPSILON
+
     :param x: input, converts to positive real
     :param epsilon: override zero, negative, and imaginary values
     :return: ceiling of log2
     """
-    real_x = np.abs(x) + epsilon
-    return np.ceil(np.log2(real_x))
+    return np.ceil(np.log2(np.abs(x) + epsilon))
 
 
 def log2_round(x: float, epsilon: float = scales.EPSILON64) -> float:
     """
-    Compute ceiling of log2 of a positive input argument.
+    Compute rounded value of log2 of a positive input argument.
     Corrects for negative, complex or zero inputs by
     taking the absolute value and adding EPSILON
+
     :param x: input, converts to positive real
     :param epsilon: override zero, negative, and imaginary values
-    :return: ceiling of log2
+    :return: rounded to nearest integer value of log2
     """
-    real_x = np.abs(x) + epsilon
-    return np.round(np.log2(real_x))
+    return np.round(np.log2(np.abs(x) + epsilon))
 
 
 def log2_floor(x: float, epsilon: float = scales.EPSILON64) -> float:
     """
-    Compute ceiling of log2 of a positive input argument.
+    Compute floor of log2 of a positive input argument.
     Corrects for negative, complex or zero inputs by
     taking the absolute value and adding EPSILON
+
     :param x: input, converts to positive real
     :param epsilon: override zero, negative, and imaginary values
-    :return: ceiling of log2
+    :return: floor of log2
     """
-    real_x = np.abs(x) + epsilon
-    return np.floor(np.log2(real_x))
+    return np.floor(np.log2(np.abs(x) + epsilon))
 
 
 def mat_max_idx(a: np.ndarray):
-    """Find the indexes of the max of a matrix"""
+    """
+    :param a: matrix to find maximum for
+    :return: The indexes of the max of a matrix
+    """
     return np.unravel_index(a.argmax(), a.shape)
 
 
 def mat_min_idx(a: np.ndarray):
-    """Find the indexes of the min of a matrix"""
+    """
+    :param a: matrix to find minimum for
+    :return: The indexes of the min of a matrix
+    """
     return np.unravel_index(a.argmin(), a.shape)
 
 
 def power_dynamics_scaled_bits(tfr_power: np.ndarray) -> [np.ndarray, np.ndarray, np.ndarray]:
     """
     Essential scales for power
+
     :param tfr_power: power from time-frequency representation
     :return:
     """
@@ -82,6 +89,7 @@ def power_dynamics_scaled_bits(tfr_power: np.ndarray) -> [np.ndarray, np.ndarray
 def shannon(tfr_power):
     """
     Shannon information and entropy
+
     :param tfr_power:
     :return:
     """
@@ -119,23 +127,23 @@ def shannon(tfr_power):
 def shannon_esnrt_per_time(tfr_power):
     """
     Normalized power pdf, information, and entropy per time step
+
     :param tfr_power:
     :return:
     """
-
     num_freq = tfr_power.shape[0]
     num_dof = num_freq  # Degrees of freedom
     ref_shannon_bits = np.log2(num_dof)/num_dof
 
     tfr_power_per_time = np.sum(tfr_power, axis=0) + scales.EPSILON64
-    tfr_power_per_time_pdf = utils.d1tile_x_d0d1(d1=1/tfr_power_per_time, d0d1=tfr_power)
+    tfr_power_per_time_pdf = um.d1tile_x_d0d1(d1=1/tfr_power_per_time, d0d1=tfr_power)
     tfr_info_per_time = -np.log2(tfr_power_per_time_pdf + scales.EPSILON64)
     tfr_isnr_per_time = np.log2(num_dof) - tfr_info_per_time
 
     tfr_shannon_per_time_bits = tfr_power_per_time_pdf * tfr_info_per_time
     # tfr_shannon_sum_per_time_bits = np.sum(tfr_shannon_per_time_bits, axis=0)
     # tfr_esnr_per_time = \
-    #     utils.d1tile_x_d0d1(d1=tfr_power.shape[0]/tfr_shannon_sum_per_time_bits, d0d1=tfr_shannon_per_time_bits)
+    #     um.d1tile_x_d0d1(d1=tfr_power.shape[0]/tfr_shannon_sum_per_time_bits, d0d1=tfr_shannon_per_time_bits)
     # Relative to ref_bits
     # tfr_esnr_per_time = (tfr_shannon_per_time_bits - ref_shannon_bits)*num_dof
     tfr_esnr_per_time = tfr_shannon_per_time_bits/ref_shannon_bits
@@ -146,10 +154,10 @@ def shannon_esnrt_per_time(tfr_power):
 def shannon_esnrf_per_freq(tfr_power):
     """
     Normalized power pdf, information, and entropy per frequency step
+
     :param tfr_power:
     :return:
     """
-
     atom_bits = 3
     num_time = tfr_power.shape[1]
     num_dof = num_time  # Degrees of freedom
@@ -157,12 +165,12 @@ def shannon_esnrf_per_freq(tfr_power):
     # ref_shannon_bits = 3/num_dof
 
     tfr_power_per_freq = np.sum(tfr_power, axis=1) + scales.EPSILON64
-    tfr_power_per_freq_pdf = utils.d0tile_x_d0d1(d0=1/tfr_power_per_freq, d0d1=tfr_power)
+    tfr_power_per_freq_pdf = um.d0tile_x_d0d1(d0=1/tfr_power_per_freq, d0d1=tfr_power)
     tfr_info_per_freq = -np.log2(tfr_power_per_freq_pdf + scales.EPSILON64)
     # TODO: taper the np.log2(num_dof), otherwise blows up at edges
     # TODO: Verify, standardize with dsp taper
     tukey_power_envelope = signal.windows.tukey(M=num_time, alpha=0.2, sym=True)**2
-    power_taper_tile = utils.just_tile_d1(d1_array1d_in=tukey_power_envelope, d0d1_shape=tfr_power.shape)
+    power_taper_tile = um.just_tile_d1(d1_array1d_in=tukey_power_envelope, d0d1_shape=tfr_power.shape)
     tfr_isnr_per_freq = np.log2(num_dof*power_taper_tile + scales.EPSILON64) - tfr_info_per_freq
 
     # # Debug
@@ -177,7 +185,7 @@ def shannon_esnrf_per_freq(tfr_power):
     tfr_shannon_per_freq_bits = tfr_power_per_freq_pdf * power_taper_tile * tfr_info_per_freq
     # tfr_shannon_sum_per_freq_bits = np.sum(tfr_shannon_per_freq_bits, axis=1)
     # tfr_esnr_per_freq = \
-    #     utils.d0tile_x_d0d1(d0=tfr_power.shape[1]/tfr_shannon_sum_per_freq_bits, d0d1=tfr_shannon_per_freq_bits)
+    #     um.d0tile_x_d0d1(d0=tfr_power.shape[1]/tfr_shannon_sum_per_freq_bits, d0d1=tfr_shannon_per_freq_bits)
     # Relative to ref_bits
     # tfr_esnr_per_freq = (tfr_shannon_per_freq_bits - ref_shannon_bits)*num_dof
     # tfr_esnr_per_freq = tfr_shannon_per_freq_bits/ref_shannon_bits
@@ -189,11 +197,11 @@ def shannon_esnrf_per_freq(tfr_power):
 def shannon_tdr_fft(sig_in_real, verbose: bool = True):
     """
     Shannon information and entropy
+
     :param sig_in_real:
     :param verbose: print to screen
     :return:
     """
-
     atom_bits = 3
     num_dof = len(sig_in_real)
     ref_shannon_bits = np.log2(num_dof)/num_dof
@@ -209,7 +217,7 @@ def shannon_tdr_fft(sig_in_real, verbose: bool = True):
     # tdr_entropy_total = np.sum(tdr_entropy)
 
     # FFT information and entropy of real input signal
-    fft_sig = scipy.fft.rfft(x=sig_in_real)
+    fft_sig = sfft.rfft(x=sig_in_real)
     fft_angle_rads = np.unwrap(np.angle(fft_sig))
     # RFFT only goes up to Nyquist TODO: use rfftfreq, presently assuming sample rate of unity
     fft_frequency = np.arange(len(fft_angle_rads))/len(fft_angle_rads)/2.
@@ -247,11 +255,11 @@ def shannon_tdr_fft(sig_in_real, verbose: bool = True):
 def shannon_tdr(sig_in_real, verbose: bool = True):
     """
     Shannon information and entropy
+
     :param sig_in_real:
     :param verbose: print to screen
     :return:
     """
-
     # Time-domain representation
     sig_sq_total = np.sum(sig_in_real**2)
     tdr_sig = sig_in_real/np.sqrt(sig_sq_total)
@@ -293,11 +301,11 @@ def shannon_tdr(sig_in_real, verbose: bool = True):
 def shannon_fft(fft_sig, verbose: bool = True):
     """
     Shannon information and entropy
+
     :param fft_sig:
     :param verbose: print to screen
     :return:
     """
-
     # FFT information and entropy of real input signal
     # fft_sig = scipy.fft.rfft(x=sig_in_real)
     fft_angle_rads = np.unwrap(np.angle(fft_sig))
@@ -348,10 +356,10 @@ def shannon_fft(fft_sig, verbose: bool = True):
 def shannon_stft(tfr_power):
     """
     Shannon information and entropy
+
     :param tfr_power:
     :return:
     """
-
     atom_bits = 3
     num_freq = tfr_power.shape[0]
     num_time = tfr_power.shape[1]
@@ -386,10 +394,10 @@ def shannon_stft(tfr_power):
 def shannon_stft_esnrt_per_time(tfr_power):
     """
     Normalized power pdf, information, and entropy per time step
+
     :param tfr_power:
     :return:
     """
-
     num_time = tfr_power.shape[1]
     num_freq = tfr_power.shape[0]
 
@@ -399,7 +407,7 @@ def shannon_stft_esnrt_per_time(tfr_power):
     ref_shannon_bits = np.log2(num_dof)/num_dof
 
     tfr_power_per_time = np.sum(tfr_power, axis=0) + scales.EPSILON64
-    tfr_power_per_time_pdf = utils.d1tile_x_d0d1(d1=1/tfr_power_per_time, d0d1=tfr_power)
+    tfr_power_per_time_pdf = um.d1tile_x_d0d1(d1=1/tfr_power_per_time, d0d1=tfr_power)
     tfr_info_per_time = -np.log2(tfr_power_per_time_pdf + scales.EPSILON64)
     tfr_isnr_per_time = np.log2(num_freq) - tfr_info_per_time
 
@@ -418,10 +426,10 @@ def shannon_stft_esnrt_per_time(tfr_power):
 def shannon_stft_esnrf_per_freq(tfr_power):
     """
     Normalized power pdf, information, and entropy per frequency step
+
     :param tfr_power:
     :return:
     """
-
     atom_bits = 3
     num_time = tfr_power.shape[1]
     num_freq = tfr_power.shape[0]
@@ -434,7 +442,7 @@ def shannon_stft_esnrf_per_freq(tfr_power):
     # idx = np.argwhere(inv_tfr_power_per_freq > min_inv*2**32)
     # inv_tfr_power_per_freq[idx] = np.zeros(idx.shape)
 
-    tfr_power_per_freq_pdf = utils.d0tile_x_d0d1(d0=1/tfr_power_per_freq, d0d1=tfr_power)
+    tfr_power_per_freq_pdf = um.d0tile_x_d0d1(d0=1/tfr_power_per_freq, d0d1=tfr_power)
     tfr_info_per_freq = -np.log2(tfr_power_per_freq_pdf + scales.EPSILON64)
     tfr_isnr_per_freq = np.log2(num_dof) - tfr_info_per_freq
 
@@ -467,16 +475,16 @@ def shannon_stft_esnrf_per_freq(tfr_power):
 #     ref_shannon_bits = np.log2(num_dof)/num_dof
 #
 #     tfr_power_per_freq = np.sum(tfr_power, axis=1)
-#     tfr_power_per_freq_pdf = utils.d0tile_x_d0d1(d0=1/tfr_power_per_freq, d0d1=tfr_power)
+#     tfr_power_per_freq_pdf = um.d0tile_x_d0d1(d0=1/tfr_power_per_freq, d0d1=tfr_power)
 #     tfr_info_per_freq = -np.log2(tfr_power_per_freq_pdf + scales.EPSILON64)
 #     tfr_isnr_per_freq = np.log2(tfr_power.shape[1]) - tfr_info_per_freq
 #
 #     tfr_shannon_per_freq_bits = tfr_power_per_freq_pdf * tfr_info_per_freq
 #     # tfr_shannon_sum_per_freq_bits = np.sum(tfr_shannon_per_freq_bits, axis=1)
 #     # tfr_esnr_per_freq = \
-#     #     utils.d0tile_x_d0d1(d0=tfr_power.shape[1]/tfr_shannon_sum_per_freq_bits, d0d1=tfr_shannon_per_freq_bits)
+#     #     um.d0tile_x_d0d1(d0=tfr_power.shape[1]/tfr_shannon_sum_per_freq_bits, d0d1=tfr_shannon_per_freq_bits)
 #     # tfr_esnr_per_freq = tfr_shannon_per_freq_bits/ref_shannon_bits
 #     tfr_esnr_per_freq = \
-#         utils.d0tile_x_d0d1(d0=1/ref_shannon_bits/scaling, d0d1=tfr_shannon_per_freq_bits)
+#         um.d0tile_x_d0d1(d0=1/ref_shannon_bits/scaling, d0d1=tfr_shannon_per_freq_bits)
 #
 #     return [tfr_info_per_freq, tfr_shannon_per_freq_bits, tfr_isnr_per_freq, tfr_esnr_per_freq]

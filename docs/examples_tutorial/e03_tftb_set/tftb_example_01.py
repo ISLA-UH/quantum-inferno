@@ -1,3 +1,7 @@
+"""
+todo: Describe me
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from tftb.processing.cohen import WignerVilleDistribution

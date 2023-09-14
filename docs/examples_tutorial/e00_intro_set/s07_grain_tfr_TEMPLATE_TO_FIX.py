@@ -1,6 +1,7 @@
 """
 libquantum example: s07_grain_tfr
 todo: does not run, missing segment_points arguments for functions like welch_power_pow2()
+todo: EPSILON is not an integer type
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -72,9 +73,9 @@ if __name__ == "__main__":
 
     # Theoretical variance TODO: construct function
     mic_sig_real_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
-                               (1 + np.exp(-(scale*omega)**2))
+        (1 + np.exp(-(scale*omega)**2))
     mic_sig_imag_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
-                               (1 - np.exp(-(scale*omega)**2))
+        (1 - np.exp(-(scale*omega)**2))
 
     # Mathematical integral ~ computed Variance * Number of Samples. The dictionary type = "norm" returns 1/2.
     mic_sig_real_integral = np.var(mic_sig_real)*len(mic_sig_real)
@@ -113,8 +114,9 @@ if __name__ == "__main__":
 
     # Information overload methods
     stft_power, stft_power_per_band, stft_power_per_sample, stft_power_total, stft_power_scaled, \
-    stft_information_bits, stft_information_bits_per_band, stft_information_bits_per_sample, \
-    stft_information_bits_total, stft_information_scaled = styx_fft.power_and_information_shannon_stft(stft_complex)
+        stft_information_bits, stft_information_bits_per_band, stft_information_bits_per_sample, \
+        stft_information_bits_total, stft_information_scaled = \
+        styx_fft.power_and_information_shannon_stft(stft_complex)
 
     # CWT
     frequency_cwt_hz, time_cwt_s, cwt_complex = \
@@ -126,8 +128,9 @@ if __name__ == "__main__":
 
     # Information overload methods
     cwt_power, cwt_power_per_band, cwt_power_per_sample, cwt_power_total, cwt_power_scaled, \
-    cwt_information_bits, cwt_information_bits_per_band, cwt_information_bits_per_sample, \
-    cwt_information_bits_total, cwt_information_scaled = info.power_and_information_shannon_cwt(cwt_complex)
+        cwt_information_bits, cwt_information_bits_per_band, cwt_information_bits_per_sample, \
+        cwt_information_bits_total, cwt_information_scaled = \
+        info.power_and_information_shannon_cwt(cwt_complex)
 
     # Stockwell transform
     frequency_stx_hz, time_stx_s, stx_complex = \
@@ -138,8 +141,9 @@ if __name__ == "__main__":
 
     # Information overload methods
     stx_power, stx_power_per_band, stx_power_per_sample, stx_power_total, stx_power_scaled, \
-    stx_information_bits, stx_information_bits_per_band, stx_information_bits_per_sample, \
-    stx_information_bits_total, stx_information_scaled = info.power_and_information_shannon_stx(stx_complex)
+        stx_information_bits, stx_information_bits_per_band, stx_information_bits_per_sample, \
+        stx_information_bits_total, stx_information_scaled = \
+        info.power_and_information_shannon_stx(stx_complex)
 
     # Scale power by variance
     welch_over_var = psd_welch_power / mic_sig_var
@@ -231,4 +235,3 @@ if __name__ == "__main__":
                            frequency_hz_ymax=fmax)
 
     plt.show()
-

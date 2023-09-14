@@ -1,3 +1,9 @@
+"""
+    * One-sided exponential amplitude modulation (See :ref:`amexpos`)
+    * Constant frequency modulation (See :ref:`fmconst`)
+    * -5 dB complex gaussian noise (See :ref:`noisecg` and :ref:`sigmerge`)
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal.windows import hamming
@@ -5,10 +11,6 @@ from tftb.generators import amexpos, fmconst, sigmerge, noisecg
 from tftb.processing.cohen import Spectrogram
 
 # https://tftb.readthedocs.io/en/latest/quickstart/intro_examples_1.html
-"""
-    * One-sided exponential amplitude modulation (See :ref:`amexpos`)
-    * Constant frequency modulation (See :ref:`fmconst`)
-    * -5 dB complex gaussian noise (See :ref:`noisecg` and :ref:`sigmerge`)"""
 
 sig_points: int = int(2**8)
 

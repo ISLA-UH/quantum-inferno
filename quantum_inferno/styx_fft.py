@@ -5,18 +5,21 @@ This module calculates spectra: STFT, FFT
 import numpy as np
 import scipy.signal as signal
 from quantum_inferno import scales_dyadic as scales
-from typing import Union, Tuple
+from typing import Tuple
 
 
 # TODO: Standardize inputs
-def butter_bandpass(sig_wf: np.ndarray,
-                    frequency_sample_rate_hz: float,
-                    frequency_cut_low_hz,
-                    frequency_cut_high_hz,
-                    filter_order: int = 4,
-                    tukey_alpha: float = 0.5):
+def butter_bandpass(
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
+        frequency_cut_low_hz,
+        frequency_cut_high_hz,
+        filter_order: int = 4,
+        tukey_alpha: float = 0.5
+) -> np.ndarray:
     """
     Butterworth bandpass filter
+
     :param sig_wf:
     :param frequency_sample_rate_hz:
     :param frequency_cut_low_hz:
@@ -25,7 +28,6 @@ def butter_bandpass(sig_wf: np.ndarray,
     :param tukey_alpha:
     :return:
     """
-
     nyquist = 0.5 * frequency_sample_rate_hz
     edge_low = frequency_cut_low_hz / nyquist
     edge_high = frequency_cut_high_hz / nyquist
@@ -35,19 +37,21 @@ def butter_bandpass(sig_wf: np.ndarray,
                            Wn=[edge_low, edge_high],
                            btype='bandpass')
     sig_taper = np.copy(sig_wf)
-    sig_taper = sig_taper * signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
-    sig_bandpass = signal.filtfilt(b, a, sig_taper)
-
-    return sig_bandpass
+    sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
+    return signal.filtfilt(b, a, sig_taper)
 
 
-def butter_highpass(sig_wf: np.ndarray,
-                    frequency_sample_rate_hz: float,
-                    frequency_cut_low_hz,
-                    filter_order: int = 4,
-                    tukey_alpha: float = 0.5):
+# todo: return value if failed edge_low comparison
+def butter_highpass(
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
+        frequency_cut_low_hz,  # todo: typing
+        filter_order: int = 4,
+        tukey_alpha: float = 0.5
+) -> np.ndarray:
     """
     Butterworth bandpass filter
+
     :param sig_wf:
     :param frequency_sample_rate_hz:
     :param frequency_cut_low_hz:
@@ -55,9 +59,7 @@ def butter_highpass(sig_wf: np.ndarray,
     :param tukey_alpha:
     :return:
     """
-
-    nyquist = 0.5 * frequency_sample_rate_hz
-    edge_low = frequency_cut_low_hz / nyquist
+    edge_low = frequency_cut_low_hz / (0.5 * frequency_sample_rate_hz)
     if edge_low >= 1:
         print('Cutoff greater than Nyquist')
         exit()
@@ -65,19 +67,20 @@ def butter_highpass(sig_wf: np.ndarray,
                            Wn=[edge_low],
                            btype='highpass')
     sig_taper = np.copy(sig_wf)
-    sig_taper = sig_taper * signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
-    sig_highpass = signal.filtfilt(b, a, sig_taper)
-
-    return sig_highpass
+    sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
+    return signal.filtfilt(b, a, sig_taper)
 
 
-def butter_lowpass(sig_wf: np.ndarray,
-                   frequency_sample_rate_hz: float,
-                   frequency_cut_hz,
-                   filter_order: int = 4,
-                   tukey_alpha: float = 0.5):
+def butter_lowpass(
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
+        frequency_cut_high_hz,  # todo: typing
+        filter_order: int = 4,
+        tukey_alpha: float = 0.5
+) -> np.ndarray:
     """
     Butterworth bandpass filter
+
     :param sig_wf:
     :param frequency_sample_rate_hz:
     :param frequency_cut_high_hz:
@@ -85,9 +88,7 @@ def butter_lowpass(sig_wf: np.ndarray,
     :param tukey_alpha:
     :return:
     """
-
-    nyquist = 0.5 * frequency_sample_rate_hz
-    edge_high = frequency_cut_hz / nyquist
+    edge_high = frequency_cut_high_hz / (0.5 * frequency_sample_rate_hz)
     if edge_high >= 1:
         print('Cutoff greater than Nyquist')
         exit()
@@ -95,74 +96,85 @@ def butter_lowpass(sig_wf: np.ndarray,
                            Wn=[edge_high],
                            btype='lowpass')
     sig_taper = np.copy(sig_wf)
-    sig_taper = sig_taper * signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
-    sig_lowpass = signal.filtfilt(b, a, sig_taper)
-
-    return sig_lowpass
+    sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
+    return signal.filtfilt(b, a, sig_taper)
 
 
-def stft_complex_pow2(sig_wf: np.ndarray,
-                      frequency_sample_rate_hz: float,
-                      segment_points: int,
-                      overlap_points: int = None,
-                      nfft_points: int = None,
-                      alpha: float = 0.25) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """ Simplest, with 50% overlap and built-in defaults """
+def stft_complex_pow2(
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
+        segment_points: int,
+        overlap_points: int = None,
+        nfft_points: int = None,
+        alpha: float = 0.25
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Simplest, with 50% overlap and built-in defaults
+
+    :param sig_wf:
+    :param frequency_sample_rate_hz:
+    :param segment_points:
+    :param overlap_points:
+    :param nfft_points:
+    :param alpha:
+    :return: frequency_stft_hz, time_stft_s, stft_complex
+    """
     if nfft_points is None:
         nfft_points = int(2**np.ceil(np.log2(segment_points)))
     if overlap_points is None:
         overlap_points = int(segment_points / 2)
-
-    frequency_stft_hz, time_stft_s, stft_complex = \
-        signal.stft(x=sig_wf,
-                    fs=frequency_sample_rate_hz,
-                    window=('tukey', alpha),
-                    nperseg=segment_points,
-                    noverlap=overlap_points,
-                    nfft=nfft_points,
-                    detrend='constant',
-                    return_onesided=True,
-                    axis=-1,
-                    boundary='zeros',
-                    padded=True)
-
-    return frequency_stft_hz, time_stft_s, stft_complex
+    return signal.stft(x=sig_wf,
+                       fs=frequency_sample_rate_hz,
+                       window=('tukey', alpha),
+                       nperseg=segment_points,
+                       noverlap=overlap_points,
+                       nfft=nfft_points,
+                       detrend='constant',
+                       return_onesided=True,
+                       axis=-1,
+                       boundary='zeros',
+                       padded=True)
 
 
-def gtx_complex_pow2(sig_wf: np.ndarray,
-                     frequency_sample_rate_hz: float,
-                     segment_points: int,
-                     gaussian_sigma: int = None,
-                     overlap_points: int = None,
-                     nfft_points: int = None) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def gtx_complex_pow2(
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
+        segment_points: int,
+        gaussian_sigma: int = None,
+        overlap_points: int = None,
+        nfft_points: int = None
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Gaussian taper with 50% overlap and built-in defaults
 
-    """ Gaussian taper with 50% overlap and built-in defaults """
+    :param sig_wf:
+    :param frequency_sample_rate_hz:
+    :param segment_points:
+    :param gaussian_sigma:
+    :param overlap_points:
+    :param nfft_points:
+    :return: frequency_stft_hz, time_stft_s, stft_complex
+    """
     if nfft_points is None:
         nfft_points = int(2**np.ceil(np.log2(segment_points)))
-
     # Wyatt spec is overlap_points = int(segment_points / np.sqrt(np.pi) / 8.)
     if overlap_points is None:
         overlap_points = int(segment_points / 2)
-
     # Gaussian window variance
     # Wyatt spec is gaussian_sigma = (segment_points + 1) / 6
     if gaussian_sigma is None:
         gaussian_sigma = int(segment_points / 4)
-
-    frequency_stft_hz, time_stft_s, stft_complex = \
-        signal.stft(x=sig_wf,
-                    fs=frequency_sample_rate_hz,
-                    window=('gaussian', gaussian_sigma),
-                    nperseg=segment_points,
-                    noverlap=overlap_points,
-                    nfft=nfft_points,
-                    detrend='constant',
-                    return_onesided=True,
-                    axis=-1,
-                    boundary='zeros',
-                    padded=True)
-
-    return frequency_stft_hz, time_stft_s, stft_complex
+    return signal.stft(x=sig_wf,
+                       fs=frequency_sample_rate_hz,
+                       window=('gaussian', gaussian_sigma),
+                       nperseg=segment_points,
+                       noverlap=overlap_points,
+                       nfft=nfft_points,
+                       detrend='constant',
+                       return_onesided=True,
+                       axis=-1,
+                       boundary='zeros',
+                       padded=True)
 
 
 def welch_power_pow2(sig_wf: np.ndarray,
@@ -171,31 +183,40 @@ def welch_power_pow2(sig_wf: np.ndarray,
                      nfft_points: int = None,
                      overlap_points: int = None,
                      alpha: float = 0.25) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Simplest, with 50% overlap and built-in defaults
 
-    """ Simplest, with 50% overlap and built-in defaults """
+    :param sig_wf:
+    :param frequency_sample_rate_hz:
+    :param segment_points:
+    :param nfft_points:
+    :param overlap_points:
+    :param alpha:
+    :return: frequency_welch_hz, welch_power
+    """
     if nfft_points is None:
         nfft_points = int(2**np.ceil(np.log2(segment_points)))
     if overlap_points is None:
         overlap_points = int(segment_points / 2)
     # Compute the Welch PSD; averaged spectrum over sliding windows
-    frequency_welch_hz, welch_power = \
-        signal.welch(x=sig_wf,
-                     fs=frequency_sample_rate_hz,
-                     window=('tukey', alpha),
-                     nperseg=segment_points,
-                     noverlap=overlap_points,
-                     nfft=nfft_points,
-                     detrend='constant',
-                     return_onesided=True,
-                     axis=-1,
-                     scaling='spectrum',
-                     average='mean')
-    return frequency_welch_hz, welch_power
+    return signal.welch(x=sig_wf,
+                        fs=frequency_sample_rate_hz,
+                        window=('tukey', alpha),
+                        nperseg=segment_points,
+                        noverlap=overlap_points,
+                        nfft=nfft_points,
+                        detrend='constant',
+                        return_onesided=True,
+                        axis=-1,
+                        scaling='spectrum',
+                        average='mean')
 
 
+# todo: lots of return values, consider an object
 def power_and_information_shannon_stft(stft_complex):
     """
     Computes power and information metrics
+
     :param stft_complex:
     :return:
     """
@@ -214,9 +235,11 @@ def power_and_information_shannon_stft(stft_complex):
         information_bits_total, information_scaled
 
 
+# todo: lots of return values, consider an object
 def power_and_information_shannon_welch(welch_power):
     """
     Computes power and information metrics
+
     :param welch_power:
     :return:
     """
@@ -302,7 +325,7 @@ def power_and_information_shannon_welch(welch_power):
 #     stft_abs = np.sqrt(np.abs(sig_stft_psd_spec))
 #     # TODO: Reconsider
 #     # Unit tone amplitude -> 1/2 bit in log2 STFT amplitude (not power)
-#     stft_bits = utils.log2epsilon(stft_abs)
+#     stft_bits = up.log2epsilon(stft_abs)
 #
 #     return stft_abs, stft_bits, time_stft_s, frequency_stft_hz
 #
@@ -386,7 +409,7 @@ def power_and_information_shannon_welch(welch_power):
 #     stft_abs = np.abs(sig_stft)
 #     # TODO: Reconsider
 #     # Unit tone amplitude -> 1/2 bit in log2 STFT amplitude (not power)
-#     stft_bits = utils.log2epsilon(stft_abs)
+#     stft_bits = up.log2epsilon(stft_abs)
 #
 #     return sig_stft, stft_abs, stft_bits, time_stft_s, frequency_stft_hz
 #
@@ -429,7 +452,7 @@ def power_and_information_shannon_welch(welch_power):
 #     fft_frequency_pos = np.fft.rfftfreq(stft_fft_points, d=sample_interval_s)
 #     fft_power = 2.*(np.abs(fft_sig_pos))**2.
 #     # Unit tone amplitude -> 1/2 bit in log2 STFT amplitude (not power)
-#     fft_spectral_power_pos_bits = utils.log2epsilon(np.sqrt(fft_power))
+#     fft_spectral_power_pos_bits = up.log2epsilon(np.sqrt(fft_power))
 #     fft_spectral_phase_radians = np.angle(fft_sig_pos)
 #     return fft_frequency_pos, fft_sig_pos, fft_spectral_power_pos_bits, fft_spectral_phase_radians
 #
@@ -462,7 +485,7 @@ def power_and_information_shannon_welch(welch_power):
 #     # returns correct RMS power level (not RFFT)
 #     fft_sig /= stft_fft_points
 #     fft_frequency = np.fft.fftfreq(stft_fft_points, d=sample_interval_s)
-#     fft_spectral_bits = utils.log2epsilon(fft_sig)
+#     fft_spectral_bits = up.log2epsilon(fft_sig)
 #     fft_spectral_phase_radians = np.angle(fft_sig)
 #     return fft_frequency, fft_sig, fft_spectral_bits, fft_spectral_phase_radians
 #
@@ -512,7 +535,7 @@ def power_and_information_shannon_welch(welch_power):
 #     # Estimate Welch periodogram by adding Sxx and dividing by the number of windows
 #     # Removes zero frequency
 #     Welch_Sxx = np.average(Sxx, axis=1)
-#     Welch_Sxx_bits = 0.5*utils.log2epsilon(Welch_Sxx[1:])
+#     Welch_Sxx_bits = 0.5*up.log2epsilon(Welch_Sxx[1:])
 #     f_center_nozero = frequency_center[1:]
 #     return f_center_nozero, Welch_Sxx_bits
 #
@@ -537,5 +560,3 @@ def power_and_information_shannon_welch(welch_power):
 #     snr_power = Welch_Sxx2/Welch_Sxx
 #     snr_frequency = f_center[1:]
 #     return snr_frequency, snr_power
-#
-#

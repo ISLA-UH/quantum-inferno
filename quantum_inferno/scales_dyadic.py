@@ -85,14 +85,15 @@ def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER):
     """
     Ensure no negative, complex, or unreasonably small orders are passed; override to 1/3 octave band
     Standard orders are scale_order = [1, 3, 6, 12, 24]. Order must be >= 0.75 or reverts to N=3
+
     :param scale_order: Band order,
     """
     # TODO: Refine
     # I'm confident there are better admissibility tests
     scale_order = np.abs(scale_order)  # Should be real, positive float
     if scale_order < DEFAULT_SCALE_ORDER_MIN:
-        print('** Warning in scales_dyadic.scale_order_check')
-        print('N<0.75 specified, overriding using N = ', DEFAULT_SCALE_ORDER_MIN)
+        print(f'** Warning from scales_dyadic.scale_order_check:\n'
+              f'N < {DEFAULT_SCALE_ORDER_MIN} specified, overriding using N = {DEFAULT_SCALE_ORDER_MIN}')
         scale_order = DEFAULT_SCALE_ORDER_MIN
     return scale_order
 
@@ -103,20 +104,18 @@ def scale_multiplier(scale_order: float = DEFAULT_SCALE_ORDER):
     :param scale_order: scale order
     :return:
     """
-    scale_order = scale_order_check(scale_order)
-    return M_OVER_N*scale_order
+    return M_OVER_N * scale_order_check(scale_order)
 
 
 def cycles_from_order(scale_order: float) -> float:
     """
-    Compute the number of cycles M for a specified band order N
+    Compute the number of cycles M for a specified band order N.
     N is the quantization parameter for the constant Q wavelet filters
 
     :param scale_order: Band order, must be > 0.75 or reverts to N=0.75
     :return: cycles_M, number of cycled per normalized angular frequency
     """
-    cycles_per_scale = scale_multiplier(scale_order)
-    return cycles_per_scale
+    return scale_multiplier(scale_order)
 
 
 def order_from_cycles(cycles_per_scale: float) -> float:
@@ -130,24 +129,19 @@ def order_from_cycles(cycles_per_scale: float) -> float:
     # A single cycle is the min req
     if np.abs(cycles_per_scale) < 1:
         cycles_per_scale = 1.
-    scale_order = cycles_per_scale/M_OVER_N
-    # Order must be greater than min
-    scale_order = scale_order_check(scale_order)
-
-    return scale_order
+    return scale_order_check(cycles_per_scale / M_OVER_N)
 
 
 def base_multiplier(scale_order: float = DEFAULT_SCALE_ORDER,
                     scale_base: float = DEFAULT_SCALE_BASE):
     """
     Dyadic (log2) foundation for arbitrary base
+
     :param scale_order:
     :param scale_base:
     :return:
     """
-
-    scale_order_check(scale_order)
-    return scale_order/np.log2(scale_base)
+    return scale_order_check(scale_order) / np.log2(scale_base)
 
 
 def scale_from_frequency_hz(scale_order: float,
@@ -155,14 +149,15 @@ def scale_from_frequency_hz(scale_order: float,
                             frequency_sample_rate_hz: float) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
-    Nondimensional scale and angular frequency for canonical Gabor/Morlet wavelet
+    Non-dimensional scale and angular frequency for canonical Gabor/Morlet wavelet
+
     :param scale_order:
     :param scale_frequency_center_hz: scale frequency in hz
     :param frequency_sample_rate_hz: sample rate in hz
     :return: scale_atom, scaled angular frequency
     """
-    scale_angular_frequency = 2. * np.pi * scale_frequency_center_hz/frequency_sample_rate_hz
-    scale_atom = cycles_from_order(scale_order)/scale_angular_frequency
+    scale_angular_frequency = 2. * np.pi * scale_frequency_center_hz / frequency_sample_rate_hz
+    scale_atom = cycles_from_order(scale_order) / scale_angular_frequency
     return scale_atom, scale_angular_frequency
 
 
@@ -172,12 +167,13 @@ def gaussian_sigma_from_frequency(frequency_sample_hz: float,
     """
     Standard deviation (sigma) of Gaussian envelope from frequency (Garces, 2023)
     Use 3/8 = 0.375
+
     :param frequency_hz: physical frequency in Hz
     :param frequency_sample_hz: sensor sample rate in Hz
     :param scale_order: Scale order
     :return: standard deviation from physical frequency in Hz
     """
-    return 0.375*scale_order*frequency_sample_hz/frequency_hz
+    return 0.375 * scale_order * frequency_sample_hz / frequency_hz
 
 
 def scale_bands_from_ave(frequency_sample_hz: float,
@@ -192,34 +188,21 @@ def scale_bands_from_ave(frequency_sample_hz: float,
     :param scale_order:
     :param scale_ref_hz:
     :param scale_base:
-    :return: [band_nyq, band_ave, band_max, log2_ave_life_dyad]
+    :return: Shortest period (Nyquist limit), Closest period band, Longest period band,
+             Closest largest power of two to averaging frequency
     """
-
     # Framework constants
-    scale_mult = scale_multiplier(scale_order)
     order_over_log2base = base_multiplier(scale_order, scale_base)
-
     # Dyadic transforms
-    log2_scale_mult = np.log2(scale_mult)
-
-    # Dependent on reference and averaging frequency
-    log2_ave_physical = np.log2(scale_ref_hz/frequency_ave_hz)
-
+    log2_scale_mult = np.log2(scale_multiplier(scale_order))
     # Dependent on sensor sample rate
-    log2_ref = np.log2(frequency_sample_hz/scale_ref_hz)
-    log2_ave_cyber = np.log2(frequency_sample_hz/frequency_ave_hz)
-
+    log2_ref = np.log2(frequency_sample_hz / scale_ref_hz)
     # Closest largest power of two to averaging frequency
-    log2_ave_life_dyad = np.ceil(log2_scale_mult + log2_ave_cyber)
-
-    # Shortest period, Nyquist limit
-    band_nyq = int(np.ceil(order_over_log2base*(1-log2_ref)))
-    # Closest period band
-    band_ave = int(np.round(order_over_log2base*log2_ave_physical))
-    # Longest period band
-    band_max = int(np.floor(order_over_log2base*(log2_ave_life_dyad - log2_scale_mult - log2_ref)))
-
-    return [band_nyq, band_ave, band_max, log2_ave_life_dyad]
+    log2_ave_life_dyad = np.ceil(log2_scale_mult + np.log2(frequency_sample_hz / frequency_ave_hz))
+    return [int(np.ceil(order_over_log2base*(1 - log2_ref))),
+            int(np.round(order_over_log2base * np.log2(scale_ref_hz / frequency_ave_hz))),
+            int(np.floor(order_over_log2base*(log2_ave_life_dyad - log2_scale_mult - log2_ref))),
+            log2_ave_life_dyad]
 
 
 def scale_band_from_frequency(frequency_input_hz: float,
@@ -229,20 +212,18 @@ def scale_band_from_frequency(frequency_input_hz: float,
     """
     For any one mid frequencies; not meant to be vectorized, only for comparing expectations.
     DOES NOT DEPEND ON SAMPLE RATE
+
     :param frequency_input_hz:
     :param scale_order:
     :param scale_ref_hz:
     :param scale_base:
     :return: [band_number, band_frequency_hz]
     """
-
     # TODO: Meant for single input values away from max and min bands
-    # Framework constants
-    order_over_log2base = base_multiplier(scale_order, scale_base)
     # Dependent on reference frequency
     log2_in_physical = np.log2(scale_ref_hz/frequency_input_hz)
     # Closest period band, TODO: check for duplicates if vectorized
-    band_number = int(np.round(order_over_log2base*log2_in_physical))
+    band_number = int(np.round(base_multiplier(scale_order, scale_base) * log2_in_physical))
     band_frequency_hz = scale_ref_hz*scale_base**(-band_number/scale_order)
 
     return [band_number, band_frequency_hz]
@@ -254,31 +235,21 @@ def scale_bands_from_pow2(frequency_sample_hz: float,
                           scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
                           scale_base: float = DEFAULT_SCALE_BASE):
     """
-
     :param frequency_sample_hz:
     :param log2_ave_life_dyad:
     :param scale_order:
     :param scale_ref_hz:
     :param scale_base:
-    :return: [band_nyq, band_max]
+    :return: Shortest period (Nyquist limit) and Longest period band
     """
-
     # Framework constants
-    scale_mult = scale_multiplier(scale_order)
     order_over_log2base = base_multiplier(scale_order, scale_base)
-
     # Dyadic transforms
-    log2_scale_mult = np.log2(scale_mult)
-
+    log2_scale_mult = np.log2(scale_multiplier(scale_order))
     # Dependent on sensor sample rate
     log2_ref = np.log2(frequency_sample_hz/scale_ref_hz)
-
-    # Shortest period, Nyquist limit
-    band_nyq = int(np.ceil(order_over_log2base*(1-log2_ref)))
-    # Longest period band
-    band_max = int(np.floor(order_over_log2base*(log2_ave_life_dyad - log2_scale_mult - log2_ref)))
-
-    return [band_nyq, band_max]
+    return [int(np.ceil(order_over_log2base * (1 - log2_ref))),
+            int(np.floor(order_over_log2base * (log2_ave_life_dyad - log2_scale_mult - log2_ref)))]
 
 
 def period_from_bands(band_min: int,
@@ -286,11 +257,17 @@ def period_from_bands(band_min: int,
                       scale_order: float = DEFAULT_SCALE_BASE,
                       scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
                       scale_base: float = DEFAULT_SCALE_BASE):
+    """
 
-    bands = np.arange(band_min, band_max+1)
+    :param band_min:
+    :param band_max:
+    :param scale_order:
+    :param scale_ref_hz:
+    :param scale_base:
+    :return:
+    """
     # Increasing order
-    period = scale_base**(bands/scale_order)/scale_ref_hz
-    return period
+    return scale_base**(np.arange(band_min, band_max + 1) / scale_order) / scale_ref_hz
 
 
 def frequency_from_bands(band_min: int,
@@ -298,11 +275,17 @@ def frequency_from_bands(band_min: int,
                          scale_order: float = DEFAULT_SCALE_BASE,
                          scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
                          scale_base: float = DEFAULT_SCALE_BASE):
+    """
 
-    bands = np.arange(band_min, band_max+1)
-    # Flip so it increases
-    frequency = np.flip(scale_ref_hz*scale_base**(-bands/scale_order))
-    return frequency
+    :param band_min:
+    :param band_max:
+    :param scale_order:
+    :param scale_ref_hz:
+    :param scale_base:
+    :return:
+    """
+    # Flip the result so it increases
+    return np.flip(scale_ref_hz*scale_base**(-np.arange(band_min, band_max + 1) / scale_order))
 
 
 def log_frequency_hz_from_fft_points(
@@ -312,7 +295,15 @@ def log_frequency_hz_from_fft_points(
         scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
         scale_base: float = DEFAULT_SCALE_BASE
 ) -> np.ndarray:
+    """
 
+    :param frequency_sample_hz:
+    :param fft_points:
+    :param scale_order:
+    :param scale_ref_hz:
+    :param scale_base:
+    :return:
+    """
     # TODO: Make function to round to to nearest power of two and perform all-around error checking for pow2
     # See log 2 functions below
     log2_ave_life_dyad = int(np.ceil(np.log2(fft_points)))
@@ -324,21 +315,21 @@ def log_frequency_hz_from_fft_points(
     log2_scale_mult = np.log2(scale_mult)
 
     # Dependent on sensor sample rate
-    log2_ref = np.log2(frequency_sample_hz/scale_ref_hz)
+    log2_ref = np.log2(frequency_sample_hz / scale_ref_hz)
 
     # Shortest period, Nyquist limit
-    band_nyq = int(np.ceil(order_over_log2base*(1-log2_ref)))
+    # band_nyq = int(np.ceil(order_over_log2base*(1-log2_ref)))
     # Shortest period, nominal 8/10 of Nyquist
-    band_aa = int(np.ceil(order_over_log2base*(np.log2(2.5) - log2_ref)))
+    band_aa = int(np.ceil(order_over_log2base * (np.log2(2.5) - log2_ref)))
     # Longest period band
-    band_max = int(np.floor(order_over_log2base*(log2_ave_life_dyad - log2_scale_mult - log2_ref)))
+    band_max = int(np.floor(order_over_log2base * (log2_ave_life_dyad - log2_scale_mult - log2_ref)))
 
     # Stopped before Nyquist, before max
     # bands_old = np.arange(band_nyq+1, band_max+1)
     # Stopped at 0.8 of Nyquist
-    bands = np.arange(band_aa, band_max+1)
+    bands = np.arange(band_aa, band_max + 1)
     # Flip so frequency increases up to one band below Nyquist
-    frequency_logarithmic_hz = np.flip(scale_ref_hz*scale_base**(-bands/scale_order))
+    frequency_logarithmic_hz = np.flip(scale_ref_hz * scale_base**(-bands / scale_order))
     return frequency_logarithmic_hz
 
 
@@ -358,10 +349,8 @@ def lin_frequency_hz_from_fft_points(
     :param scale_base:
     :return:
     """
-
     frequency_log_hz = log_frequency_hz_from_fft_points(frequency_sample_hz, fft_points,
                                                         scale_order, scale_ref_hz, scale_base)
-    frequency_lin_min = frequency_log_hz[0]  # First band
-    frequency_lin_max = frequency_log_hz[-1]  # Last band
-    frequency_linear_hz = np.linspace(start=frequency_lin_min, stop=frequency_lin_max, num=len(frequency_log_hz))
+    frequency_linear_hz = np.linspace(start=frequency_log_hz[0], stop=frequency_log_hz[-1],
+                                      num=len(frequency_log_hz))
     return frequency_linear_hz

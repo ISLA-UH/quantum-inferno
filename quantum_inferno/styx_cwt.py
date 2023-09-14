@@ -13,17 +13,15 @@ from typing import Tuple, Union
 def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale, omega) -> Tuple[float, float]:
     """
     Theoretical variance of a Gabor wavelet, with real and imaginary components
+
     :param amp: wavelet amplitude
     :param time_s: time support vector
     :param scale: wavelet scale
     :param omega: angular frequency
     :return: nominal wavelet real and imaginary variance
     """
-
-    base_var = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale
-    real_cmpnt = (1 + np.exp(-(scale*omega)**2))
-    imag_cmpnt = (1 - np.exp(-(scale*omega)**2))
-    return base_var / real_cmpnt, base_var / imag_cmpnt
+    base_var = amp**2 / len(time_s) * 0.5 * np.sqrt(np.pi) * scale
+    return base_var / (1 + np.exp(-(scale * omega)**2)), base_var / (1 - np.exp(-(scale * omega)**2))
 
 
 def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
@@ -37,16 +35,16 @@ def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
     :param scale_atom: atom/logon scale
     :return: amp_canonical, amp_unit_spectrum
     """
-
     amp_canonical = (np.pi * scale_atom ** 2) ** (-1/4)
-    amp_unit_spectrum = (4*np.pi*scale_atom**2) ** (-1/4) * amp_canonical
-    return amp_canonical, amp_unit_spectrum
+    return amp_canonical, (4*np.pi*scale_atom**2) ** (-1/4) * amp_canonical
 
 
+# todo: isn't this just returning (4 * np.pi * scale_atom**2) ** (-1/4)?
 def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
     Return chirp amplitude
+
     amp_dict_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
     amp_dict_unit_spectrum = return unit peak spectrum; for practical implementation.
     amp_dict_unity = 1. Default (no scaling), for testing and validation against real and imaginary wavelets.
@@ -54,9 +52,8 @@ def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
     :param scale_atom: atom/logon scale
     :return: amp_canonical, amp_unit_spectrum
     """
-
     amp_canonical = (np.pi * scale_atom ** 2) ** (-1/4)
-    amp_unit_spectrum = (4*np.pi*scale_atom**2) ** (-1/4) * amp_canonical
+    amp_unit_spectrum = (4 * np.pi * scale_atom**2) ** (-1/4) * amp_canonical
     amp_norm2spect = amp_unit_spectrum/amp_canonical
 
     return amp_norm2spect
@@ -76,6 +73,7 @@ def wavelet_time(time_s: np.ndarray,
     return frequency_sample_rate_hz * (time_s - offset_time_s)
 
 
+# todo: lots of return values, consider object
 def wavelet_complex(
         band_order_nth: float,
         time_s: np.ndarray,
@@ -97,7 +95,6 @@ def wavelet_complex(
     :param frequency_sample_rate_hz: sample rate on Hz
     :return: waveform_complex, time_shifted_s
     """
-
     # Center and nondimensionalize time
     xtime_shifted = wavelet_time(time_s, offset_time_s, frequency_sample_rate_hz)
 
@@ -133,6 +130,7 @@ def wavelet_centered_4cwt(
 ) -> Tuple[np.ndarray, np.ndarray, Union[np.ndarray, float], Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
     Gabor atoms for CWT computation centered on the duration of signal
+    defaults to "norm" for dictionary_type.
 
     :param duration_points: number of points in the signal
     :param band_order_nth: Nth order of constant Q bands
@@ -141,29 +139,19 @@ def wavelet_centered_4cwt(
     :param dictionary_type: Canonical unit-norm ("norm"), unit spectrum ("spect"), or unit modulus ("unit")
     :return: waveform_complex, time_shifted_s
     """
-
     time_s = np.arange(duration_points)/frequency_sample_rate_hz
-    offset_time_s = time_s[-1]/2.
 
     wavelet_gabor, xtime_shifted, scale_angular_frequency, scale, omega, amp_canonical, amp_unit_spectrum = \
-        wavelet_complex(band_order_nth, time_s, offset_time_s, scale_frequency_center_hz, frequency_sample_rate_hz)
+        wavelet_complex(band_order_nth, time_s, time_s[-1]/2., scale_frequency_center_hz, frequency_sample_rate_hz)
 
-    if dictionary_type == "norm":
-        amp = amp_canonical
-    elif dictionary_type == "spect":
+    if dictionary_type == "spect":
         amp = amp_unit_spectrum
     elif dictionary_type == "unit":
-        if np.isscalar(scale):
-            amp = 1.
-        else:
-            amp = np.ones(scale.shape)
+        amp = 1. if np.isscalar(scale) else np.ones(scale.shape)
     else:
         amp = amp_canonical
 
-    wavelet_chirp = amp * wavelet_gabor
-    time_centered_s = xtime_shifted/frequency_sample_rate_hz
-
-    return wavelet_chirp, time_centered_s, scale, omega, amp
+    return amp * wavelet_gabor, xtime_shifted / frequency_sample_rate_hz, scale, omega, amp
 
 
 def cwt_complex_any_scale_pow2(
@@ -185,10 +173,7 @@ def cwt_complex_any_scale_pow2(
     :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
     :return: frequency_cwt_hz, time_s, cwt
     """
-
     wavelet_points = len(sig_wf)
-    time_cwt_s = np.arange(wavelet_points)/frequency_sample_rate_hz
-    scale_points = len(frequency_cwt_hz)
     cycles_m = scales.cycles_from_order(scale_order=band_order_nth)
 
     cw_complex, _, _, _, amp = \
@@ -208,17 +193,12 @@ def cwt_complex_any_scale_pow2(
                          w=cycles_m,
                          dtype=np.complex128)
         if dictionary_type == 'spect':
-            cwt_amp_norm2spec = amplitude_convert_norm_to_spect(scale_atom=scale_atom)
             # Convert to 2d matrix
-            spec_scale = np.tile(cwt_amp_norm2spec, (wavelet_points, 1)).T
-            cwt *= spec_scale
+            cwt *= np.tile(amplitude_convert_norm_to_spect(scale_atom=scale_atom), (wavelet_points, 1)).T
 
     else:
         # Convolution using the fft method
-        # Convert to a 2d matrix
-        sig_wf_2d = np.tile(sig_wf, (scale_points, 1))
-        # Flip time
-        cw_complex_fliplr = np.fliplr(cw_complex)
-        cwt = signal.fftconvolve(sig_wf_2d, np.conj(cw_complex_fliplr), mode='same', axes=-1)
+        cwt = signal.fftconvolve(np.tile(sig_wf, (len(frequency_cwt_hz), 1)),
+                                 np.conj(np.fliplr(cw_complex)), mode='same', axes=-1)
 
-    return frequency_cwt_hz, time_cwt_s, cwt
+    return frequency_cwt_hz, np.arange(wavelet_points) / frequency_sample_rate_hz, cwt

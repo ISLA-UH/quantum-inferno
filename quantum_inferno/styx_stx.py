@@ -11,14 +11,15 @@ from quantum_inferno.utils import is_power_of_two
 from typing import Tuple
 
 
-def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
+def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int, verbosity: bool = False):
     """
     Zero-pad signal to the higher 2**n points for FFT
+
     :param sig_wf:
     :param n_fft:
+    :param verbosity: if True, outputs additional debugging statements
     :return:
     """
-
     # Flatten to 2D and memorize original shape
     n_times = sig_wf.shape[-1]
 
@@ -31,12 +32,11 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
         n_fft = 2 ** int(np.ceil(np.log2(n_times)))
 
     if n_times < n_fft:
-        # TODO: Add verbosity
-        # print('The input signal is shorter ({}) than "n_fft" ({}). '
-        #       'Applying zero padding.'.format(sig_wf.shape[-1], n_fft))
+        if verbosity:
+            print('The input signal is shorter ({}) than "n_fft" ({}). '
+                  'Applying zero padding.'.format(sig_wf.shape[-1], n_fft))
         zero_pad: int = n_fft - n_times
-        pad_array = np.zeros(sig_wf.shape[:-1] + (zero_pad,), sig_wf.dtype)
-        sig_wf = np.concatenate((sig_wf, pad_array), axis=-1)
+        sig_wf = np.concatenate((sig_wf, np.zeros(sig_wf.shape[:-1] + (zero_pad,), sig_wf.dtype)), axis=-1)
     else:
         zero_pad: int = 0
 
@@ -153,7 +153,8 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
 #         stx_index = np.abs(frequency_fft - fsx).argmin()
 #         frequency_stx_fft[isx] = frequency_fft[stx_index]
 #         # omega_sx = 2*np.pi*frequency_stx_hz/sample_rate    # non-dimensional angular stx frequency
-#         omega_sx = 2 * np.pi * frequency_stx_fft[isx]/frequency_sample_rate  # eq non-dimensional angular fft frequency
+#         # eq non-dimensional angular fft frequency
+#         omega_sx = 2 * np.pi * frequency_stx_fft[isx]/frequency_sample_rate
 #         if omega_sx == 0.:
 #             windows_fft[isx] = np.ones(len(n_fft_pow2))
 #         else:
@@ -178,36 +179,38 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
 #     return tfr_stx, psd_stx, frequency_stx, frequency_stx_fft, windows_fft
 
 
-def stx_complex_any_scale_pow2(band_order_nth: float,
-                               sig_wf: np.ndarray,
-                               frequency_sample_rate_hz: float,
-                               frequency_stx_hz: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+# todo: don't return a value you just pass in
+def stx_complex_any_scale_pow2(
+        band_order_nth: float,
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
+        frequency_stx_hz: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     With some assumptions and simplifications, and with some vectorization
+
     :param band_order_nth: Fractional octave band - revisit
     :param sig_wf: input signal with 2^M points
     :param frequency_sample_rate_hz: sample rate in Hz
     :param frequency_stx_hz: frequency vector in increasing order
-    :return: 
+    :return: frequency_stx_hz, time_stx_s, tfr_stx
     """
     n_fft_pow2 = len(sig_wf)
-    time_stx_s = np.arange(n_fft_pow2)/frequency_sample_rate_hz
     scale_points = len(frequency_stx_hz)
-    cycles_m = scales.cycles_from_order(scale_order=band_order_nth)
     # Take FFT and concatenate. A leaner version could let the fft do the padding.
     sig_fft = fft(sig_wf)
     sig_fft_cat = np.concatenate([sig_fft, sig_fft], axis=-1)
 
-    frequency_fft = fftfreq(n_fft_pow2, 1/frequency_sample_rate_hz)   # in units of 1/sample interval
+    frequency_fft = fftfreq(n_fft_pow2, 1 / frequency_sample_rate_hz)   # in units of 1/sample interval
     omega_fft = 2 * np.pi * frequency_fft / frequency_sample_rate_hz  # scaled angular frequency
-    omega_stx = 2*np.pi*frequency_stx_hz/frequency_sample_rate_hz    # non-dimensional angular stx frequency
-    sigma_stx = cycles_m/omega_stx  # TODO: revisit; manage order vs frequency, use same nomenclature as cwt
+    omega_stx = 2 * np.pi * frequency_stx_hz / frequency_sample_rate_hz    # non-dimensional angular stx frequency
+    sigma_stx = scales.cycles_from_order(scale_order=band_order_nth) / omega_stx
+    # TODO: revisit; manage order vs frequency, use same nomenclature as cwt
 
     # Construct 2d matrices
     # sig_fft_cat_2d = np.tile(sig_fft_cat, (scale_points, 1))
-    omega_fft_2d = np.tile(omega_fft, (scale_points, 1))
-    sigma_stx_2d = np.tile(sigma_stx, (n_fft_pow2, 1)).T
-    windows_fft_2d = np.exp(-0.5 * (sigma_stx_2d ** 2.) * (omega_fft_2d ** 2.))
+    windows_fft_2d = np.exp(-0.5 * (np.tile(sigma_stx, (n_fft_pow2, 1)).T ** 2.)
+                            * (np.tile(omega_fft, (scale_points, 1)) ** 2.))
 
     # Construct shifting frequency indexes
     tfr_stx = np.empty((scale_points, n_fft_pow2), dtype=np.complex128)
@@ -218,4 +221,4 @@ def stx_complex_any_scale_pow2(band_order_nth: float,
         stx_index = np.abs(frequency_fft - fsx).argmin()
         tfr_stx[isx, :] = ifft(sig_fft_cat[stx_index:stx_index + n_fft_pow2] * windows_fft_2d[isx, :])
 
-    return frequency_stx_hz, time_stx_s, tfr_stx
+    return frequency_stx_hz, np.arange(n_fft_pow2) / frequency_sample_rate_hz, tfr_stx

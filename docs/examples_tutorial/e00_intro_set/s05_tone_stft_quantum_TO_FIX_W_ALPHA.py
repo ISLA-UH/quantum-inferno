@@ -6,7 +6,7 @@ TODO: Turn into functions with hard-coded defaults
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import utils
+from quantum_inferno import utils, utils_picker as up
 from libquantum2 import benchmark_signals
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 
@@ -86,8 +86,8 @@ if __name__ == "__main__":
 
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate Stockwell first
-    mic_spect_bits = utils.log2epsilon(np.sqrt(psd_spec_power))
-    mic_stft_bits = utils.log2epsilon(np.sqrt(stft_power))
+    mic_spect_bits = up.log2epsilon(np.sqrt(psd_spec_power))
+    mic_stft_bits = up.log2epsilon(np.sqrt(stft_power))
 
     print('Max spect bits:', np.max(mic_spect_bits))
     print('Max stft bits:', np.max(mic_stft_bits))
@@ -161,4 +161,3 @@ if __name__ == "__main__":
                            frequency_hz_ymax=fmax)
 
     plt.show()
-
