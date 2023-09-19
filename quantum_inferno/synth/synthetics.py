@@ -293,7 +293,7 @@ def frequency_algebraic_nth(frequency_geometric: np.ndarray,
     :param band_order_nth:  Nth order of constant Q bands
     :return:
     """
-    return frequency_geometric*(np.sqrt(1 + 1 / (8 * band_order_nth ** 2)))
+    return frequency_geometric * (np.sqrt(1 + 1 / (8 * band_order_nth ** 2)))
 
 
 # todo: this is in utils.py line 219
