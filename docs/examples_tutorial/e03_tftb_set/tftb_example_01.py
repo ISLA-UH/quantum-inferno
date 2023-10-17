@@ -1,5 +1,6 @@
 """
 todo: Describe me
+https://tftb.readthedocs.io/en/latest/apiref/tftb.generators.html
 """
 
 import numpy as np
