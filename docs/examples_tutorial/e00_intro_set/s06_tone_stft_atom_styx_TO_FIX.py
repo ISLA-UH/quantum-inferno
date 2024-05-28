@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from libquantum import utils, atoms
-from libquantum2 import benchmark_signals
+from quantum_inferno.synth import benchmark_signals
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 from libquantum.styx_stx import tfr_stx_fft
 
