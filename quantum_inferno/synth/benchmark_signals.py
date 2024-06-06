@@ -1,5 +1,6 @@
 """
-This module does something.  todo: what does it do
+This module provides benchmark synthetic functions and some quick plotting routines
+
 """
 import numpy as np
 import scipy.signal as signal
@@ -9,10 +10,7 @@ from quantum_inferno import utils
 from typing import Tuple
 import matplotlib.pyplot as plt
 
-# from libquantum.scales import EPSILON
-# from libquantum import synthetics, utils
 
-# todo: not used
 """ Quick plotting routines """
 
 
@@ -137,7 +135,7 @@ def plot_st_window_tfr_lin(window, frequency_sx, frequency_fft):
     plt.title("TFR window, lin")
 
 
-# todo: not used
+""" Signal conditioning  """
 
 
 def signal_gate(wf, t, tmin, tmax, fraction_cosine: float = 0):
