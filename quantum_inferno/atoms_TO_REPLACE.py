@@ -1,6 +1,6 @@
 """
 This module contains functions to construct quantized, standardized information packets using binary metrics.
-Copied over functions from libquantum_inferno/atoms.py that are used in quantum-inferno
+Copied over functions from libquantum_inferno/atoms_TO_REPLACE.py that are used in quantum-inferno
 """
 
 import numpy as np

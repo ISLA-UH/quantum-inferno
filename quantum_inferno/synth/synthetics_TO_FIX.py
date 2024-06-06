@@ -4,9 +4,8 @@ This module constructs synthetic signals
 
 import numpy as np
 import scipy.signal as signal
-from scipy.integrate import cumulative_trapezoid
 from typing import Optional, Tuple, Union
-from quantum_inferno import scales_dyadic, utils, atoms
+from quantum_inferno import scales_dyadic, utils, atoms_TO_REPLACE
 
 
 def gabor_loose_grain(
@@ -38,7 +37,7 @@ def gabor_loose_grain(
     time_s = np.arange(number_points) / frequency_sample_rate_hz
 
     xtime_shifted = atoms.chirp_time(time_s, np.max(time_s) / 2.0, frequency_sample_rate_hz)
-    wavelet_gauss = np.exp(-atoms.chirp_p_complex(scale_atom, gamma, index_shift) * xtime_shifted ** 2)
+    wavelet_gauss = np.exp(-atoms_TO_REPLACE.chirp_p_complex(scale_atom, gamma, index_shift) * xtime_shifted ** 2)
     wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_m * xtime_shifted / scale_atom)
 
     return np.copy(wavelet_gabor) * utils.taper_tukey(wavelet_gabor, 0.1), time_s, scale_atom
@@ -101,7 +100,7 @@ def tukey_tight_grain(
     # Fundamental chirp parameters
     cycles_m, quality_factor_q, gamma = atoms.chirp_MQG_from_N(band_order_nth, index_shift, frequency_base_input)
     scale_atom = atoms.chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)
-    p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
+    p_complex = atoms_TO_REPLACE.chirp_p_complex(scale_atom, gamma, index_shift)
 
     # Time from nominal duration
     grain_duration_s = cycles_m / scale_frequency_center_hz

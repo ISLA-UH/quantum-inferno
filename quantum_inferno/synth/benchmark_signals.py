@@ -5,7 +5,7 @@ This module provides benchmark synthetic functions and some quick plotting routi
 import numpy as np
 import scipy.signal as signal
 from quantum_inferno.scales_dyadic import get_epsilon
-from quantum_inferno.synth import synthetics
+from quantum_inferno.synth import synthetics_TO_FIX
 from quantum_inferno import utils
 from typing import Tuple
 import matplotlib.pyplot as plt

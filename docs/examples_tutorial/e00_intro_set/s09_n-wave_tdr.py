@@ -5,7 +5,7 @@ Constructs and processes N wave
 import numpy as np
 import matplotlib.pyplot as plt
 from quantum_inferno import styx_fft
-from quantum_inferno.synth import synthetics
+from quantum_inferno.synth import synthetics_TO_FIX
 import scipy.signal as signal
 
 

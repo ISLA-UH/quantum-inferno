@@ -6,7 +6,7 @@ TODO: Turn into functions with hard-coded defaults
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from quantum_inferno import utils, utils_picker as up
+from quantum_inferno import utils_picker as up
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.plot_templates import plot_time_frequency_reps_black as pltq
 

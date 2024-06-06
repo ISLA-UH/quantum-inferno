@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import blast_pulse as kaboom
 from quantum_inferno import utils, utils_picker as up
-from quantum_inferno import atoms
+from quantum_inferno import atoms_TO_REPLACE
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 
 from quantum_inferno.styx_stx import tfr_stx_fft

@@ -136,7 +136,7 @@ def tfr_stx_fft(
                 frequency_center_geometric,
                 frequency_start,
                 frequency_end,
-            ) = scales.band_frequencies_low_high(
+            ) = scales.band_frequency_low_high(
                 frequency_order_input=scale_order_input,
                 frequency_low_input=f_start,
                 frequency_high_input=f_stop,

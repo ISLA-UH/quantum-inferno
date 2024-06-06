@@ -15,7 +15,7 @@ Bulletin of the Seismological Society of America
 
 import numpy as np
 from typing import Optional, Tuple, Union
-from quantum_inferno.synth.synthetics import white_noise_fbits, antialias_half_nyquist
+from quantum_inferno.synth.synthetics_TO_FIX import white_noise_fbits, antialias_half_nyquist
 from quantum_inferno.scales_dyadic import get_epsilon
 
 # from libquantum.synthetics import white_noise_fbits, antialias_halfNyquist
