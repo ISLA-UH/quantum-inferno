@@ -19,7 +19,8 @@ station_id_str = 'synth'
 alpha = 1
 
 
-def n_wave_period_center(intro_s: float, n_wave_duration_s: float, outro_s: float, sample_rate_hz: float) -> np.ndarray:
+def n_wave_period_center(intro_s: float, n_wave_duration_s: float, outro_s: float, sample_rate_hz: float) -> \
+        [np.ndarray, np.ndarray, np.ndarray]:
     """
     N-Wave is simple
 
