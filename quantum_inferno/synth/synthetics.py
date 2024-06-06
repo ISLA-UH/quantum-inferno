@@ -142,7 +142,7 @@ def gabor_grain_frequencies(
         frequency_center,
         frequency_start,
         frequency_end,
-    ) = scales_dyadic.band_frequencies_low_high(
+    ) = scales_dyadic.band_frequency_low_high(
         frequency_order_input,
         frequency_base_input,
         frequency_ref_input,

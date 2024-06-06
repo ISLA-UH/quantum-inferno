@@ -229,7 +229,7 @@ def band_frequency_low_high(
     frequency_start = 1 / scale_end
     frequency_center_algebraic = (frequency_end + frequency_start) / 2.0
 
-    # Inherit the order, base, and band number
+    # Inherit the order, base, and frequency band number (negative of period band number because of the inversion)
     return (
         scale_order,
         scale_base,
