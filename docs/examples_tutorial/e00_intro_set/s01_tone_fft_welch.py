@@ -4,8 +4,8 @@ Compute Welch power spectral density (PSD) on simple tone to verify amplitudes
 Case study: Sinusoid input with unit amplitude
 Validate: Welch power averaged over the signal duration is 1/2
 RMS amplitude = 1/sqrt(2)
-TODO: Add the quantum functions to compute the Welch PSD
-TODO: switch to variance from rms
+TODO: Add the quantum functions to compute the Welch PSD; add to fft or construct styx_welch
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,10 +48,6 @@ if __name__ == "__main__":
     # If one, the Tukey window is equivalent to a Hann window.
     alpha = 0
 
-    # Computed and nominal values
-    mic_sig_rms = np.std(mic_sig)
-    mic_sig_rms_nominal = 1 / np.sqrt(2)
-
     # Computed Variance; divides by the number of points
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1 / 2.0
@@ -90,10 +86,7 @@ if __name__ == "__main__":
     print("Welch returns only the positive frequencies")
     print("len(Pxx):", len(frequency_welch_hz))
 
-    # The spectrum option returns the var at the peak, which for a tone will have an rms of 1/sqrt(2)
-    fft_rms_welch = np.sqrt(power_welch_spectrum) / mic_sig_rms
-    fft_rms_welch_psd = np.sqrt(frequency_resolution_fft_hz * power_welch_density) / mic_sig_rms
-
+    # The spectrum option returns the var at the peak, which for a tone will have a var of 1/2
     fft_welch_over_var = power_welch_spectrum / mic_sig_var
     fft_welch_psd_times_df_over_var = frequency_resolution_fft_hz * power_welch_density / mic_sig_var
 
