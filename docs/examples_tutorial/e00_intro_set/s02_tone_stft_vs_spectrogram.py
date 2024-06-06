@@ -48,10 +48,6 @@ if __name__ == "__main__":
     # If one, the Tukey window is equivalent to a Hann window.
     alpha = 0.25  # 25% Tukey (Cosine) window
 
-    # Computed and nominal values
-    mic_sig_rms = np.std(mic_sig)
-    mic_sig_rms_nominal = 1/np.sqrt(2)
-
     # Computed Variance; divides by the number of points
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1/2.
@@ -99,10 +95,7 @@ if __name__ == "__main__":
 
     stft_power = 2 * np.abs(stft_complex) ** 2
 
-    fft_rms_welch = np.sqrt(np.abs(psd_welch_power)) / mic_sig_rms
-    fft_rms_spect = np.sqrt(np.average(psd_spec_power, axis=1)) / mic_sig_rms
-    fft_rms_stft = np.sqrt(np.average(stft_power, axis=1)) / mic_sig_rms
-
+    # Compute the ratio of the PSD to the variance
     welch_over_var = psd_welch_power / mic_sig_var
     spect_over_var = np.average(psd_spec_power, axis=1) / mic_sig_var
     stft_over_var = np.average(stft_power, axis=1) / mic_sig_var
