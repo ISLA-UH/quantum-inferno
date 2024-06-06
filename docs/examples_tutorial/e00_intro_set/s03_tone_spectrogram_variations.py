@@ -1,5 +1,5 @@
 """
-libquantum example: s04_tone_spect_variations.py
+libquantum example: s03_tone_spect_variations.py
 Compute spectrogram with different scaling and mode options.
 scaling{ ‘density’, ‘spectrum’ }
 mode{‘psd’, ‘complex’, ‘magnitude’}
@@ -10,6 +10,7 @@ Sinusoid input with unit amplitude
 Validate:
 Welch power averaged over the signal duration is 1/2
 RMS amplitude = 1/sqrt(2)
+Variance = 1/2
 TODO: Redo with variance, RMS is silly
 """
 import numpy as np

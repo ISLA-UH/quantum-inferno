@@ -4,7 +4,8 @@ Compute Welch power spectral density (PSD) on simple tone to verify amplitudes
 Case study: Sinusoid input with unit amplitude
 Validate: Welch power averaged over the signal duration is 1/2
 RMS amplitude = 1/sqrt(2)
-
+TODO: Add the quantum functions to compute the Welch PSD
+TODO: switch to variance from rms
 """
 import numpy as np
 import matplotlib.pyplot as plt

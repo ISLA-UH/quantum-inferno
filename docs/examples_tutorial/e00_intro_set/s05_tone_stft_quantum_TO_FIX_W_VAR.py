@@ -1,6 +1,6 @@
 """
 libquantum example: s05_stft_tone_quantum
-Compute stft spectrogram with libquantum
+Compute stft spectrogram
 TODO: Turn into functions with hard-coded defaults
 """
 import numpy as np

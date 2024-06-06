@@ -31,7 +31,7 @@ if __name__ == "__main__":
     # In the first example (FFT), the nominal signal duration was 1s.
     # In this example the nominal signal duration is 16s, with averaging (fft) window duration of 1s.
     # Compare to synthetic tone with 2^n points and max FFT amplitude at exact and NOT exact fft frequency
-    # If NOT exact fft frequency, spectrum does not return unit amplitude (but it's close)
+    # If NOT exact fft frequency does not return unit amplitude (but it's close)
     frequency_tone_hz = 60
     [mic_sig, time_s, time_fft_nd,
      frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz] = \
