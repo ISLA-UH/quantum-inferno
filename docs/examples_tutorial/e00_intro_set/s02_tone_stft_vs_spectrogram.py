@@ -30,6 +30,8 @@ if __name__ == "__main__":
     # In this example, added noise, taper, and antialiasing filter.
     # In the first example (FFT), the nominal signal duration was 1s.
     # In this example the nominal signal duration is 16s, with averaging (fft) window duration of 1s.
+    # Compare to synthetic tone with 2^n points and max FFT amplitude at exact and NOT exact fft frequency
+    # If NOT exact fft frequency, spectrum does not return unit amplitude (but it's close)
     frequency_tone_hz = 60
     [mic_sig, time_s, time_fft_nd,
      frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz] = \
@@ -39,17 +41,6 @@ if __name__ == "__main__":
                                              time_fft_s=1,
                                              use_fft_frequency=True,
                                              add_noise_taper_aa=True)
-
-    # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
-    # It does not return unit amplitude (but it's close)
-    # [mic_sig, time_s, time_fft_nd,
-    #  frequency_sample_rate_hz, frequency_center_stft_hz, frequency_resolution_stft_hz] = \
-    #     benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz,
-    #                                          frequency_sample_rate_hz=800,
-    #                                          time_duration_s=16,
-    #                                          time_fft_s=1,
-    #                                          use_fft_frequency=False,
-    #                                          add_noise_taper_aa=True)
 
     # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window
     # inside the cosine tapered region.
