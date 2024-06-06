@@ -80,7 +80,7 @@ if __name__ == "__main__":
     stft_power = 2 * np.abs(stft_complex) ** 2
 
     # Compute complex wavelet transform (cwt) from signal duration using the Gabor atoms
-    cwt_complex, _, time_cwt_s, frequency_cwt_hz = atoms.cwt_chirp_from_sig(
+    cwt_complex, _, time_cwt_s, frequency_cwt_hz = atoms_TO_REPLACE.cwt_chirp_from_sig(
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         band_order_Nth=order_number_input,

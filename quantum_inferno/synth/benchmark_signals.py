@@ -432,11 +432,11 @@ def well_tempered_tone(
 
     if add_noise_taper_aa:
         # Add noise
-        mic_sig += synthetics.white_noise_fbits(sig=mic_sig, std_bit_loss=8.0)
+        mic_sig += synthetics_TO_FIX.white_noise_fbits(sig=mic_sig, std_bit_loss=8.0)
         # Taper before AA
         mic_sig *= utils.taper_tukey(mic_sig, fraction_cosine=0.1)
         # Antialias (AA)
-        synthetics.antialias_half_nyquist(mic_sig)
+        synthetics_TO_FIX.antialias_half_nyquist(mic_sig)
 
     print("WELL TEMPERED TONE SYNTHETIC")
     print("Nyquist frequency:", frequency_sample_rate_hz / 2)
