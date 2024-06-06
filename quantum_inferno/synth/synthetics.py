@@ -312,15 +312,3 @@ def frequency_algebraic_nth(frequency_geometric: np.ndarray, band_order_nth: flo
     """
     return frequency_geometric * (np.sqrt(1 + 1 / (8 * band_order_nth ** 2)))
 
-
-# todo: this is in utils.py line 219
-def integrate_cumtrapz(timestamps_s: np.ndarray, sensor_wf: np.ndarray, initial_value: float = 0) -> np.ndarray:
-    """
-    cumulative trapezoid integration using scipy.integrate.cumulative_trapezoid
-
-    :param timestamps_s: timestamps corresponding to the data in seconds
-    :param sensor_wf: data to integrate using cumulative trapezoid
-    :param initial_value: the value to add in the initial of the integrated data to match length of input (default is 0)
-    :return: integrated data with the same length as the input
-    """
-    return cumulative_trapezoid(x=timestamps_s, y=sensor_wf, initial=initial_value)

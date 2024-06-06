@@ -1,6 +1,7 @@
 """
 This module contains general utilities that can work with values containing nans.
 TODO: Break up into smaller modules
+TODO: Add tests
 """
 
 import os
@@ -83,8 +84,7 @@ def taper_tukey(sig_wf_or_time: np.ndarray, fraction_cosine: float) -> np.ndarra
     """
     Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
     fraction_cosine = 0 is a rectangular window, 1 is a Hann window
-    todo: is fraction cosine a scale and what are its limits
-
+    todo: is fraction cosine a scale and what are its limits. Reconcile with ref to alpha in rest of code
     :param sig_wf_or_time: input signal or time
     :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
     :return: tukey taper window amplitude
@@ -92,7 +92,6 @@ def taper_tukey(sig_wf_or_time: np.ndarray, fraction_cosine: float) -> np.ndarra
     return signal.windows.tukey(M=np.size(sig_wf_or_time), alpha=fraction_cosine, sym=True)
 
 
-# todo: this is in synthetics.py line 300
 # Integrals and derivatives
 def integrate_cumtrapz(timestamps_s: np.ndarray, sensor_wf: np.ndarray, initial_value: float = 0) -> np.ndarray:
     """
