@@ -1,5 +1,6 @@
 """
-This module contains functions for examining doppler shift in signals
+This module contains functions for constructing and examining doppler shift in signals
+
 """
 
 import numpy as np
