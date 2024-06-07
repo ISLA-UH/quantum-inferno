@@ -94,9 +94,9 @@ if __name__ == "__main__":
     stft_power = 2 * np.abs(stft_complex) ** 2
 
     # Compute the power over the whole record
-    fft_var_welch_norm = np.abs(psd_welch_power) / mic_sig_var
-    fft_var_spect_norm = np.average(psd_spec_power, axis=1) / mic_sig_var
-    fft_var_stft_norm = np.average(stft_power, axis=1) / mic_sig_var
+    fft_var_norm_welch = np.abs(psd_welch_power) / mic_sig_var
+    fft_var_norm_spect = np.average(psd_spec_power, axis=1) / mic_sig_var
+    fft_var_norm_stft = np.average(stft_power, axis=1) / mic_sig_var
 
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate Stockwell first
@@ -126,9 +126,9 @@ if __name__ == "__main__":
     ax1.set_title("Synthetic CW, with taper")
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("Norm")
-    ax2.semilogx(frequency_welch_hz, fft_var_welch_norm, label="Welch")
-    ax2.semilogx(frequency_spect_hz, fft_var_spect_norm, "--", label="Spect")
-    ax2.semilogx(frequency_stft_hz, fft_var_stft_norm, ".-", label="STFT")
+    ax2.semilogx(frequency_welch_hz, fft_var_norm_welch, label="Welch")
+    ax2.semilogx(frequency_spect_hz, fft_var_norm_spect, "--", label="Spect")
+    ax2.semilogx(frequency_stft_hz, fft_var_norm_stft, ".-", label="STFT")
     ax2.set_title("Welch and Spect FFT (VAR), f = " + str(round(frequency_center_fft_hz, 2)) + " Hz")
     ax2.set_xlabel("Frequency, hz")
     ax2.set_ylabel("FFT VAR / SIG VAR")
@@ -160,7 +160,7 @@ if __name__ == "__main__":
         wf_panel_a_units="Norm",
         mesh_panel_b_cbar_units="bits",
         start_time_epoch=0,
-        figure_title="spectrogram for " + EVENT_NAME,
+        figure_title="Spectrogram for " + EVENT_NAME,
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
@@ -176,7 +176,7 @@ if __name__ == "__main__":
         wf_panel_a_units="Norm",
         mesh_panel_b_cbar_units="bits",
         start_time_epoch=0,
-        figure_title="stft for " + EVENT_NAME,
+        figure_title="STFT for " + EVENT_NAME,
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
