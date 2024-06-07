@@ -93,9 +93,10 @@ if __name__ == "__main__":
 
     stft_power = 2 * np.abs(stft_complex) ** 2
 
-    fft_rms_welch = np.abs(psd_welch_power) / mic_sig_var
-    fft_rms_spect = np.average(psd_spec_power, axis=1) / mic_sig_var
-    fft_rms_stft = np.average(stft_power, axis=1) / mic_sig_var
+    # Compute the power over the whole record
+    fft_var_welch_norm = np.abs(psd_welch_power) / mic_sig_var
+    fft_var_spect_norm = np.average(psd_spec_power, axis=1) / mic_sig_var
+    fft_var_stft_norm = np.average(stft_power, axis=1) / mic_sig_var
 
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate Stockwell first
@@ -125,13 +126,14 @@ if __name__ == "__main__":
     ax1.set_title("Synthetic CW, with taper")
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("Norm")
-    ax2.semilogx(frequency_welch_hz, fft_rms_welch)
-    ax2.semilogx(frequency_spect_hz, fft_rms_spect)
-    ax2.semilogx(frequency_stft_hz, fft_rms_stft, ".-")
+    ax2.semilogx(frequency_welch_hz, fft_var_welch_norm, label="Welch")
+    ax2.semilogx(frequency_spect_hz, fft_var_spect_norm, "--", label="Spect")
+    ax2.semilogx(frequency_stft_hz, fft_var_stft_norm, ".-", label="STFT")
     ax2.set_title("Welch and Spect FFT (VAR), f = " + str(round(frequency_center_fft_hz, 2)) + " Hz")
     ax2.set_xlabel("Frequency, hz")
-    ax2.set_ylabel("FFT VAR * sqrt(2)")
+    ax2.set_ylabel("FFT VAR / SIG VAR")
     ax2.grid(True)
+    ax2.legend(loc='upper left')
 
     # Plot the inverse stft (full recovery)
     fig2, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
@@ -142,7 +144,7 @@ if __name__ == "__main__":
     ax2.plot(sig_time_istft, (mic_sig - sig_wf_istft) ** 2)
     ax2.set_title("(original - inverse)**2")
     ax2.set_xlabel("Time, s")
-    ax2.set_ylabel("Norm")
+    ax2.set_ylabel("Raw Error, highest at taper")
 
     # Select plot frequencies
     fmin = 2 * frequency_resolution_fft_hz
