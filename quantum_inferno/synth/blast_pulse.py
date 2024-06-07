@@ -15,11 +15,8 @@ Bulletin of the Seismological Society of America
 
 import numpy as np
 from typing import Optional, Tuple, Union
-from quantum_inferno.synth.synthetics_TO_FIX import white_noise_fbits, antialias_half_nyquist
+from quantum_inferno.synth.synthetics_NEW import white_noise_fbits, antialias_half_nyquist
 from quantum_inferno.scales_dyadic import get_epsilon
-
-# from libquantum.synthetics import white_noise_fbits, antialias_halfNyquist
-# from libquantum.scales import EPSILON
 
 
 def gt_blast_period_center(time_center_s: np.ndarray, pseudo_period_s: float) -> np.ndarray:

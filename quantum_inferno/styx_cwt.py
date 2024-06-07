@@ -10,6 +10,8 @@ from quantum_inferno import scales_dyadic as scales
 from typing import Tuple, Union
 
 
+# TODO: LOOK AT ATOMS_TO_REPLACE and scaled_dyadic for inline cwt frequency. Same for STX.
+
 def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale, omega) -> Tuple[float, float]:
     """
     Theoretical variance of a Gabor wavelet, with real and imaginary components

@@ -11,6 +11,9 @@ from quantum_inferno.utils import is_power_of_two
 from typing import Tuple
 
 
+# TODO: LOOK AT ATOMS_TO_REPLACE and scaled_dyadic for inline STX frequency. Same for CWT.
+
+# TODO: Place this def somewhere more useful, like quantum_inferno/utils.py. Use native fft padding.
 def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int, verbosity: bool = False):
     """
     Zero-pad signal to the higher 2**n points for FFT
