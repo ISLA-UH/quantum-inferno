@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import spectrogram
 from quantum_inferno import scales_dyadic
-import quantum_inferno.synth.synthetics_TO_FIX as synth
+import quantum_inferno.synth.synthetics_NEW as synth
 import quantum_inferno.synth.doppler as doppler
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 print(__doc__)
