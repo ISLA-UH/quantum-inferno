@@ -1,123 +1,15 @@
 """
 This module constructs synthetic signals
+TODO: ADD MORE INFO
 """
 
 import numpy as np
 import scipy.signal as signal
 from typing import Optional, Tuple, Union
-# from quantum_inferno import scales_dyadic, utils, atoms_TO_REPLACE
-from quantum_inferno import scales_dyadic, utils
-
-def gabor_loose_grain(
-    band_order_nth: float,
-    number_points: int,
-    scale_frequency_center_hz: float,
-    frequency_sample_rate_hz: float,
-    index_shift: float = 0,
-    frequency_base_input: float = scales_dyadic.Slice.G2,
-) -> Tuple[np.ndarray, np.ndarray, float]:
-    """
-    Loose grain with tight Tukey wrap to ensure zero at edges
-
-    :param band_order_nth: Nth order of constant Q bands
-    :param number_points: Number of points in the signal
-    :param scale_frequency_center_hz: center frequency fc in Hz
-    :param frequency_sample_rate_hz: sample rate of frequency in Hz
-    :param index_shift: index of shift for the Gabor chirp, default of zero
-    :param frequency_base_input: G2 or G3. Default is G2
-    :return: numpy array with Tukey grain
-    """
-    # Fundamental chirp parameters
-    cycles_m, quality_factor_q, gamma = atoms_TO_REPLACE.chirp_MQG_from_N(
-        band_order_nth, index_shift, frequency_base_input
-    )
-    scale_atom = atoms_TO_REPLACE.chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)
-
-    # # Time from nominal duration
-    # grain_duration_s = cycles_M/scale_frequency_center_hz
-    # Time from number of points
-    time_s = np.arange(number_points) / frequency_sample_rate_hz
-
-    xtime_shifted = atoms_TO_REPLACE.chirp_time(time_s, np.max(time_s) / 2.0, frequency_sample_rate_hz)
-    wavelet_gauss = np.exp(-atoms_TO_REPLACE.chirp_p_complex(scale_atom, gamma, index_shift) * xtime_shifted ** 2)
-    wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_m * xtime_shifted / scale_atom)
-
-    return np.copy(wavelet_gabor) * utils.taper_tukey(wavelet_gabor, 0.1), time_s, scale_atom
+from quantum_inferno import scales_dyadic
 
 
-def gabor_tight_grain(
-    band_order_nth: float,
-    scale_frequency_center_hz: float,
-    frequency_sample_rate_hz: float,
-    index_shift: float = 0,
-    frequency_base_input: float = scales_dyadic.Slice.G2,
-) -> np.ndarray:
-    """
-    Gabor grain with tight Tukey wrap to ensure zero at edges
-
-    :param band_order_nth: Nth order of constant Q bands
-    :param scale_frequency_center_hz: center frequency fc in Hz
-    :param frequency_sample_rate_hz: sample rate of frequency in Hz
-    :param index_shift: index of shift
-    :param frequency_base_input: G2 or G3. Default is G2
-    :return: numpy array with Tukey grain
-    """
-
-    # Fundamental chirp parameters
-    cycles_m, quality_factor_q, gamma = atoms_TO_REPLACE.chirp_MQG_from_N(
-        band_order_nth, index_shift, frequency_base_input
-    )
-    scale_atom = atoms_TO_REPLACE.chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)
-    p_complex = atoms_TO_REPLACE.chirp_p_complex(scale_atom, gamma, index_shift)
-
-    # Time from nominal duration
-    grain_duration_s = cycles_m / scale_frequency_center_hz
-    time_s = np.arange(int(np.round(grain_duration_s * frequency_sample_rate_hz))) / frequency_sample_rate_hz
-
-    xtime_shifted = atoms_TO_REPLACE.chirp_time(time_s, np.max(time_s) / 2.0, frequency_sample_rate_hz)
-    wavelet_gabor = np.exp(-p_complex * xtime_shifted ** 2) * np.exp(1j * cycles_m * xtime_shifted / scale_atom)
-
-    return np.copy(wavelet_gabor) * utils.taper_tukey(wavelet_gabor, 0.1)
-
-
-def tukey_tight_grain(
-    band_order_nth: float,
-    scale_frequency_center_hz: float,
-    frequency_sample_rate_hz: float,
-    fraction_cosine: float = 0.5,
-    index_shift: float = 0,
-    frequency_base_input: float = scales_dyadic.Slice.G2,
-) -> np.ndarray:
-    """
-    Tukey grain with same support as Gabor atom
-
-    :param band_order_nth: Nth order of constant Q bands
-    :param scale_frequency_center_hz: center frequency fc in Hz
-    :param frequency_sample_rate_hz: sample rate of frequency in Hz
-    :param fraction_cosine: fraction of the window inside the cosine tapered window,
-        shared between the head and tail.  Default 0.5
-    :param index_shift: index of shift.  Default 0
-    :param frequency_base_input: G2 or G3. Default G2
-    :return: numpy array with Tukey grain
-    """
-
-    # Fundamental chirp parameters
-    cycles_m, quality_factor_q, gamma = atoms_TO_REPLACE.chirp_MQG_from_N(
-        band_order_nth, index_shift, frequency_base_input
-    )
-    scale_atom = atoms_TO_REPLACE.chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)
-    p_complex = atoms_TO_REPLACE.chirp_p_complex(scale_atom, gamma, index_shift)
-
-    # Time from nominal duration
-    grain_duration_s = cycles_m / scale_frequency_center_hz
-    time_s = np.arange(int(np.round(grain_duration_s * frequency_sample_rate_hz))) / frequency_sample_rate_hz
-
-    xtime_shifted = atoms_TO_REPLACE.chirp_time(time_s, np.max(time_s) / 2.0, frequency_sample_rate_hz)
-    # Pull out phase component from gaussian envelope
-    wavelet_gabor = np.exp(1j * cycles_m * xtime_shifted / scale_atom + 1j * np.imag(-p_complex * xtime_shifted ** 2))
-
-    return np.copy(wavelet_gabor) * utils.taper_tukey(wavelet_gabor, fraction_cosine)
-
+# TODO: ADD Gabor grain
 
 def gabor_grain_frequencies(
     frequency_order_input: float,

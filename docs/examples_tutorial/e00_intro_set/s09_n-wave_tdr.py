@@ -5,7 +5,7 @@ Constructs and processes N wave
 import numpy as np
 import matplotlib.pyplot as plt
 from quantum_inferno import styx_fft
-from quantum_inferno.synth import synthetics_TO_FIX
+from quantum_inferno.synth import synthetics_NEW
 import scipy.signal as signal
 
 
@@ -18,6 +18,7 @@ station_id_str = "synth"
 alpha = 1
 
 
+# TODO: ADD THIS TO SYNTHETICS
 def n_wave_period_center(
     intro_s: float, n_wave_duration_s: float, outro_s: float, sample_rate_hz: float
 ) -> [np.ndarray, np.ndarray, np.ndarray]:
@@ -66,7 +67,7 @@ if __name__ == "__main__":
         outro_s=mult * pseudo_period_main_s,
         sample_rate_hz=frequency_sample_rate_hz,
     )
-    sig_wf_aa = synthetics_TO_FIX.antialias_half_nyquist(synth=np.copy(sig_wf_raw))
+    sig_wf_aa = synthetics_NEW.antialias_half_nyquist(synth=np.copy(sig_wf_raw))
     sig_wf_dec = signal.decimate(np.copy(sig_wf_aa), decimate)
     sig_time_s = sig_time_s_raw[::10]
 
