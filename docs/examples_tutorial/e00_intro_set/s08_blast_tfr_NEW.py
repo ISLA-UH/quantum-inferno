@@ -1,50 +1,67 @@
 """
-libquantum example: s06_stft_tone_stft_atom_styx
-Compute stft spectrogram with libquantum
-TODO: Turn into functions with hard-coded defaults
+libquantum example: s08_blast_tfr
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from quantum_inferno.synth import benchmark_signals
-import quantum_inferno.plot_templates.plot_time_frequency_reps_black as pltq
-from quantum_inferno import utils, atoms_TO_REPLACE
+from quantum_inferno.synth import blast_pulse as kaboom
+from quantum_inferno import utils_picker as up
+from quantum_inferno import utils, scales_dyadic
+from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
+import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 from quantum_inferno.styx_stx import tfr_stx_fft
 
-# import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
-# from libquantum.styx_stx import tfr_stx_fft
-# from libquantum import utils, atoms
 
 print(__doc__)
-EVENT_NAME = "tone test"
+EVENT_NAME = "grain test"
 station_id_str = "synth"
 # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
 # If zero, the Tukey window is equivalent to a rectangular window.
 # If one, the Tukey window is equivalent to a Hann window.
 alpha = 1
 
-# Set tone parameters
-frequency_tone_hz = 60
-order_number_input = 3
-
 if __name__ == "__main__":
     """
-    Compute the spectrogram over sliding windows.
-    The Welch method is equivalent to averaging the spectrogram over the columns.
+    Blast test
     """
-    # Construct a tone of fixed frequency with a constant sample rate as in previous
-    # The nominal signal duration is 16s, with nominal averaging (fft) window duration of 1s.
-    [
-        mic_sig,
-        time_s,
-        time_fft_nd,
-        frequency_sample_rate_hz,
-        frequency_center_fft_hz,
-        frequency_resolution_fft_hz,
-    ] = benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz, add_noise_taper_aa=True)
+
+    order_number_input = 6
+    EVENT_NAME = "Blast Test"
+    station_id_str = "Synth"
+
+    frequency_sample_rate_hz = 800.0
+    # Target frequency
+    frequency_center_hz = 60
+    pseudo_period_main_s = 1 / frequency_center_hz
+
+    # Duration set by the number of cycles
+    window_cycles = 4 * 32
+    window_duration_s = window_cycles * pseudo_period_main_s
+    time_points = 2 ** int(np.log2(window_duration_s * frequency_sample_rate_hz))  # Use 2^n
+    time_fft_nd = int(time_points / 2 ** 3)
+    sig_duration_s = time_points / frequency_sample_rate_hz
+    std_bit_loss = 1.0
+
+    time_s, mic_sig = kaboom.gt_blast_center_noise(
+        duration_s=sig_duration_s,
+        frequency_peak_hz=frequency_center_hz,
+        sample_rate_hz=frequency_sample_rate_hz,
+        noise_std_loss_bits=std_bit_loss,
+    )
+
+    time_s -= time_s[0]
+    mic_sig *= utils.taper_tukey(sig_wf_or_time=time_s, fraction_cosine=0.1)  # Add taper
+    mic_sig /= np.max(mic_sig)  # Max unit amplitude
+
+    frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
+    fft_index = np.argmin(np.abs(frequency_fft_pos_hz - frequency_center_hz))
+    frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
+    frequency_resolution_fft_hz = frequency_sample_rate_hz / time_fft_nd
 
     # Computed and nominal values
     mic_sig_rms = np.std(mic_sig)
+    # TODO: Get RMS
     mic_sig_rms_nominal = 1 / np.sqrt(2)
 
     # Compute the Welch PSD; averaged spectrum over sliding windows
@@ -79,26 +96,35 @@ if __name__ == "__main__":
 
     stft_power = 2 * np.abs(stft_complex) ** 2
 
-    # Compute complex wavelet transform (cwt) from signal duration using the Gabor atoms
-    cwt_complex, _, time_cwt_s, frequency_cwt_hz = atoms_TO_REPLACE.cwt_chirp_from_sig(
+    # TODO: CLEAN UP!! This is a mess
+    # Compute complex wavelet transform (cwt)
+    frequencies_cwt_hz = scales_dyadic.log_frequency_hz_from_fft_points(
+        frequency_sample_hz=frequency_sample_rate_hz,
+        fft_points=len(mic_sig),
+        scale_order=order_number_input)
+
+    # TODO: BUILD frequency_cwt_hz INTO METHOD
+    [frequency_cwt_hz, time_cwt_s, cwt_complex] = cwt_complex_any_scale_pow2(
+        band_order_nth=order_number_input,
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
-        band_order_Nth=order_number_input,
-        dictionary_type="spect",
-        frequency_ref=frequency_center_fft_hz,
+        frequency_cwt_hz=frequencies_cwt_hz,
+        cwt_type="fft",
+        dictionary_type="spect"
     )
 
-    cwt_power = 2 * np.abs(cwt_complex) ** 2
+    cwt_power = np.abs(cwt_complex) ** 2
 
     # Compute Stockwell transform
+    # TODO: Return time with zero origin
     [stx_complex, _, frequency_stx_hz, frequency_stx_fft_hz, W] = tfr_stx_fft(
         sig_wf=mic_sig,
-        n_fft_in=8192,  # needs to have value or error pops up in sig_pad_up_to_pow2(sig_wf, n_fft_in)
         time_sample_interval=1 / frequency_sample_rate_hz,
         frequency_min=frequency_resolution_fft_hz,
         frequency_max=frequency_sample_rate_hz / 2,
         scale_order_input=order_number_input,
-        scale_ref_input=1 / 59.66796875,
+        scale_ref_input=1 / frequency_center_fft_hz,
+        n_fft_in=1024,  # NEED n_fft_in to function
         is_geometric=True,
         is_inferno=False,
     )
@@ -116,9 +142,9 @@ if __name__ == "__main__":
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate CWT and Stockwell first
 
-    mic_stft_bits = utils.log2epsilon(np.sqrt(stft_power))
-    mic_cwt_bits = utils.log2epsilon(np.sqrt(cwt_power))
-    mic_stx_bits = utils.log2epsilon(np.sqrt(stx_power))
+    mic_stft_bits = up.log2epsilon(np.sqrt(stft_power))
+    mic_cwt_bits = up.log2epsilon(np.sqrt(cwt_power))
+    mic_stx_bits = up.log2epsilon(np.sqrt(stx_power))
 
     print("Max stft bits:", np.max(mic_stft_bits))
     print("Max cwt bits:", np.max(mic_cwt_bits))
@@ -137,18 +163,18 @@ if __name__ == "__main__":
 
     ax2.set_title("Welch and Spect FFT (RMS), f = " + str(round(frequency_center_fft_hz * 100) / 100) + " Hz")
     ax2.set_xlabel("Frequency, hz")
-    ax2.set_ylabel("|FFT|/RMS(FFT)")
+    ax2.set_ylabel("FFT RMS / std(sig)")
     ax2.grid(True)
     ax2.legend()
 
-    plt.show()
-    exit()
+    # plt.show()
+    # exit()
     # Select plot frequencies
     fmin = 2 * frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
 
     pltq.plot_wf_mesh_vert(
-        redvox_id="00",
+        station_id="00",
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_stft_s,
@@ -164,23 +190,7 @@ if __name__ == "__main__":
     )
 
     pltq.plot_wf_mesh_vert(
-        redvox_id="00",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_s,
-        mesh_frequency=frequency_stx_hz,
-        mesh_panel_b_tfr=mic_stx_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title="STX for " + EVENT_NAME,
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
-
-    pltq.plot_wf_mesh_vert(
-        redvox_id="00",
+        station_id="00",
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_cwt_s,
@@ -191,6 +201,22 @@ if __name__ == "__main__":
         mesh_panel_b_cbar_units="bits",
         start_time_epoch=0,
         figure_title="cwt for " + EVENT_NAME,
+        frequency_hz_ymin=fmin,
+        frequency_hz_ymax=fmax,
+    )
+
+    pltq.plot_wf_mesh_vert(
+        station_id="00",
+        wf_panel_a_sig=mic_sig,
+        wf_panel_a_time=time_s,
+        mesh_time=time_s,
+        mesh_frequency=frequency_stx_hz,
+        mesh_panel_b_tfr=mic_stx_bits,
+        mesh_panel_b_colormap_scaling="range",
+        wf_panel_a_units="Norm",
+        mesh_panel_b_cbar_units="bits",
+        start_time_epoch=0,
+        figure_title="STX for " + EVENT_NAME,
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )

@@ -262,7 +262,7 @@ if __name__ == "__main__":
     #     wf_panel_a_units="Norm",
     #     mesh_panel_b_cbar_units="bits",
     #     start_time_epoch=0,
-    #     figure_title="cwt for " + EVENT_NAME,
+    #     figure_title="CWT for " + EVENT_NAME,
     #     frequency_hz_ymin=fmin,
     #     frequency_hz_ymax=fmax,
     # )

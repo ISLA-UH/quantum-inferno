@@ -31,15 +31,16 @@ def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
     amp_dict_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
     amp_dict_unit_spectrum = return unit peak spectrum; for practical implementation.
     amp_dict_unity = 1. Default (no scaling), for testing and validation against real and imaginary wavelets.
-
+    Programmers: Although tempting, do not simplify - this follows the original math and is a touchstone.
     :param scale_atom: atom/logon scale
     :return: amp_canonical, amp_unit_spectrum
+
     """
     amp_canonical = (np.pi * scale_atom ** 2) ** (-1/4)
-    return amp_canonical, (4*np.pi*scale_atom**2) ** (-1/4) * amp_canonical
+    amp_unit_spectrum = (4 * np.pi * scale_atom ** 2) ** (-1/4) * amp_canonical
+    return amp_canonical, amp_unit_spectrum
 
 
-# todo: isn't this just returning (4 * np.pi * scale_atom**2) ** (-1/4)?
 def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
@@ -163,7 +164,7 @@ def cwt_complex_any_scale_pow2(
         dictionary_type: str = "norm"
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Calculate CWT for chirp
+    Calculate CWT
 
     :param band_order_nth: Nth order of constant Q bands
     :param sig_wf: array with input signal
@@ -171,9 +172,10 @@ def cwt_complex_any_scale_pow2(
     :param frequency_cwt_hz: center frequency vector
     :param cwt_type: one of "fft", or "morlet2". Default is "fft"
     :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
-    :return: frequency_cwt_hz, time_s, cwt
+    :return: frequency_cwt_hz, time_cwt_s, cwt
     """
     wavelet_points = len(sig_wf)
+    time_cwt_s = np.arange(wavelet_points) / frequency_sample_rate_hz
     cycles_m = scales.cycles_from_order(scale_order=band_order_nth)
 
     cw_complex, _, _, _, amp = \
@@ -200,5 +202,6 @@ def cwt_complex_any_scale_pow2(
         # Convolution using the fft method
         cwt = signal.fftconvolve(np.tile(sig_wf, (len(frequency_cwt_hz), 1)),
                                  np.conj(np.fliplr(cw_complex)), mode='same', axes=-1)
+        # TODO: Where is 'spect' option for dictionary_type?
 
-    return frequency_cwt_hz, np.arange(wavelet_points) / frequency_sample_rate_hz, cwt
+    return frequency_cwt_hz, time_cwt_s, cwt
