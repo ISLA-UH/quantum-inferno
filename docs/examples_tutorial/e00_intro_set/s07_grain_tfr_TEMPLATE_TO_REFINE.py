@@ -5,9 +5,11 @@ todo: EPSILON is not an integer type
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from quantum_inferno import styx_stx, styx_cwt, styx_fft, info
+from quantum_inferno import styx_stx, styx_cwt, styx_fft
 from quantum_inferno import scales_dyadic as scales
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
+from quantum_inferno import utils_picker
+
 
 print(__doc__)
 
@@ -40,6 +42,7 @@ if __name__ == "__main__":
     # Want to evaluate the CWX and STX at the NFFT frequencies of the sliding-window Welch/STFT spectra
     frequency_stft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
 
+    # TODO: REVISIT THIS - CWT FREQUENCY IS COMPUTED from the number of points of the signal
     # CWT
     cwt_fft_index = np.argmin(np.abs(frequency_cwt_pos_hz - frequency_center_hz))
     frequency_center_cwt_hz = frequency_cwt_pos_hz[cwt_fft_index]
@@ -66,6 +69,8 @@ if __name__ == "__main__":
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         dictionary_type="norm",
     )
+
+    time_s -= time_s[0]
     mic_sig_real = np.real(mic_sig_complex)
     mic_sig_imag = np.imag(mic_sig_complex)
 
@@ -128,31 +133,34 @@ if __name__ == "__main__":
         segment_points=time_fft_nd,  # nfft must be greater than or equal to nperseg.
     )
 
-    # Information overload methods
-    (
-        stft_power,
-        stft_power_per_band,
-        stft_power_per_sample,
-        stft_power_total,
-        stft_power_scaled,
-        stft_information_bits,
-        stft_information_bits_per_band,
-        stft_information_bits_per_sample,
-        stft_information_bits_total,
-        stft_information_scaled,
-    ) = styx_fft.power_and_information_shannon_stft(stft_complex)
+    stft_power = 2 * np.abs(stft_complex) ** 2
+
+    # # Information overload methods
+    # (
+    #     stft_power,
+    #     stft_power_per_band,
+    #     stft_power_per_sample,
+    #     stft_power_total,
+    #     stft_power_scaled,
+    #     stft_information_bits,
+    #     stft_information_bits_per_band,
+    #     stft_information_bits_per_sample,
+    #     stft_information_bits_total,
+    #     stft_information_scaled,
+    # ) = styx_fft.power_and_information_shannon_stft(stft_complex)
 
     # CWT
     frequency_cwt_hz, time_cwt_s, cwt_complex = styx_cwt.cwt_complex_any_scale_pow2(
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
-        frequency_cwt_hz=frequency_cwt_fft_hz,
         band_order_nth=order_number_input,
         dictionary_type="spect",
     )
 
-    # TODO: Make power_and_information_shannon_cwt() function
-    # # Information overload methods
+    cwt_power = 2 * np.abs(cwt_complex) ** 2
+
+    # TODO, maybe: Make power_and_information_shannon_cwt() function
+    # Information overload methods
     # (
     #     cwt_power,
     #     cwt_power_per_band,
@@ -166,13 +174,15 @@ if __name__ == "__main__":
     #     cwt_information_scaled,
     # ) = info.power_and_information_shannon_cwt(cwt_complex)
     #
-    # # Stockwell transform
-    # frequency_stx_hz, time_stx_s, stx_complex = styx_stx.stx_complex_any_scale_pow2(
-    #     sig_wf=mic_sig,
-    #     frequency_sample_rate_hz=frequency_sample_rate_hz,
-    #     frequency_stx_hz=frequency_cwt_fft_hz,
-    #     band_order_nth=order_number_input,
-    # )
+    # Stockwell transform
+    frequency_stx_hz, time_stx_s, stx_complex = styx_stx.stx_complex_any_scale_pow2(
+        band_order_nth=order_number_input,
+        sig_wf=mic_sig,
+        frequency_sample_rate_hz=frequency_sample_rate_hz
+    )
+
+    stx_power = 2 * np.abs(stx_complex) ** 2
+
     #
     # # Information overload methods
     # (
@@ -191,14 +201,21 @@ if __name__ == "__main__":
     # Scale power by variance
     welch_over_var = psd_welch_power / mic_sig_var
     stft_over_var = np.average(stft_power, axis=1) / mic_sig_var
-    # cwt_over_var = np.average(cwt_power, axis=1) / mic_sig_var
-    # stx_over_var = np.average(stx_power, axis=1) / mic_sig_var
+    cwt_over_var = np.average(cwt_power, axis=1) / mic_sig_var
+    stx_over_var = np.average(stx_power, axis=1) / mic_sig_var
 
     print("\nSum scaled spectral power")
     print("Sum Welch:", np.sum(welch_over_var))
     print("Sum STFT:", np.sum(stft_over_var))
-    # print("Sum CWT:", np.sum(cwt_over_var))
-    # print("Sum STX:", np.sum(stx_over_var))
+    print("Sum CWT:", np.sum(cwt_over_var))
+    print("Sum STX:", np.sum(stx_over_var))
+
+    # Express in bits; revisit
+    # TODO: What units shall we use? Evaluate CWT and Stockwell first
+
+    mic_stft_bits = utils_picker.log2epsilon(np.sqrt(stft_power))
+    mic_cwt_bits = utils_picker.log2epsilon(np.sqrt(cwt_power))
+    mic_stx_bits = utils_picker.log2epsilon(np.sqrt(stx_power))
     #
     # print("Sum cwt_power_scaled :", np.sum(cwt_power_scaled))
     # print("Sum cwt_information_scaled :", np.sum(cwt_information_scaled))
@@ -218,11 +235,11 @@ if __name__ == "__main__":
     ax1.set_ylabel("Norm")
     ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
     ax2.semilogx(frequency_stft_hz, stft_over_var, ".-", label="STFT")
-    # ax2.semilogx(frequency_cwt_hz, cwt_over_var, "-.", label="CWT")
-    # ax2.semilogx(frequency_stx_hz, stx_over_var, "--", label="STX")
-    ax2.set_title("Welch and Spect FFT (RMS), f = " + str(round(frequency_center_stft_hz * 100) / 100) + " Hz")
+    ax2.semilogx(frequency_cwt_hz, cwt_over_var, "-.", label="CWT")
+    ax2.semilogx(frequency_stx_hz, stx_over_var, "--", label="STX")
+    ax2.set_title("Spectral Power, f = " + str(round(frequency_center_stft_hz * 100) / 100) + " Hz")
     ax2.set_xlabel("Frequency, hz")
-    ax2.set_ylabel("Power / var(sig)")
+    ax2.set_ylabel("Power / Var(sig)")
     ax2.grid(True)
     ax2.legend()
 
@@ -241,7 +258,7 @@ if __name__ == "__main__":
         wf_panel_a_time=time_s,
         mesh_time=time_stft_s,
         mesh_frequency=frequency_stft_hz,
-        mesh_panel_b_tfr=np.log2(stft_power + scales.get_epsilon()),
+        mesh_panel_b_tfr=mic_stft_bits,
         mesh_panel_b_colormap_scaling="range",
         wf_panel_a_units="Norm",
         mesh_panel_b_cbar_units="bits",
@@ -251,36 +268,36 @@ if __name__ == "__main__":
         frequency_hz_ymax=fmax,
     )
 
-    # pltq.plot_wf_mesh_vert(
-    #     station_id="00",
-    #     wf_panel_a_sig=mic_sig,
-    #     wf_panel_a_time=time_cwt_s,
-    #     mesh_time=time_cwt_s,
-    #     mesh_frequency=frequency_cwt_hz,
-    #     mesh_panel_b_tfr=np.log2(cwt_power + scales.get_epsilon()),
-    #     mesh_panel_b_colormap_scaling="range",
-    #     wf_panel_a_units="Norm",
-    #     mesh_panel_b_cbar_units="bits",
-    #     start_time_epoch=0,
-    #     figure_title="CWT for " + EVENT_NAME,
-    #     frequency_hz_ymin=fmin,
-    #     frequency_hz_ymax=fmax,
-    # )
-    #
-    # pltq.plot_wf_mesh_vert(
-    #     station_id="00",
-    #     wf_panel_a_sig=mic_sig,
-    #     wf_panel_a_time=time_stx_s,
-    #     mesh_time=time_stx_s,
-    #     mesh_frequency=frequency_stx_hz,
-    #     mesh_panel_b_tfr=np.log2(stx_power + scales.get_epsilon()),
-    #     mesh_panel_b_colormap_scaling="range",
-    #     wf_panel_a_units="Norm",
-    #     mesh_panel_b_cbar_units="bits",
-    #     start_time_epoch=0,
-    #     figure_title="STX for " + EVENT_NAME,
-    #     frequency_hz_ymin=fmin,
-    #     frequency_hz_ymax=fmax,
-    # )
+    pltq.plot_wf_mesh_vert(
+        station_id="00",
+        wf_panel_a_sig=mic_sig,
+        wf_panel_a_time=time_s,
+        mesh_time=time_cwt_s,
+        mesh_frequency=frequency_cwt_hz,
+        mesh_panel_b_tfr=mic_cwt_bits,
+        mesh_panel_b_colormap_scaling="range",
+        wf_panel_a_units="Norm",
+        mesh_panel_b_cbar_units="bits",
+        start_time_epoch=0,
+        figure_title="cwt for " + EVENT_NAME,
+        frequency_hz_ymin=fmin,
+        frequency_hz_ymax=fmax,
+    )
+
+    pltq.plot_wf_mesh_vert(
+        station_id="00",
+        wf_panel_a_sig=mic_sig,
+        wf_panel_a_time=time_s,
+        mesh_time=time_s,
+        mesh_frequency=frequency_stx_hz,
+        mesh_panel_b_tfr=mic_stx_bits,
+        mesh_panel_b_colormap_scaling="range",
+        wf_panel_a_units="Norm",
+        mesh_panel_b_cbar_units="bits",
+        start_time_epoch=0,
+        figure_title="STX for " + EVENT_NAME,
+        frequency_hz_ymin=fmin,
+        frequency_hz_ymax=fmax,
+    )
 
     plt.show()

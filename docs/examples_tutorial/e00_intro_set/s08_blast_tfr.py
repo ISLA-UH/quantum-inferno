@@ -6,12 +6,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import blast_pulse as kaboom
-from quantum_inferno import utils_picker as up
-from quantum_inferno import utils, scales_dyadic
+from quantum_inferno import utils, utils_picker
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
-import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 from quantum_inferno.styx_stx import tfr_stx_fft
-
+import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 
 print(__doc__)
 EVENT_NAME = "grain test"
@@ -96,19 +94,11 @@ if __name__ == "__main__":
 
     stft_power = 2 * np.abs(stft_complex) ** 2
 
-    # TODO: CLEAN UP!! This is a mess
     # Compute complex wavelet transform (cwt)
-    frequencies_cwt_hz = scales_dyadic.log_frequency_hz_from_fft_points(
-        frequency_sample_hz=frequency_sample_rate_hz,
-        fft_points=len(mic_sig),
-        scale_order=order_number_input)
-
-    # TODO: BUILD frequency_cwt_hz INTO METHOD
     [frequency_cwt_hz, time_cwt_s, cwt_complex] = cwt_complex_any_scale_pow2(
         band_order_nth=order_number_input,
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
-        frequency_cwt_hz=frequencies_cwt_hz,
         cwt_type="fft",
         dictionary_type="spect"
     )
@@ -142,9 +132,9 @@ if __name__ == "__main__":
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate CWT and Stockwell first
 
-    mic_stft_bits = up.log2epsilon(np.sqrt(stft_power))
-    mic_cwt_bits = up.log2epsilon(np.sqrt(cwt_power))
-    mic_stx_bits = up.log2epsilon(np.sqrt(stx_power))
+    mic_stft_bits = utils_picker.log2epsilon(np.sqrt(stft_power))
+    mic_cwt_bits = utils_picker.log2epsilon(np.sqrt(cwt_power))
+    mic_stx_bits = utils_picker.log2epsilon(np.sqrt(stx_power))
 
     print("Max stft bits:", np.max(mic_stft_bits))
     print("Max cwt bits:", np.max(mic_cwt_bits))

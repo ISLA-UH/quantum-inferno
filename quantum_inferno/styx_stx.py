@@ -333,8 +333,11 @@ def tfr_stx_fft(
 
 
 # todo: don't return a value you just pass in
+# TODO: AS IN CWT, build log STX frequency. See above for fancier version
 def stx_complex_any_scale_pow2(
-    band_order_nth: float, sig_wf: np.ndarray, frequency_sample_rate_hz: float, frequency_stx_hz: np.ndarray
+        band_order_nth: float,
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     With some assumptions and simplifications, and with some vectorization
@@ -342,10 +345,15 @@ def stx_complex_any_scale_pow2(
     :param band_order_nth: Fractional octave band - revisit
     :param sig_wf: input signal with 2^M points
     :param frequency_sample_rate_hz: sample rate in Hz
-    :param frequency_stx_hz: frequency vector in increasing order
     :return: frequency_stx_hz, time_stx_s, tfr_stx
+
     """
     n_fft_pow2 = len(sig_wf)
+    frequency_stx_hz = scales.log_frequency_hz_from_fft_points(
+        frequency_sample_hz=frequency_sample_rate_hz,
+        fft_points=n_fft_pow2,
+        scale_order=band_order_nth)
+
     scale_points = len(frequency_stx_hz)
     # Take FFT and concatenate. A leaner version could let the fft do the padding.
     sig_fft = fft(sig_wf)

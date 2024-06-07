@@ -1,7 +1,7 @@
 """
 This module contains functions to construct quantized, standardized information packets using binary metrics.
 No-chirp/sweep (index_shift=0, variable removed), simplified for the base stockwell transform.
-Based on Garces (2020).
+Based on Garces (2023).
 """
 
 import numpy as np
@@ -161,6 +161,61 @@ def cwt_complex_any_scale_pow2(
         band_order_nth: float,
         sig_wf: np.ndarray,
         frequency_sample_rate_hz: float,
+        cwt_type: str = "fft",
+        dictionary_type: str = "norm"
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Calculate CWT
+
+    :param band_order_nth: Nth order of constant Q bands
+    :param sig_wf: array with input signal
+    :param frequency_sample_rate_hz: sample rate in Hz
+    :param cwt_type: one of "fft", or "morlet2". Default is "fft"
+    :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
+    :return: frequency_cwt_hz, time_cwt_s, cwt
+    """
+    wavelet_points = len(sig_wf)
+    time_cwt_s = np.arange(wavelet_points) / frequency_sample_rate_hz
+    cycles_m = scales.cycles_from_order(scale_order=band_order_nth)
+
+    frequency_cwt_hz = scales.log_frequency_hz_from_fft_points(
+        frequency_sample_hz=frequency_sample_rate_hz,
+        fft_points=len(sig_wf),
+        scale_order=band_order_nth)
+
+    cw_complex, _, _, _, amp = \
+        wavelet_centered_4cwt(band_order_nth=band_order_nth,
+                              duration_points=wavelet_points,
+                              scale_frequency_center_hz=frequency_cwt_hz,
+                              frequency_sample_rate_hz=frequency_sample_rate_hz,
+                              dictionary_type=dictionary_type)
+
+    if cwt_type == "morlet2":
+        scale_atom, _ = \
+            scales.scale_from_frequency_hz(scale_order=band_order_nth,
+                                           frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                           scale_frequency_center_hz=frequency_cwt_hz)
+        cwt = signal.cwt(data=sig_wf, wavelet=signal.morlet2,
+                         widths=scale_atom,
+                         w=cycles_m,
+                         dtype=np.complex128)
+        if dictionary_type == 'spect':
+            # Convert to 2d matrix
+            cwt *= np.tile(amplitude_convert_norm_to_spect(scale_atom=scale_atom), (wavelet_points, 1)).T
+
+    else:
+        # Convolution using the fft method
+        cwt = signal.fftconvolve(np.tile(sig_wf, (len(frequency_cwt_hz), 1)),
+                                 np.conj(np.fliplr(cw_complex)), mode='same', axes=-1)
+        # TODO: Where is 'spect' option for dictionary_type?
+
+    return frequency_cwt_hz, time_cwt_s, cwt
+
+
+def cwt_complex_any_scale_pow2_TO_REPLACE(
+        band_order_nth: float,
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
         frequency_cwt_hz: np.ndarray,
         cwt_type: str = "fft",
         dictionary_type: str = "norm"
@@ -179,6 +234,11 @@ def cwt_complex_any_scale_pow2(
     wavelet_points = len(sig_wf)
     time_cwt_s = np.arange(wavelet_points) / frequency_sample_rate_hz
     cycles_m = scales.cycles_from_order(scale_order=band_order_nth)
+
+    frequencies_cwt_hz = scales.log_frequency_hz_from_fft_points(
+        frequency_sample_hz=frequency_sample_rate_hz,
+        fft_points=len(sig_wf),
+        scale_order=band_order_nth)
 
     cw_complex, _, _, _, amp = \
         wavelet_centered_4cwt(band_order_nth=band_order_nth,
