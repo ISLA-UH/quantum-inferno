@@ -9,7 +9,7 @@ from typing import Optional, Tuple, Union
 from quantum_inferno import scales_dyadic
 
 
-# TODO: ADD Gabor grain
+# TODO: ADD Gabor grain, see also cwt and dyadic scales
 
 def gabor_grain_frequencies(
     frequency_order_input: float,
