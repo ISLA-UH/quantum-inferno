@@ -10,6 +10,8 @@ from quantum_inferno import utils, utils_picker
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
 from quantum_inferno.styx_stx import tfr_stx_fft
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
+from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
+
 
 print(__doc__)
 EVENT_NAME = "grain test"
@@ -100,7 +102,7 @@ if __name__ == "__main__":
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         cwt_type="fft",
-        dictionary_type="spect"
+        dictionary_type="spect",
     )
 
     cwt_power = np.abs(cwt_complex) ** 2
@@ -132,9 +134,9 @@ if __name__ == "__main__":
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate CWT and Stockwell first
 
-    mic_stft_bits = utils_picker.log2epsilon(np.sqrt(stft_power))
-    mic_cwt_bits = utils_picker.log2epsilon(np.sqrt(cwt_power))
-    mic_stx_bits = utils_picker.log2epsilon(np.sqrt(stx_power))
+    mic_stft_bits = to_log2_with_epsilon(np.sqrt(stft_power))
+    mic_cwt_bits = to_log2_with_epsilon(np.sqrt(cwt_power))
+    mic_stx_bits = to_log2_with_epsilon(np.sqrt(stx_power))
 
     print("Max stft bits:", np.max(mic_stft_bits))
     print("Max cwt bits:", np.max(mic_cwt_bits))

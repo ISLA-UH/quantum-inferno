@@ -11,6 +11,8 @@ import quantum_inferno.plot_templates.plot_time_frequency_reps_black as pltq
 from quantum_inferno import utils, scales_dyadic
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
 from quantum_inferno.styx_stx import tfr_stx_fft
+from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
+
 
 print(__doc__)
 EVENT_NAME = "tone test"
@@ -84,9 +86,8 @@ if __name__ == "__main__":
     # TODO: CLEAN UP!! This is a mess
     # Compute complex wavelet transform (cwt)
     frequencies_cwt_hz = scales_dyadic.log_frequency_hz_from_fft_points(
-        frequency_sample_hz=frequency_sample_rate_hz,
-        fft_points=len(mic_sig),
-        scale_order=order_number_input)
+        frequency_sample_hz=frequency_sample_rate_hz, fft_points=len(mic_sig), scale_order=order_number_input
+    )
 
     # TODO: BUILD frequency_cwt_hz INTO METHOD
     [frequency_cwt_hz, time_cwt_s, cwt_complex] = cwt_complex_any_scale_pow2(
@@ -95,7 +96,7 @@ if __name__ == "__main__":
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         frequency_cwt_hz=frequencies_cwt_hz,
         cwt_type="fft",
-        dictionary_type="spect"
+        dictionary_type="spect",
     )
 
     cwt_power = 2 * np.abs(cwt_complex) ** 2
@@ -126,9 +127,9 @@ if __name__ == "__main__":
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate CWT and Stockwell first
 
-    mic_stft_bits = utils.log2epsilon(np.sqrt(stft_power))
-    mic_cwt_bits = utils.log2epsilon(np.sqrt(cwt_power))
-    mic_stx_bits = utils.log2epsilon(np.sqrt(stx_power))
+    mic_stft_bits = to_log2_with_epsilon(np.sqrt(stft_power))
+    mic_cwt_bits = to_log2_with_epsilon(np.sqrt(cwt_power))
+    mic_stx_bits = to_log2_with_epsilon(np.sqrt(stx_power))
 
     print("Max stft bits:", np.max(mic_stft_bits))
     print("Max cwt bits:", np.max(mic_cwt_bits))

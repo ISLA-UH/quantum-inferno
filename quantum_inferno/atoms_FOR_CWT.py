@@ -5,8 +5,9 @@ Copied over functions from libquantum_inferno/atoms_FOR_CWT.py that are used in 
 
 import numpy as np
 import scipy.signal as signal
-from quantum_inferno import scales_dyadic as scales, utils
+from quantum_inferno import scales_dyadic as scales
 from typing import Tuple, Union
+from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 
 def chirp_complex(
@@ -456,7 +457,7 @@ def cwt_chirp_complex(
     # Time scales are increasing, which is the opposite of what is expected for the frequency. Flip.
     frequency_cwt_hz = np.flip(frequency_cwt_hz_flipped)
     cwt = np.flipud(cwt_flipped)
-    cwt_bits = utils.log2epsilon(cwt)
+    cwt_bits = to_log2_with_epsilon(cwt)
 
     return cwt, cwt_bits, time_s, frequency_cwt_hz
 

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from quantum_inferno import styx_stx, styx_cwt, styx_fft
 from quantum_inferno import scales_dyadic as scales
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
-from quantum_inferno import utils_picker
+from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 
 print(__doc__)
@@ -176,9 +176,7 @@ if __name__ == "__main__":
     #
     # Stockwell transform
     frequency_stx_hz, time_stx_s, stx_complex = styx_stx.stx_complex_any_scale_pow2(
-        band_order_nth=order_number_input,
-        sig_wf=mic_sig,
-        frequency_sample_rate_hz=frequency_sample_rate_hz
+        band_order_nth=order_number_input, sig_wf=mic_sig, frequency_sample_rate_hz=frequency_sample_rate_hz
     )
 
     stx_power = 2 * np.abs(stx_complex) ** 2
@@ -213,9 +211,9 @@ if __name__ == "__main__":
     # Express in bits; revisit
     # TODO: What units shall we use? Evaluate CWT and Stockwell first
 
-    mic_stft_bits = utils_picker.log2epsilon(np.sqrt(stft_power))
-    mic_cwt_bits = utils_picker.log2epsilon(np.sqrt(cwt_power))
-    mic_stx_bits = utils_picker.log2epsilon(np.sqrt(stx_power))
+    mic_stft_bits = to_log2_with_epsilon(np.sqrt(stft_power))
+    mic_cwt_bits = to_log2_with_epsilon(np.sqrt(cwt_power))
+    mic_stx_bits = to_log2_with_epsilon(np.sqrt(stx_power))
     #
     # print("Sum cwt_power_scaled :", np.sum(cwt_power_scaled))
     # print("Sum cwt_information_scaled :", np.sum(cwt_information_scaled))
