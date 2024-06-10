@@ -18,19 +18,22 @@ class ExtractionType(Enum):
 
     BITMAX = fancier signal picker, from ABSOLUTE max
     """
+
     ARGMAX: str = "argmax"
     SIGMAX: str = "sigmax"
     BITMAX: str = "bitmax"
 
 
+# TODO: sig_extract returns first peak, which may not be the best peak
+# TODO: It may be better to separate extracting the signal and finding the peaks
 def sig_extract(
-        sig: np.ndarray,
-        time_epoch_s: np.ndarray,
-        intro_s: float,
-        outro_s: float,
-        pick_bits_below_max: float = 1.,
-        pick_time_interval_s: float = 1.,
-        extract_type: ExtractionType = ExtractionType.ARGMAX
+    sig: np.ndarray,
+    time_epoch_s: np.ndarray,
+    intro_s: float,
+    outro_s: float,
+    pick_bits_below_max: float = 1.0,
+    pick_time_interval_s: float = 1.0,
+    extract_type: ExtractionType = ExtractionType.ARGMAX,
 ) -> Tuple[np.ndarray, np.ndarray, float]:
     """
     Extract signal and time relative to reference index
@@ -46,25 +49,39 @@ def sig_extract(
     """
     if extract_type == ExtractionType.SIGMAX:
         # First pick
-        pick_func = picker_signal_max_index(sig_sample_rate_hz=1./np.mean(np.diff(time_epoch_s)),
-                                            sig=sig, bits_pick=pick_bits_below_max,
-                                            time_interval_s=pick_time_interval_s)[0]
-        pick_fun2 = picker_signal_finder(sig=sig, sig_sample_rate_hz=1./np.mean(np.diff(time_epoch_s)),
-                                         bits_pick=pick_bits_below_max, mode="max",
-                                         time_interval_s=pick_time_interval_s)[0]
-        assert(pick_func == pick_fun2)
+        pick_func = picker_signal_max_index(
+            sig_sample_rate_hz=1.0 / np.mean(np.diff(time_epoch_s)),
+            sig=sig,
+            bits_pick=pick_bits_below_max,
+            time_interval_s=pick_time_interval_s,
+        )[0]
+        pick_fun2 = picker_signal_finder(
+            sig=sig,
+            sig_sample_rate_hz=1.0 / np.mean(np.diff(time_epoch_s)),
+            bits_pick=pick_bits_below_max,
+            mode="max",
+            time_interval_s=pick_time_interval_s,
+        )[0]
+        assert pick_func == pick_fun2
     elif extract_type == ExtractionType.BITMAX:
         # First pick
-        pick_func = picker_signal_bit_index(sig_sample_rate_hz=1./np.mean(np.diff(time_epoch_s)),
-                                            sig=sig, bits_pick=pick_bits_below_max,
-                                            time_interval_s=pick_time_interval_s)[0]
-        pick_fun2 = picker_signal_finder(sig=sig, sig_sample_rate_hz=1./np.mean(np.diff(time_epoch_s)),
-                                         bits_pick=pick_bits_below_max, mode="bit",
-                                         time_interval_s=pick_time_interval_s)[0]
-        assert(pick_func == pick_fun2)
+        pick_func = picker_signal_bit_index(
+            sig_sample_rate_hz=1.0 / np.mean(np.diff(time_epoch_s)),
+            sig=sig,
+            bits_pick=pick_bits_below_max,
+            time_interval_s=pick_time_interval_s,
+        )[0]
+        pick_fun2 = picker_signal_finder(
+            sig=sig,
+            sig_sample_rate_hz=1.0 / np.mean(np.diff(time_epoch_s)),
+            bits_pick=pick_bits_below_max,
+            mode="bit",
+            time_interval_s=pick_time_interval_s,
+        )[0]
+        assert pick_func == pick_fun2
     else:
         if extract_type != ExtractionType.ARGMAX:
-            print('Unexpected extraction type to sig_extract, return max')
+            print("Unexpected extraction type to sig_extract, return max")
         # Max pick
         pick_func = np.argmax(np.abs(sig))
 
@@ -72,14 +89,11 @@ def sig_extract(
     intro_index = np.argmin(np.abs(time_epoch_s - (pick_time_epoch_s - intro_s)))
     outro_index = np.argmin(np.abs(time_epoch_s - (pick_time_epoch_s + outro_s)))
 
-    return sig[intro_index: outro_index], time_epoch_s[intro_index: outro_index], pick_time_epoch_s
+    return sig[intro_index:outro_index], time_epoch_s[intro_index:outro_index], pick_time_epoch_s
 
 
 def sig_frame(
-        sig: np.ndarray,
-        time_epoch_s: np.ndarray,
-        epoch_s_start: float,
-        epoch_s_stop: float
+    sig: np.ndarray, time_epoch_s: np.ndarray, epoch_s_start: float, epoch_s_stop: float
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Frame one-component signal within start and stop epoch times
@@ -93,14 +107,11 @@ def sig_frame(
     intro_index = np.argmin(np.abs(time_epoch_s - epoch_s_start))
     outro_index = np.argmin(np.abs(time_epoch_s - epoch_s_stop))
 
-    return sig[intro_index: outro_index], time_epoch_s[intro_index: outro_index]
+    return sig[intro_index:outro_index], time_epoch_s[intro_index:outro_index]
 
 
 def sig3c_frame(
-        sig3c: np.ndarray,
-        time_epoch_s: np.ndarray,
-        epoch_s_start: float,
-        epoch_s_stop: float
+    sig3c: np.ndarray, time_epoch_s: np.ndarray, epoch_s_start: float, epoch_s_stop: float
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Frame three-component signal within start and stop epoch times
@@ -114,7 +125,7 @@ def sig3c_frame(
     intro_index = np.argmin(np.abs(time_epoch_s - epoch_s_start))
     outro_index = np.argmin(np.abs(time_epoch_s - epoch_s_stop))
 
-    return sig3c[:, intro_index: outro_index], time_epoch_s[intro_index: outro_index]
+    return sig3c[:, intro_index:outro_index], time_epoch_s[intro_index:outro_index]
 
 
 def dbepsilon(x: np.ndarray) -> np.ndarray:
@@ -150,11 +161,7 @@ def log2epsilon_max(x: np.ndarray) -> float:
 
 
 def picker_signal_finder(
-        sig: np.array,
-        sig_sample_rate_hz: float,
-        bits_pick: float,
-        time_interval_s: float,
-        mode: str = "max"
+    sig: np.array, sig_sample_rate_hz: float, bits_pick: float, time_interval_s: float, mode: str = "max"
 ) -> np.array:
     """
     computes picker index for positive (option "max") or absolute (option "bit") max of a signal.
@@ -167,17 +174,16 @@ def picker_signal_finder(
     :return: picker index for the signal
     """
     height_min = log2epsilon_max(sig) - bits_pick if mode == "bit" else np.max(sig) - 2 ** bits_pick
-    time_index_pick, _ = signal.find_peaks(log2epsilon(sig) if mode == "bit" else sig,
-                                           height=height_min,
-                                           distance=int(time_interval_s * sig_sample_rate_hz))
+    time_index_pick, _ = signal.find_peaks(
+        log2epsilon(sig) if mode == "bit" else sig,
+        height=height_min,
+        distance=int(time_interval_s * sig_sample_rate_hz),
+    )
     return time_index_pick
 
 
 def picker_signal_max_index(
-        sig: np.array,
-        sig_sample_rate_hz: float,
-        bits_pick: float,
-        time_interval_s: float
+    sig: np.array, sig_sample_rate_hz: float, bits_pick: float, time_interval_s: float
 ) -> np.array:
     """
     :param sig: array of waveform data
@@ -195,10 +201,7 @@ def picker_signal_max_index(
 
 
 def picker_signal_bit_index(
-        sig: np.array,
-        sig_sample_rate_hz: float,
-        bits_pick: float,
-        time_interval_s: float
+    sig: np.array, sig_sample_rate_hz: float, bits_pick: float, time_interval_s: float
 ) -> np.ndarray:
     """
     :param sig: array of waveform data
