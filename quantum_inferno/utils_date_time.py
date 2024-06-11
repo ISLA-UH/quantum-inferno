@@ -3,11 +3,12 @@ This RedVox SDK module contains constants and helper functions for converting be
 All time-based functions take inputs and output in UTC.
 """
 
-from datetime import datetime, tzinfo, timedelta
+from datetime import datetime, tzinfo, timedelta, timezone
 from typing import List, Tuple
 
 # noinspection Mypy
 import numpy as np
+import pandas as pd
 
 # Microsecond constants
 MICROSECONDS_IN_MILLISECOND: float = 1000.0
@@ -431,9 +432,7 @@ def weeks_to_days(weeks: float) -> float:
     return weeks * DAYS_IN_WEEK
 
 
-def datetime_from(
-    year: int, month: int, day: int, hour: int = 0, minute: int = 0, second: int = 0
-) -> datetime:
+def datetime_from(year: int, month: int, day: int, hour: int = 0, minute: int = 0, second: int = 0) -> datetime:
     """
     Returns a datetime object in UTC based off the given parameters.
 
@@ -448,6 +447,7 @@ def datetime_from(
     return datetime(year, month, day, hour, minute, second)
 
 
+# NOTE: the datetime module has a timestamp method that can be used to convert to epoch time (given timezone)
 def datetime_to_epoch_seconds_utc(date_time: datetime) -> float:
     """
     Given a datetime, return the number of seconds since the epoch UTC.
@@ -456,6 +456,10 @@ def datetime_to_epoch_seconds_utc(date_time: datetime) -> float:
     :return: A UTC second timestamp.
     """
     return (date_time - EPOCH).total_seconds()
+
+
+print(datetime_to_epoch_seconds_utc(datetime(1970, 1, 2, 0, 0, 0)))
+print(datetime(1970, 1, 2, 0, 0, 0, tzinfo=timezone.utc).timestamp())
 
 
 def datetime_to_epoch_milliseconds_utc(date_time: datetime) -> float:
@@ -480,6 +484,7 @@ def datetime_to_epoch_microseconds_utc(date_time: datetime) -> float:
     return seconds_to_microseconds(epoch_seconds)
 
 
+# We can use pandas to_datetime or convert the units then use utcfromtimestamp method
 def datetime_from_epoch_seconds_utc(epoch_seconds_utc: float) -> datetime:
     """
     Given number of seconds since the epoch UTC, return a Python datetime object.
@@ -488,6 +493,11 @@ def datetime_from_epoch_seconds_utc(epoch_seconds_utc: float) -> datetime:
     :return: A datetime object.
     """
     return EPOCH + timedelta(seconds=epoch_seconds_utc)
+
+
+print(datetime_from_epoch_seconds_utc(123456))
+print(datetime.utcfromtimestamp(123456))
+print(pd.to_datetime(123456, unit="s"))
 
 
 def datetime_from_epoch_milliseconds_utc(epoch_milliseconds_utc: float) -> datetime:
@@ -520,9 +530,7 @@ def datetimes_from_epoch_seconds_utc(epochs_seconds_utc: List[int]) -> List[date
     return list(map(datetime_from_epoch_seconds_utc, epochs_seconds_utc))
 
 
-def generate_timestamps_s_utc(
-    start_timestamp_s_utc: float, sample_rate_hz: float, num_samples: int
-) -> np.ndarray:
+def generate_timestamps_s_utc(start_timestamp_s_utc: float, sample_rate_hz: float, num_samples: int) -> np.ndarray:
     """
     Given a starting timestamp, a sample rate, and a number of samples, compute timestamps for all samples.
 
@@ -555,12 +563,8 @@ class DateIterator:
         start_dt_full: datetime = datetime.utcfromtimestamp(start_timestamp_utc_s)
         end_dt_full: datetime = datetime.utcfromtimestamp(end_timestamp_utc_s)
 
-        self.start_dt: datetime = datetime_from(
-            start_dt_full.year, start_dt_full.month, start_dt_full.day
-        )
-        self.end_dt: datetime = datetime_from(
-            end_dt_full.year, end_dt_full.month, end_dt_full.day
-        )
+        self.start_dt: datetime = datetime_from(start_dt_full.year, start_dt_full.month, start_dt_full.day)
+        self.end_dt: datetime = datetime_from(end_dt_full.year, end_dt_full.month, end_dt_full.day)
 
         self._one_day: timedelta = timedelta(days=1)
 
@@ -596,14 +600,9 @@ class DateIteratorAPIM:
         end_dt_full: datetime = datetime.utcfromtimestamp(end_timestamp_utc_s)
 
         self.start_dt: datetime = datetime_from(
-            start_dt_full.year,
-            start_dt_full.month,
-            start_dt_full.day,
-            start_dt_full.hour,
+            start_dt_full.year, start_dt_full.month, start_dt_full.day, start_dt_full.hour
         )
-        self.end_dt: datetime = datetime_from(
-            end_dt_full.year, end_dt_full.month, end_dt_full.day, end_dt_full.hour
-        )
+        self.end_dt: datetime = datetime_from(end_dt_full.year, end_dt_full.month, end_dt_full.day, end_dt_full.hour)
 
         self._one_day: timedelta = timedelta(days=1)
         self._one_hour: timedelta = timedelta(hours=1)
