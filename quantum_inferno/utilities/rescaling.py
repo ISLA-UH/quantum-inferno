@@ -9,6 +9,11 @@ from scipy import signal
 from quantum_inferno.scales_dyadic import get_epsilon as EPSILON
 
 
+class DataScaleType(Enum):
+    AMP: str = "amplitude"  # Provided data is in amplitude (waveform, etc.)
+    POW: str = "power"  # Provided data is in power (psd, etc.)
+
+
 def to_log2_with_epsilon(x: np.ndarray or float) -> np.ndarray or float:
     """
     :param x: data or value to rescale
@@ -26,15 +31,24 @@ def log2_with_epsilon_max(x: np.ndarray) -> float:
     return np.max(to_log2_with_epsilon(x))
 
 
-# TODO: would it be better to have options to set the reference for dB? Also option to take power or amplitude?
-def to_decibel_with_epsilon(x: np.ndarray or float) -> np.ndarray or float:
+# TODO: would reference option to be min max etc be better?
+def to_decibel_with_epsilon(
+    x: np.ndarray or float, reference: float = 1.0, scaling: DataScaleType = DataScaleType.AMP
+) -> np.ndarray or float:
     """
-    :param x: amplitude data to rescale
-    :return: rescaled data in dB
+    Convert data to decibels with epsilon added to avoid log(0) errors.
+    :param x: data or value to rescale
+    :param reference: reference value for the decibel scaling (default is None)
+    :param scaling: the type of the data (default is amplitude)
+    :return:
     """
-    return 20 * np.log10(np.abs(x) + EPSILON)
+    if scaling == DataScaleType.POW:
+        return 10 * np.log10(np.abs(x / reference) + EPSILON)
+    else:
+        return 20 * np.log10(np.abs(x / reference) + EPSILON)
 
 
+# TODO: Function to find the maximum of the data may be redundant
 def decibel_with_epsilon_max(x: np.ndarray) -> float:
     """
     :param x: data to find the maximum of in dB space

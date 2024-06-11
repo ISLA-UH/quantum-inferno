@@ -26,6 +26,7 @@ class ExtractionType(Enum):
 
 # TODO: sig_extract returns first peak, which may not be the best peak
 # TODO: It may be better to separate extracting the signal and finding the peaks
+# TODO: Some methods may be redundant as they transform the signal to log2 and apply picker
 def sig_extract(
     sig: np.ndarray,
     time_epoch_s: np.ndarray,
@@ -182,6 +183,7 @@ def picker_signal_finder(
     return time_index_pick
 
 
+# TODO: Both picker_signal_max_index and picker_signal_bit_index is already contained in picker_signal_finder
 def picker_signal_max_index(
     sig: np.array, sig_sample_rate_hz: float, bits_pick: float, time_interval_s: float
 ) -> np.array:
