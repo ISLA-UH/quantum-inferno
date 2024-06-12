@@ -18,7 +18,7 @@ class ExtractionType(Enum):
 
 class ScalingType(Enum):
     BITS: str = "bits"  # data is in bits
-    AMPS: str = "amplitude"  # data is in amplitude #TODO: reword
+    AMPS: str = "amplitude"  # data is in amplitude
 
 
 # TODO: Figure what is wanted for find peaks other than a wrapper for find_peaks
