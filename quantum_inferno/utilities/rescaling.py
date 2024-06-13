@@ -19,7 +19,7 @@ def to_log2_with_epsilon(x: np.ndarray or float) -> np.ndarray or float:
     :param x: data or value to rescale
     :return: rescaled data or value
     """
-    return np.log2(x + EPSILON)
+    return np.log2(x + EPSILON())
 
 
 # TODO: Function to find the maximum of the data may be redundant
@@ -43,9 +43,9 @@ def to_decibel_with_epsilon(
     :return:
     """
     if scaling == DataScaleType.POW:
-        return 10 * np.log10(np.abs(x / reference) + EPSILON)
+        return 10 * np.log10(np.abs(x / reference) + EPSILON())
     else:
-        return 20 * np.log10(np.abs(x / reference) + EPSILON)
+        return 20 * np.log10(np.abs(x / reference) + EPSILON())
 
 
 # TODO: Function to find the maximum of the data may be redundant
