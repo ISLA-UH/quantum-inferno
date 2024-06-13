@@ -99,7 +99,7 @@ def mesh_colormap_limits(
         color_max = np.max(mesh_array)
         color_min = color_max - color_range
     else:
-        print("User specified mesh color limits will be applied.")
+        # print("User specified mesh color limits will be applied.")
         color_max = np.max(np.abs(mesh_array))
         color_min = np.min(np.abs(mesh_array))
 
