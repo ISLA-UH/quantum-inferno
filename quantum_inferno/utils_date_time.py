@@ -3,12 +3,11 @@ This RedVox SDK module contains constants and helper functions for converting be
 All time-based functions take inputs and output in UTC.
 """
 
-from datetime import datetime, tzinfo, timedelta, timezone
+from datetime import datetime, tzinfo, timedelta
 from typing import List, Tuple
 
 # noinspection Mypy
 import numpy as np
-import pandas as pd
 
 # Microsecond constants
 MICROSECONDS_IN_MILLISECOND: float = 1000.0
@@ -458,10 +457,6 @@ def datetime_to_epoch_seconds_utc(date_time: datetime) -> float:
     return (date_time - EPOCH).total_seconds()
 
 
-print(datetime_to_epoch_seconds_utc(datetime(1970, 1, 2, 0, 0, 0)))
-print(datetime(1970, 1, 2, 0, 0, 0, tzinfo=timezone.utc).timestamp())
-
-
 def datetime_to_epoch_milliseconds_utc(date_time: datetime) -> float:
     """
     Given a datetime, return the number of milliseconds since the epoch UTC.
@@ -493,11 +488,6 @@ def datetime_from_epoch_seconds_utc(epoch_seconds_utc: float) -> datetime:
     :return: A datetime object.
     """
     return EPOCH + timedelta(seconds=epoch_seconds_utc)
-
-
-print(datetime_from_epoch_seconds_utc(123456))
-print(datetime.utcfromtimestamp(123456))
-print(pd.to_datetime(123456, unit="s"))
 
 
 def datetime_from_epoch_milliseconds_utc(epoch_milliseconds_utc: float) -> datetime:
