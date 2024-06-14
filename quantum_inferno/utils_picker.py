@@ -24,9 +24,6 @@ class ExtractionType(Enum):
     BITMAX: str = "bitmax"
 
 
-# TODO: sig_extract returns first peak, which may not be the best peak
-# TODO: It may be better to separate extracting the signal and finding the peaks
-# TODO: Some methods may be redundant as they transform the signal to log2 and apply picker
 def sig_extract(
     sig: np.ndarray,
     time_epoch_s: np.ndarray,
