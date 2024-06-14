@@ -6,10 +6,6 @@ from datetime import datetime, tzinfo, timedelta, timezone
 from typing import List, Tuple
 import numpy as np
 
-# TODO: Add support for time zones?
-# TODO: Add utils for graphing time data...
-
-
 # dictionary of time units and their conversion factors to seconds (can add more units as needed)
 time_unit_dict = {
     "ps": 1e-12,  # "picosecond"
