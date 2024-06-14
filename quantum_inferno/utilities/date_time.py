@@ -2,8 +2,7 @@
 Collection of functions to convert between time bases
 """
 
-from datetime import datetime, tzinfo, timedelta, timezone
-from typing import List, Tuple
+from datetime import datetime, timezone
 import numpy as np
 
 # dictionary of time units and their conversion factors to seconds (can add more units as needed)
