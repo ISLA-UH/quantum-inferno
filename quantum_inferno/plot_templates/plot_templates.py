@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable, AxesDivider
 import numpy as np
 
-import quantum_inferno.utils_date_time as dt
+import quantum_inferno.utilities.date_time as dt
 from quantum_inferno.plot_templates import plot_base as plt_base
 
 
@@ -30,17 +30,18 @@ def sanitize_timestamps(time_input: np.ndarray, start_epoch: Optional[float] = N
 
 def get_time_label(
         start_time_epoch: float,
-        units_time: str
+        units_time: str,
+        utc_offset_h: float = 0.
 ) -> str:
     """
-    :param start_time_epoch: start time in epoch UTC
+    :param start_time_epoch: start time in seconds since epoch UTC
     :param units_time: units of time
+    :param utc_offset_h: hours offset from UTC.  Default 0 (UTC time)
     :return: label for time units on a chart
     """
     label: str = f"Time ({units_time})"
     if start_time_epoch != 0:
-        # TODO: Allow for different time formats
-        start_datetime_epoch = dt.datetime.utcfromtimestamp(start_time_epoch)
+        start_datetime_epoch = dt.set_timestamp_to_utc(start_time_epoch, utc_offset_h)
         label += f' from UTC {start_datetime_epoch.strftime("%Y-%m-%d %H:%M:%S")}'
     return label
 
@@ -53,22 +54,21 @@ def mesh_time_frequency_edges(
         frequency_scaling: str = "linear"
 ) -> Tuple[np.ndarray, np.ndarray, float, float]:
     """
-    Find time and frequency edges for plotting
+    Find time and frequency edges for plotting.  Raises an error if data is invalid.
 
     :param frequency: frequencies
     :param time: timestamps of the data
     :param frequency_ymin: minimum frequency for y-axis
     :param frequency_ymax: maximum frequency for y-axis
     :param frequency_scaling: "log" or "linear". Default is "linear"
-    :return: min and max frequency for plot, time and frequency edges
+    :return: time and frequency edges, frequency min and max
     """
-    # todo: are these fail cases?
     if frequency_ymin > frequency_ymax:
-        print("Higher frequency must be greater than lower frequency")
+        raise ValueError("Highest frequency must be greater than lowest frequency")
     if not np.all(frequency[:-1] <= frequency[1:]):
-        print("Frequency must be increasing, flip it")
+        raise ValueError("Frequency must be increasing, flip it")
     if not np.all(time[:-1] <= time[1:]):
-        print("Time must be increasing, flip it")
+        raise ValueError("Time must be increasing, flip it")
 
     t_half_bin: float = np.abs(time[2] - time[1]) / 2.
     t_edge: np.ndarray = np.append(time[0] - t_half_bin, time + t_half_bin)
@@ -80,18 +80,19 @@ def mesh_time_frequency_edges(
         f_half_bin: float = (frequency[2] - frequency[1]) / 2.
         f_edge: np.ndarray = np.append(frequency[0] - f_half_bin, frequency + f_half_bin)
 
-    # Initialize
-    frequency_fix_ymin = 1. * frequency_ymin
-    frequency_fix_ymax = 1. * frequency_ymax
-
     if frequency_ymin < f_edge[1]:
-        frequency_fix_ymin = f_edge[0]
-    if frequency_fix_ymin <= 0 and frequency_scaling == "log":
-        frequency_fix_ymin = f_edge[1]
+        frequency_ymin = f_edge[0]
+    elif frequency_ymin <= 0 and frequency_scaling == "log":
+        frequency_ymin = f_edge[1]
     if frequency_ymax > f_edge[-1]:
-        frequency_fix_ymax = f_edge[-1]
+        frequency_ymax = f_edge[-1]
 
-    return t_edge, f_edge, frequency_fix_ymin, frequency_fix_ymax
+    if not isinstance(frequency_ymin, float):
+        frequency_ymin = float(frequency_ymin)
+    if not isinstance(frequency_ymax, float):
+        frequency_ymax = float(frequency_ymax)
+
+    return t_edge, f_edge, frequency_ymin, frequency_ymax
 
 
 def plot_wf_3_vert(
@@ -118,19 +119,21 @@ def plot_wf_3_vert(
     wf_panel_b_time_zero = sanitize_timestamps(wf_panel_b.time, epoch_start)
     wf_panel_a_time_zero = sanitize_timestamps(wf_panel_a.time, epoch_start)
 
-    # todo: why not quit if they match?
     # Catch cases where there may not be any data
-    time_xmin = wf_panel_a_time_zero[0]
-    time_xmax = wf_panel_a_time_zero[-1]
-    if time_xmin == time_xmax:
-        time_xmin = wf_panel_b_time_zero[0]
-        time_xmax = wf_panel_b_time_zero[-1]
-    if time_xmin == time_xmax:
-        time_xmin = wf_panel_c_time_zero[0]
-        time_xmax = wf_panel_c_time_zero[-1]
-    if time_xmin == time_xmax:
+    if wf_panel_a_time_zero[0] == wf_panel_a_time_zero[-1] and wf_panel_b_time_zero[0] == wf_panel_b_time_zero[-1]\
+            and wf_panel_c_time_zero[0] == wf_panel_c_time_zero[-1]:
         print("No data to plot for " + wf_base.figure_title)
         return plt.figure()
+
+    if wf_panel_a_time_zero[0] == wf_panel_b_time_zero[0] == wf_panel_c_time_zero[0]:
+        time_xmin = wf_panel_a_time_zero[0]
+    else:
+        time_xmin = np.min([wf_panel_a_time_zero[0], wf_panel_b_time_zero[0], wf_panel_c_time_zero[0]])
+
+    if wf_panel_a_time_zero[-1] == wf_panel_b_time_zero[-1] == wf_panel_c_time_zero[-1]:
+        time_xmax = wf_panel_a_time_zero[-1]
+    else:
+        time_xmax = np.max([wf_panel_a_time_zero[-1], wf_panel_b_time_zero[-1], wf_panel_c_time_zero[-1]])
 
     # Figure starts here
     fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = \
@@ -141,15 +144,12 @@ def plot_wf_3_vert(
     fig: plt.Figure = fig_ax_tuple[0]
     axes: List[plt.Axes] = fig_ax_tuple[1]
     fig_panel_c: plt.Axes = axes[0]
-    fig_panel_b: plt.Axes = axes[1]
-    fig_panel_a: plt.Axes = axes[2]
-
-    if wf_base.figure_title_show:
-        fig_panel_c.set_title(f"{wf_base.figure_title} at Station {wf_base.station_id}")
+    axes_iter = 0
 
     for pnl in ["c", "b", "a"]:
+        fig_panel: plt.Axes = axes[axes_iter]
+        axes_iter += 1
         # python eval() function allows us to use variables to name other variables
-        fig_panel = eval(f"fig_panel_{pnl}")
         wf_panel_zero = eval(f"wf_panel_{pnl}_time_zero")
         wf_panel = eval(f"wf_panel_{pnl}")
         fig_panel.plot(wf_panel_zero, wf_panel.sig)
@@ -164,6 +164,9 @@ def plot_wf_3_vert(
         fig_panel.tick_params(axis='y', labelsize='large')
         fig_panel.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
         fig_panel.yaxis.get_offset_text().set_x(-0.034)
+
+    if wf_base.figure_title_show:
+        fig_panel_c.set_title(f"{wf_base.figure_title} at Station {wf_base.station_id}")
 
     fig.text(.5, .01, time_label, ha='center', size=wf_base.params_tfr.text_size)
 
@@ -271,8 +274,6 @@ def plot_wf_mesh_2_vert(
         mesh_panel_cbar.set_label(mesh_panel.cbar_units, rotation=270,
                                   size=wf_base.params_tfr.text_size)
         mesh_panel_cax.tick_params(labelsize='large')
-        if wf_base.figure_title_show:
-            fig_mesh_panel_c.set_title(f"{wf_base.figure_title} ({wf_base.station_id})")
         fig_panel.set_ylabel(mesh_base.units_frequency, size=wf_base.params_tfr.text_size)
         fig_panel.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
         fig_panel.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
@@ -292,8 +293,6 @@ def plot_wf_mesh_2_vert(
     fig_wf_panel_a.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
     fig_wf_panel_a.grid(True)
     fig_wf_panel_a.tick_params(axis='y', labelsize='large')
-
-    # TODO: ADD OPTIONS AS BELOW
     fig_wf_panel_a.ticklabel_format(style="plain", scilimits=(0, 0), axis="y")
     fig_wf_panel_a.yaxis.get_offset_text().set_x(-0.034)
 
@@ -405,27 +404,26 @@ def plot_wf_mesh_vt(
     if mesh_base.frequency_scaling == "linear":
         # Only works for linear range
         fig_mesh_panel_b.ticklabel_format(style=mesh_panel.ytick_style, scilimits=(0, 0), axis="y")
+
     # Waveform panel
     fig_wf_panel_a.plot(wf_pnl_a_elapsed_time, wf_panel.sig, color=wf_base.waveform_color)
     fig_wf_panel_a.set_ylabel(wf_panel.units, size=wf_base.params_tfr.text_size)
     fig_wf_panel_a.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
-
     fig_wf_panel_a.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
     fig_wf_panel_a.grid(True)
     fig_wf_panel_a.tick_params(axis='y', labelsize='large')
-    # TODO: Standardize with inputs
+    ytick_style = wf_panel.ytick_style
     if wf_panel.yscaling == 'auto':
         fig_wf_panel_a.set_ylim(np.min(wf_panel.sig), np.max(wf_panel.sig))
-        fig_wf_panel_a.ticklabel_format(style="plain", scilimits=(0, 0), axis="y")
+        ytick_style = "plain"
     elif wf_panel.yscaling == 'symmetric':
         fig_wf_panel_a.set_ylim(-np.max(np.abs(wf_panel.sig)), np.max(np.abs(wf_panel.sig)))
     elif wf_panel.yscaling == 'positive':
         fig_wf_panel_a.set_ylim(0, np.max(np.abs(wf_panel.sig)))
     else:
         fig_wf_panel_a.set_ylim(plt_base.DEFAULT_YLIM_MIN, plt_base.DEFAULT_YLIM_MAX)
-    fig_wf_panel_a.ticklabel_format(style=wf_panel.ytick_style, scilimits=(0, 0), axis="y")
+    fig_wf_panel_a.ticklabel_format(style=ytick_style, scilimits=(0, 0), axis="y")
     fig_wf_panel_a.yaxis.get_offset_text().set_x(-0.034)
-
     wf_panel_a_div: AxesDivider = make_axes_locatable(fig_wf_panel_a)
     wf_panel_a_cax: plt.Axes = wf_panel_a_div.append_axes("right", size="1%", pad="0.5%")
     wf_panel_a_cax.axis("off")
