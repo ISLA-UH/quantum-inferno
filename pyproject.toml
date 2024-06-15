@@ -15,13 +15,14 @@ license = {file = "LICENSE"}
 
 # Please specify dependencies in alphabetical order
 dependencies = [
-    "librosa==0.10.1",
-    "matplotlib==3.7.1",
-    "numpy==1.23.5",
-    "pyproj~=3.6.0",
-    "scipy==1.10.1",
-    "setuptools==60.2.0",
-    "tftb==0.1.4"
+    "librosa==0.10.1", # librosa is a Python package for music and audio analysis.
+    "matplotlib==3.7.1", # Matplotlib is a comprehensive library for visualizations in Python.
+    "numpy==1.23.5", # NumPy is a library for numerical computing in Python.
+    "pyproj~=3.6.0", # pyproj is a Python interface to PROJ (cartographic projections and coordinate transform library).
+    "pywt==1.6.0", # PyWavelets is a Python package for wavelet transformations.
+    "scipy==1.10.1", # SciPy is a library for scientific computing in Python.
+    "setuptools==60.2.0", # Setuptools is a package development process library.
+    "tftb==0.1.4" # TFR, Wigner-Ville, and Cohen-Posch distributions.
 ]
 
 [project.urls]
