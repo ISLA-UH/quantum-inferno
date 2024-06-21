@@ -6,9 +6,9 @@ import numpy as np
 import scipy.signal as signal
 from quantum_inferno.scales_dyadic import get_epsilon
 from quantum_inferno.synth import synthetics_NEW
-from quantum_inferno import utils
 from typing import Tuple
 import matplotlib.pyplot as plt
+from quantum_inferno.utilities.window import get_tukey
 
 
 """ Quick plotting routines """
@@ -434,7 +434,7 @@ def well_tempered_tone(
         # Add noise
         mic_sig += synthetics_NEW.white_noise_fbits(sig=mic_sig, std_bit_loss=8.0)
         # Taper before AA
-        mic_sig *= utils.taper_tukey(mic_sig, fraction_cosine=0.1)
+        mic_sig *= get_tukey(array=mic_sig, alpha=0.1)
         # Antialias (AA)
         synthetics_NEW.antialias_half_nyquist(mic_sig)
 

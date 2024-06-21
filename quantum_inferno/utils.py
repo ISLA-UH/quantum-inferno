@@ -92,6 +92,7 @@ def taper_tukey(sig_wf_or_time: np.ndarray, fraction_cosine: float) -> np.ndarra
     return signal.windows.tukey(M=np.size(sig_wf_or_time), alpha=fraction_cosine, sym=True)
 
 
+# added to calculations
 # Integrals and derivatives
 def integrate_cumtrapz(timestamps_s: np.ndarray, sensor_wf: np.ndarray, initial_value: float = 0) -> np.ndarray:
     """

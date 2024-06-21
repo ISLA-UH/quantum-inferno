@@ -6,11 +6,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import blast_pulse as kaboom
-from quantum_inferno import utils, utils_picker
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
 from quantum_inferno.styx_stx import tfr_stx_fft
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
+from quantum_inferno.utilities.window import get_tukey
 
 
 print(__doc__)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     )
 
     time_s -= time_s[0]
-    mic_sig *= utils.taper_tukey(sig_wf_or_time=time_s, fraction_cosine=0.1)  # Add taper
+    mic_sig *= get_tukey(array=time_s, alpha=0.1)  # Add taper
     mic_sig /= np.max(mic_sig)  # Max unit amplitude
 
     frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)

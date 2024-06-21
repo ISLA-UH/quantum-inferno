@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import benchmark_signals
 import quantum_inferno.plot_templates.plot_time_frequency_reps_black as pltq
-from quantum_inferno import utils, scales_dyadic
+from quantum_inferno import scales_dyadic
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
 from quantum_inferno.styx_stx import tfr_stx_fft
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
