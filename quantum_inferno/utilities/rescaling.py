@@ -3,9 +3,7 @@ A set of functions to rescale data.
 """
 
 from enum import Enum
-from typing import Tuple
 import numpy as np
-from scipy import signal
 from quantum_inferno.scales_dyadic import get_epsilon
 
 
@@ -30,7 +28,7 @@ def is_power_of_two(n: int) -> bool:
     return n > 0 and not (n & (n - 1))
 
 
-# TODO: would reference option to be min max etc be better?
+# TODO: would reference option to be min max etc be better rather than setting reference manually?
 def to_decibel_with_epsilon(
     x: np.ndarray or float, reference: float = 1.0, scaling: DataScaleType = DataScaleType.AMP
 ) -> np.ndarray or float:

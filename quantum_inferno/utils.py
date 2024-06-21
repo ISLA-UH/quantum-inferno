@@ -38,7 +38,6 @@ def is_power_of_two(n: int) -> bool:
 
 """ Time/Sample Duration Utils """
 # add to calculations
-# TODO: some examples use parts of outputs, values can be calcuated later if needed, consolidate.
 
 
 def duration_points(sample_rate_hz: float, time_s: float) -> Tuple[int, int, int]:
