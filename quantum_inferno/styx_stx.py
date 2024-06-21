@@ -7,8 +7,8 @@ Rederivation in preparation, Garces et al. 2022; last updated 9 May 2022
 import numpy as np
 from scipy.fft import fft, ifft, fftfreq
 from quantum_inferno import scales_dyadic as scales
-from quantum_inferno.utils import is_power_of_two
 from typing import Tuple
+from quantum_inferno.utilities.rescaling import is_power_of_two
 
 
 # TODO: LOOK AT ATOMS_TO_REPLACE and scaled_dyadic for inline STX frequency. Same for CWT.
@@ -335,9 +335,7 @@ def tfr_stx_fft(
 # todo: don't return a value you just pass in
 # TODO: AS IN CWT, build log STX frequency. See above for fancier version
 def stx_complex_any_scale_pow2(
-        band_order_nth: float,
-        sig_wf: np.ndarray,
-        frequency_sample_rate_hz: float,
+    band_order_nth: float, sig_wf: np.ndarray, frequency_sample_rate_hz: float
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     With some assumptions and simplifications, and with some vectorization
@@ -350,9 +348,8 @@ def stx_complex_any_scale_pow2(
     """
     n_fft_pow2 = len(sig_wf)
     frequency_stx_hz = scales.log_frequency_hz_from_fft_points(
-        frequency_sample_hz=frequency_sample_rate_hz,
-        fft_points=n_fft_pow2,
-        scale_order=band_order_nth)
+        frequency_sample_hz=frequency_sample_rate_hz, fft_points=n_fft_pow2, scale_order=band_order_nth
+    )
 
     scale_points = len(frequency_stx_hz)
     # Take FFT and concatenate. A leaner version could let the fft do the padding.
