@@ -3,7 +3,7 @@ A set of functions to pick key portions of a signal.
 """
 
 from enum import Enum
-from typing import Tuple
+from typing import Tuple, Optional
 
 import numpy as np
 from scipy import signal
@@ -14,6 +14,9 @@ from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 
 class ExtractionType(Enum):
+    """
+    Type of extraction to perform on signal
+    """
     SIGMAX: str = "sigmax"  # Extract signal using the largest positive value
     SIGMIN: str = "sigmin"  # Extract signal using the largest negative value
     SIGABS: str = "sigabs"  # Extract signal using the largest absolute value
@@ -21,6 +24,9 @@ class ExtractionType(Enum):
 
 
 class ScalingType(Enum):
+    """
+    Units of the signal
+    """
     AMPS: str = "amps"  # Signal is in amplitudes
     BITS: str = "bits"  # Signal is in bits
 
@@ -37,22 +43,22 @@ def find_sample_rate_hz_from_timestamps(timestamps: np.ndarray, time_unit: str =
     return 1.0 / np.mean(np.diff(timestamps_seconds))
 
 
-def scale_signal_by_extraction_type(signal: np.ndarray, extraction_type: ExtractionType) -> np.ndarray:
+def scale_signal_by_extraction_type(in_signal: np.ndarray, extraction_type: ExtractionType) -> np.ndarray:
     """
     Normalize the signal based on the extraction type
 
-    :param signal: input signal
+    :param in_signal: input signal
     :param extraction_type: extraction type
     :return: normalized signal
     """
     if extraction_type == ExtractionType.SIGMAX:
-        return signal / np.nanmax(signal)
+        return in_signal / np.nanmax(in_signal)
     elif extraction_type == ExtractionType.SIGMIN:
-        return signal / np.nanmax(-signal)
+        return in_signal / np.nanmax(-in_signal)
     elif extraction_type == ExtractionType.SIGABS:
-        return signal / np.nanmax(np.abs(signal))
+        return in_signal / np.nanmax(np.abs(in_signal))
     elif extraction_type == ExtractionType.SIGBIT:
-        return to_log2_with_epsilon(signal)
+        return to_log2_with_epsilon(in_signal)
 
 
 def apply_bandpass(
@@ -83,7 +89,7 @@ def find_peaks_by_extraction_type_with_bandpass(
     sample_rate_hz: float,
     filter_order: int = 7,
     extraction_type: ExtractionType = ExtractionType.SIGMAX,
-    height: float or None = 0.7,
+    height: Optional[float] = 0.7,
     *args,
 ) -> np.ndarray:
     """
@@ -105,7 +111,8 @@ def find_peaks_by_extraction_type_with_bandpass(
 
 
 def find_peaks_by_extraction_type(
-    timeseries: np.ndarray, extraction_type: ExtractionType = ExtractionType.SIGMAX, height: float or None = 0.7, *args
+    timeseries: np.ndarray, extraction_type: ExtractionType = ExtractionType.SIGMAX,
+        height: Optional[float] = 0.7, *args
 ) -> np.ndarray:
     """
     Find peaks in the timeseries data by extraction type
@@ -125,12 +132,13 @@ def find_peaks_with_bits(
     timeseries: np.ndarray,
     sample_rate_hz: float,
     scaling_type: ScalingType = ScalingType.AMPS,
-    threshold_bits: int or None = 1,
-    time_distance_seconds: float or None = 0.1,
+    threshold_bits: Optional[int] = 1,
+    time_distance_seconds: Optional[float] = 0.1,
     *args,
 ) -> np.ndarray:
     """
     Find peaks in the timeseries data with a threshold in bits (originally picker_signal_finder)
+
     :param timeseries: time series
     :param sample_rate_hz: sample rate of the signal
     :param scaling_type: scaling type of the signal (default AMPS)
@@ -169,7 +177,7 @@ def extract_signal_index_with_buffer(
 
 
 def extract_signal_with_buffer_seconds(
-    timeseries: np.ndarray, sample_rate_hz, peak: int, intro_buffer_s: float, outro_buffer_s: float
+    timeseries: np.ndarray, sample_rate_hz: float, peak: int, intro_buffer_s: float, outro_buffer_s: float
 ) -> np.ndarray:
     """
     Extract a signal with a buffer in seconds around the peak
@@ -196,6 +204,7 @@ def extract_signal_with_buffer_seconds(
 def find_peaks_to_comb_function(timeseries: np.ndarray, peaks: np.ndarray) -> np.ndarray:
     """
     Returns a comb function of the same length as the timeseries with 1s at the peak locations and 0s elsewhere
+
     :param timeseries: input signal
     :param peaks: peak locations
     :return: a comb function with the peak locations
