@@ -7,7 +7,8 @@ import scipy.signal as signal
 from typing import Optional, Tuple, Union
 
 # from quantum_inferno import scales_dyadic, utils, atoms_FOR_CWT
-from quantum_inferno import scales_dyadic, utils, atoms_FOR_CWT
+from quantum_inferno import scales_dyadic, atoms_FOR_CWT
+from quantum_inferno.utilities.window import get_tukey
 
 
 def gabor_loose_grain(
@@ -44,7 +45,7 @@ def gabor_loose_grain(
     wavelet_gauss = np.exp(-atoms_FOR_CWT.chirp_p_complex(scale_atom, gamma, index_shift) * xtime_shifted ** 2)
     wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_m * xtime_shifted / scale_atom)
 
-    return np.copy(wavelet_gabor) * utils.taper_tukey(wavelet_gabor, 0.1), time_s, scale_atom
+    return np.copy(wavelet_gabor) * get_tukey(wavelet_gabor, 0.1), time_s, scale_atom
 
 
 def gabor_tight_grain(
@@ -79,7 +80,7 @@ def gabor_tight_grain(
     xtime_shifted = atoms_FOR_CWT.chirp_time(time_s, np.max(time_s) / 2.0, frequency_sample_rate_hz)
     wavelet_gabor = np.exp(-p_complex * xtime_shifted ** 2) * np.exp(1j * cycles_m * xtime_shifted / scale_atom)
 
-    return np.copy(wavelet_gabor) * utils.taper_tukey(wavelet_gabor, 0.1)
+    return np.copy(wavelet_gabor) * get_tukey(wavelet_gabor, 0.1)
 
 
 def tukey_tight_grain(
@@ -118,7 +119,7 @@ def tukey_tight_grain(
     # Pull out phase component from gaussian envelope
     wavelet_gabor = np.exp(1j * cycles_m * xtime_shifted / scale_atom + 1j * np.imag(-p_complex * xtime_shifted ** 2))
 
-    return np.copy(wavelet_gabor) * utils.taper_tukey(wavelet_gabor, fraction_cosine)
+    return np.copy(wavelet_gabor) * get_tukey(wavelet_gabor, fraction_cosine)
 
 
 def gabor_grain_frequencies(
