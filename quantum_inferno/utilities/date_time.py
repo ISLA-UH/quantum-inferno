@@ -37,25 +37,32 @@ def convert_time_unit(input_time: np.ndarray or float, input_unit: str, output_u
 def utc_datetime_to_utc_timestamp(datetime_obj: datetime, output_unit: str = "s") -> np.ndarray or float:
     """
     Convert a UTC datetime object to a UTC timestamp.
+    If datetime_object is not timezone aware, it will be assumed to be in UTC.
+    If datetime_object is timezone aware, it will be converted to UTC.
     :param datetime_obj: UTC datetime object to convert
     :param output_unit: time unit to convert the UTC timestamp to (default: seconds)
     :return: converted UTC timestamp
     """
     if output_unit not in time_unit_dict.keys():
         raise ValueError(f"Invalid time unit, please use one of the following: {time_unit_dict.keys()}")
+    if datetime_obj.tzinfo is None:
+        datetime_obj = datetime_obj.replace(tzinfo=timezone.utc)
+    elif datetime_obj.tzinfo != timezone.utc:
+        datetime_obj = datetime_obj.astimezone(timezone.utc)
     return convert_time_unit(datetime_obj.timestamp(), "s", output_unit)
 
 
 def utc_timestamp_to_utc_datetime(timestamp: np.ndarray or float, input_unit: str = "s") -> datetime:
     """
     Convert a UTC timestamp to a UTC datetime object.
+    Note: timestamp is assumed to be in UTC.
     :param timestamp: UTC timestamp to convert
     :param input_unit: time unit of the UTC timestamp (default: seconds)
     :return: converted UTC datetime object
     """
     if input_unit not in time_unit_dict.keys():
         raise ValueError(f"Invalid time unit, please use one of the following: {time_unit_dict.keys()}")
-    return datetime.utcfromtimestamp(convert_time_unit(timestamp, input_unit, "s"))
+    return datetime.utcfromtimestamp(convert_time_unit(timestamp, input_unit, "s")).replace(tzinfo=timezone.utc)
 
 
 def set_datetime_to_utc(datetime_obj: datetime, tzinfo_warning: bool = False) -> datetime:
