@@ -37,8 +37,10 @@ def is_power_of_two(n: int) -> bool:
 
 
 """ Time/Sample Duration Utils """
-
+# add to calculations
 # TODO: some examples use parts of outputs, values can be calcuated later if needed, consolidate.
+
+
 def duration_points(sample_rate_hz: float, time_s: float) -> Tuple[int, int, int]:
     """
     Compute number of points
@@ -128,6 +130,7 @@ def derivative_diff(timestamps_s: np.ndarray, sensor_wf: np.ndarray) -> np.ndarr
     return derivative_data
 
 
+# in scales_dyadic
 def log2epsilon(x: np.ndarray) -> np.ndarray:
     """
     log 2 of the absolute value of linear amplitude, with EPSILON to avoid singularities

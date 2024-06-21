@@ -7,8 +7,9 @@ The Welch method is equivalent to averaging the spectrogram over the columns.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from quantum_inferno import styx_fft, styx_cwt, scales_dyadic, utils
+from quantum_inferno import styx_fft, styx_cwt, scales_dyadic
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
+from quantum_inferno.utilities.calculations import get_num_points, RoundingType, OutputType
 
 print(__doc__)
 
@@ -68,8 +69,14 @@ if __name__ == "__main__":
     )
 
     # Spectral cyberspace is defined is sample points and scaled frequencies
-    ave_points_ceil_log2, ave_points_ceil_pow2, ave_time_ceil_pow2_s = utils.duration_ceil(
-        sample_rate_hz=frequency_sample_rate_hz, time_s=duration_fft_s
+    # ave_points_ceil_log2, ave_points_ceil_pow2, ave_time_ceil_pow2_s = utils.duration_ceil(
+    #     sample_rate_hz=frequency_sample_rate_hz, time_s=duration_fft_s
+    # ) # This is the same as the following
+    ave_points_ceil_log2 = get_num_points(
+        sample_rate_hz=frequency_sample_rate_hz,
+        duration_s=duration_fft_s,
+        round_type=RoundingType.CEIL,
+        unit=OutputType.BITS,
     )
     # dyadic number of points
     time_fft_nd = 2 ** ave_points_ceil_log2
