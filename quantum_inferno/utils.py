@@ -14,7 +14,7 @@ from quantum_inferno.scales_dyadic import get_epsilon
 
 """ Directory check & make """
 
-
+# Now in exporting
 def checkmake_dir(dir_name: str):
     """
     Check if the dir_name exists; if not, make it
@@ -27,7 +27,7 @@ def checkmake_dir(dir_name: str):
 
 """ Logical power of two flag """
 
-
+# now in rescaling
 def is_power_of_two(n: int) -> bool:
     """
     :param n: value to check
@@ -38,7 +38,7 @@ def is_power_of_two(n: int) -> bool:
 
 """ Time/Sample Duration Utils """
 
-
+# TODO: some examples use parts of outputs, values can be calcuated later if needed, consolidate.
 def duration_points(sample_rate_hz: float, time_s: float) -> Tuple[int, int, int]:
     """
     Compute number of points
@@ -79,7 +79,7 @@ def duration_floor(sample_rate_hz: float, time_s: float) -> Tuple[int, int, floa
 
 """ Sampling Utils """
 
-
+# added to windows
 def taper_tukey(sig_wf_or_time: np.ndarray, fraction_cosine: float) -> np.ndarray:
     """
     Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.

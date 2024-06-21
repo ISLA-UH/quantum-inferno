@@ -22,13 +22,12 @@ def to_log2_with_epsilon(x: np.ndarray or float) -> np.ndarray or float:
     return np.log2(x + get_epsilon())
 
 
-# TODO: Function to find the maximum of the data may be redundant
-def log2_with_epsilon_max(x: np.ndarray) -> float:
+def is_power_of_two(n: int) -> bool:
     """
-    :param x: data to find the maximum of in log2 space
-    :return: maximum of the data in log2 space
+    :param n: value to check
+    :return True if n is positive and a power of 2, False otherwise
     """
-    return np.max(to_log2_with_epsilon(x))
+    return n > 0 and not (n & (n - 1))
 
 
 # TODO: would reference option to be min max etc be better?
@@ -39,19 +38,10 @@ def to_decibel_with_epsilon(
     Convert data to decibels with epsilon added to avoid log(0) errors.
     :param x: data or value to rescale
     :param reference: reference value for the decibel scaling (default is None)
-    :param scaling: the type of the data (default is amplitude)
+    :param scaling: the scaling type of the data (default is amplitude)
     :return:
     """
     if scaling == DataScaleType.POW:
         return 10 * np.log10(np.abs(x / reference) + get_epsilon())
     else:
         return 20 * np.log10(np.abs(x / reference) + get_epsilon())
-
-
-# TODO: Function to find the maximum of the data may be redundant
-def decibel_with_epsilon_max(x: np.ndarray) -> float:
-    """
-    :param x: data to find the maximum of in dB space
-    :return: maximum of the data in dB space
-    """
-    return np.max(to_decibel_with_epsilon(x))
