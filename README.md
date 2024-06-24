@@ -43,7 +43,7 @@ More details will be placed in the [Installation guide](https://github.com/ISLA-
 Full examples can be found in the [examples documentation](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples.md#examples-using-quantum-inferno).
 
 ### API Documentation
-Check the [API Documentation](https://redvoxinc.github.io/quantum-inferno).
+Check the [API Documentation](https://ISLA-UH.github.io/quantum-inferno).
 
 ### Resources
 

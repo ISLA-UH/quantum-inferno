@@ -3,16 +3,17 @@ This module contains functions to construct quantized, standardized information 
 No-chirp/sweep (index_shift=0, variable removed), simplified for the base stockwell transform.
 Based on Garces (2023).
 """
+from typing import Tuple, Union
 
 import numpy as np
 import scipy.signal as signal
+
 from quantum_inferno import scales_dyadic as scales
-from typing import Tuple, Union
 
 
 # TODO: LOOK AT ATOMS_TO_REPLACE and scaled_dyadic for inline cwt frequency. Same for STX.
 
-def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale, omega) -> Tuple[float, float]:
+def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale: float, omega: float) -> Tuple[float, float]:
     """
     Theoretical variance of a Gabor wavelet, with real and imaginary components
 
@@ -30,13 +31,17 @@ def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
     Return chirp amplitude
+
     amp_dict_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
+
     amp_dict_unit_spectrum = return unit peak spectrum; for practical implementation.
+
     amp_dict_unity = 1. Default (no scaling), for testing and validation against real and imaginary wavelets.
+
     Programmers: Although tempting, do not simplify - this follows the original math and is a touchstone.
+
     :param scale_atom: atom/logon scale
     :return: amp_canonical, amp_unit_spectrum
-
     """
     amp_canonical = (np.pi * scale_atom ** 2) ** (-1/4)
     amp_unit_spectrum = (4 * np.pi * scale_atom ** 2) ** (-1/4) * amp_canonical
@@ -49,7 +54,9 @@ def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
     Return chirp amplitude
 
     amp_dict_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
+
     amp_dict_unit_spectrum = return unit peak spectrum; for practical implementation.
+
     amp_dict_unity = 1. Default (no scaling), for testing and validation against real and imaginary wavelets.
 
     :param scale_atom: atom/logon scale
@@ -85,10 +92,9 @@ def wavelet_complex(
         frequency_sample_rate_hz: float
 ) -> Tuple[np.ndarray, np.ndarray, Union[np.ndarray, float], Union[np.ndarray, float],
            Union[np.ndarray, float], Union[np.ndarray, float], Union[np.ndarray, float]]:
-
     """
     Quantized atom for specified band_order_Nth and arbitrary time duration.
-    Unscaled, to be modified by the dictionary type and use case.
+    Unscaled, to be modified by the dictionary type and use case. (<--there is no dictionary type)
     Returns a frequency x time dimension wavelet vector
 
     :param band_order_nth: Nth order of constant Q bands
