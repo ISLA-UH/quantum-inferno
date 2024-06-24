@@ -5,9 +5,12 @@ from typing import List, Tuple
 import numpy as np
 from scipy import signal
 import quantum_inferno.scales_dyadic as scales
-from quantum_inferno import util_matrix as um
+
+# from quantum_inferno import util_matrix as um
+from quantum_inferno.utilities.matrix import d1tile_x_d0d1, d0tile_x_d0d1, just_tile_d1
 import scipy.fft as sfft
 
+# TODO: verify that utilities.matrix are correctly used in this module
 
 # TODO: Use 'em or lose 'em
 def log2_ceil(x: float, epsilon: float = scales.EPSILON64) -> float:
@@ -148,7 +151,8 @@ def shannon_esnrt_per_time(tfr_power):
     ref_shannon_bits = np.log2(num_freq) / num_freq
 
     tfr_power_per_time = np.sum(tfr_power, axis=0) + scales.EPSILON64
-    tfr_power_per_time_pdf = um.d1tile_x_d0d1(d1=1 / tfr_power_per_time, d0d1=tfr_power)
+    # tfr_power_per_time_pdf = um.d1tile_x_d0d1(d1=1 / tfr_power_per_time, d0d1=tfr_power)
+    tfr_power_per_time_pdf = d0tile_x_d0d1(d0=1 / tfr_power_per_time, d0d1=tfr_power)
     tfr_info_per_time = -scale_log2_64(tfr_power_per_time_pdf)
     tfr_isnr_per_time = np.log2(num_freq) - tfr_info_per_time
 
@@ -178,12 +182,12 @@ def shannon_esnrf_per_freq(tfr_power):
     # ref_shannon_bits = 3/num_dof
 
     tfr_power_per_freq = np.sum(tfr_power, axis=1) + scales.EPSILON64
-    tfr_power_per_freq_pdf = um.d0tile_x_d0d1(d0=1 / tfr_power_per_freq, d0d1=tfr_power)
+    tfr_power_per_freq_pdf = d0tile_x_d0d1(d0=1 / tfr_power_per_freq, d0d1=tfr_power)
     tfr_info_per_freq = -scale_log2_64(tfr_power_per_freq_pdf)
     # TODO: taper the np.log2(num_dof), otherwise blows up at edges
     # TODO: Verify, standardize with dsp taper
-    tukey_power_envelope = signal.windows.tukey(M=num_time, alpha=0.2, sym=True)**2
-    power_taper_tile = um.just_tile_d1(d1_array1d_in=tukey_power_envelope, d0d1_shape=tfr_power.shape)
+    tukey_power_envelope = signal.windows.tukey(M=num_time, alpha=0.2, sym=True) ** 2
+    power_taper_tile = just_tile_d1(d1_array1d_in=tukey_power_envelope, d0d1_shape=tfr_power.shape)
     tfr_isnr_per_freq = scale_log2_64(num_time * power_taper_tile) - tfr_info_per_freq
 
     # # Debug
@@ -221,6 +225,7 @@ class Shannon:
     """
     class for Shannon information of a signal
     """
+
     def __init__(self, marginal: np.ndarray):
         """
         :param marginal: # todo
@@ -240,21 +245,22 @@ class ShannonTDR(Shannon):
     """
     class for Shannon TDR information
     """
+
     def __init__(self, sig_in_real: np.ndarray):
         """
         :param sig_in_real: # todo
         """
-        self.sig: np.ndarray = sig_in_real / np.sqrt(np.sum(sig_in_real**2))
-        super().__init__(self.sig**2)
+        self.sig: np.ndarray = sig_in_real / np.sqrt(np.sum(sig_in_real ** 2))
+        super().__init__(self.sig ** 2)
 
     def print_total_ref_entropy(self):
-        print('Ref entropy, time:', self.ref_entropy)
+        print("Ref entropy, time:", self.ref_entropy)
 
     def print_total_entropy(self):
-        print('Total Entropy, time:', np.sum(self.entropy))
+        print("Total Entropy, time:", np.sum(self.entropy))
 
     def print_total_marginal(self):
-        print('Sum of time marginal:', np.sum(self.marginal))
+        print("Sum of time marginal:", np.sum(self.marginal))
 
 
 # todo: check if this matches the expected values
@@ -262,24 +268,25 @@ class ShannonFFT(Shannon):
     """
     class for Shannon FFT information
     """
+
     def __init__(self, sig_in_real: np.ndarray):
         """
         :param sig_in_real: # todo
         """
         self.sig = sfft.rfft(x=sig_in_real)
         self.angle_rads: np.ndarray = np.unwrap(np.angle(self.sig))
-        self.frequency: np.ndarray = np.arange(len(self.angle_rads)) / len(self.angle_rads) / 2.
-        fft_sq = np.abs(self.sig)**2
+        self.frequency: np.ndarray = np.arange(len(self.angle_rads)) / len(self.angle_rads) / 2.0
+        fft_sq = np.abs(self.sig) ** 2
         super().__init__(fft_sq / np.sum(fft_sq))
 
     def print_total_ref_entropy(self):
-        print('Ref entropy, frequency:', self.ref_entropy)
+        print("Ref entropy, frequency:", self.ref_entropy)
 
     def print_total_entropy(self):
-        print('Total Entropy, frequency:', np.sum(self.entropy))
+        print("Total Entropy, frequency:", np.sum(self.entropy))
 
     def print_total_marginal(self):
-        print('Sum of frequency marginal:', np.sum(self.marginal))
+        print("Sum of frequency marginal:", np.sum(self.marginal))
 
 
 # todo: parameter and return types
@@ -298,12 +305,12 @@ def shannon_tdr_fft(sig_in_real, verbose: bool = True):
     # ref_shannon_bits = np.log2(num_dof)/num_dof
 
     # Time-domain representation
-    sig_sq_total = np.sum(sig_in_real**2)
+    sig_sq_total = np.sum(sig_in_real ** 2)
     tdr_sig = sig_in_real / np.sqrt(sig_sq_total)
     # Time marginals
-    tdr_marginal = tdr_sig**2
+    tdr_marginal = tdr_sig ** 2
     tdr_info = -np.log2(tdr_marginal + scales.EPSILON32)
-    tdr_entropy = tdr_marginal*tdr_info
+    tdr_entropy = tdr_marginal * tdr_info
     # tdr_marginal_total = np.sum(tdr_marginal)
     # tdr_entropy_total = np.sum(tdr_entropy)
 
@@ -311,9 +318,9 @@ def shannon_tdr_fft(sig_in_real, verbose: bool = True):
     fft_sig = sfft.rfft(x=sig_in_real)
     fft_angle_rads = np.unwrap(np.angle(fft_sig))
     # RFFT only goes up to Nyquist TODO: use rfftfreq, presently assuming sample rate of unity
-    fft_frequency = np.arange(len(fft_angle_rads)) / len(fft_angle_rads) / 2.
+    fft_frequency = np.arange(len(fft_angle_rads)) / len(fft_angle_rads) / 2.0
     # Frequency marginals
-    fft_sq = np.abs(fft_sig)**2
+    fft_sq = np.abs(fft_sig) ** 2
     fft_sq_total = np.sum(fft_sq)
     fft_marginal = fft_sq / fft_sq_total
     fft_info = -np.log2(fft_marginal + scales.EPSILON32)
@@ -332,15 +339,29 @@ def shannon_tdr_fft(sig_in_real, verbose: bool = True):
     fft_esnr = fft_entropy / ref_fft_entropy
 
     if verbose:
-        print('Ref entropy, time:', ref_tdr_entropy)
-        print('Ref entropy, frequency:', ref_fft_entropy)
-        print('Total Entropy, time:', np.sum(tdr_entropy))
-        print('Total Entropy, frequency:', 2 * np.sum(fft_entropy))
-        print('Sum of time marginal:', np.sum(tdr_marginal))
-        print('Sum of frequency marginal:', np.sum(fft_marginal))
+        print("Ref entropy, time:", ref_tdr_entropy)
+        print("Ref entropy, frequency:", ref_fft_entropy)
+        print("Total Entropy, time:", np.sum(tdr_entropy))
+        print("Total Entropy, frequency:", 2 * np.sum(fft_entropy))
+        print("Sum of time marginal:", np.sum(tdr_marginal))
+        print("Sum of frequency marginal:", np.sum(fft_marginal))
 
-    return [tdr_sig, tdr_marginal, tdr_info, tdr_entropy, tdr_isnr, tdr_esnr,
-            fft_sig, fft_marginal, fft_frequency, fft_angle_rads, fft_info, fft_entropy, fft_isnr, fft_esnr]
+    return [
+        tdr_sig,
+        tdr_marginal,
+        tdr_info,
+        tdr_entropy,
+        tdr_isnr,
+        tdr_esnr,
+        fft_sig,
+        fft_marginal,
+        fft_frequency,
+        fft_angle_rads,
+        fft_info,
+        fft_entropy,
+        fft_isnr,
+        fft_esnr,
+    ]
 
 
 # todo: parameter and return types
@@ -354,10 +375,10 @@ def shannon_tdr(sig_in_real, verbose: bool = True):
     :return:
     """
     # Time-domain representation
-    tdr_sig = sig_in_real / np.sqrt(np.sum(sig_in_real**2))
+    tdr_sig = sig_in_real / np.sqrt(np.sum(sig_in_real ** 2))
     # Time marginals
     # TODO: rel relative to q=1/M; log2(p/q), after Rosso et al. 2001
-    tdr_marginal = tdr_sig**2
+    tdr_marginal = tdr_sig ** 2
     tdr_info, tdr_entropy, ref_tdr_entropy = get_info_and_entropy_32(tdr_marginal)
     # tdr_info_rel = np.log2(tdr_marginal * len(tdr_marginal) + scales.EPSILON32)
     # tdr_entropy_total = np.sum(tdr_entropy)
@@ -381,9 +402,9 @@ def shannon_tdr(sig_in_real, verbose: bool = True):
     # tdr_esnr = tdr_rel_entropy/ref_tdr_rel_entropy
 
     if verbose:
-        print('Ref entropy, time:', ref_tdr_entropy)
-        print('Total Entropy, time:', np.sum(tdr_entropy))
-        print('Sum of time marginal:', np.sum(tdr_marginal))
+        print("Ref entropy, time:", ref_tdr_entropy)
+        print("Total Entropy, time:", np.sum(tdr_entropy))
+        print("Sum of time marginal:", np.sum(tdr_marginal))
 
     return [tdr_sig, tdr_marginal, tdr_info, tdr_entropy, tdr_isnr, tdr_esnr]
 
@@ -404,7 +425,7 @@ def shannon_fft(fft_sig, verbose: bool = True):
     # # RFFT only goes up to Nyquist
     # fft_frequency = np.arange(len(fft_angle_rads))/len(fft_angle_rads)/2.
     # Frequency marginals
-    fft_sq = np.abs(fft_sig)**2
+    fft_sq = np.abs(fft_sig) ** 2
     fft_sq_total = np.sum(fft_sq)
     fft_marginal = fft_sq / fft_sq_total
     fft_info, fft_entropy, ref_fft_entropy = get_info_and_entropy_32(fft_marginal)
@@ -436,9 +457,9 @@ def shannon_fft(fft_sig, verbose: bool = True):
     # fft_esnr = np.log2(len(fft_marginal))/len(fft_marginal) - fft_entropy
 
     if verbose:
-        print('Ref entropy, frequency:', ref_fft_entropy)
-        print('Total Entropy, frequency:', 2 * np.sum(fft_entropy))
-        print('Sum of frequency marginal:', np.sum(fft_marginal))
+        print("Ref entropy, frequency:", ref_fft_entropy)
+        print("Total Entropy, frequency:", 2 * np.sum(fft_entropy))
+        print("Sum of frequency marginal:", np.sum(fft_marginal))
 
     return [fft_marginal, fft_angle_rads, fft_info, fft_entropy, fft_isnr, fft_esnr]
 
@@ -455,7 +476,7 @@ def shannon_stft(tfr_power):
     num_freq = tfr_power.shape[0]
     num_time = tfr_power.shape[1]
     # Previous
-    num_dof = num_freq * num_time    # Degrees of freedom
+    num_dof = num_freq * num_time  # Degrees of freedom
     ref_shannon_bits = np.log2(num_dof) / num_dof
     # TODO: Works OK
     # num_dof = num_time*(1-stft_overlap_fractional)    # Degrees of freedom
@@ -477,8 +498,7 @@ def shannon_stft(tfr_power):
     # print('min max tfr_shannon_bits')
     # print(np.min(tfr_shannon_bits), np.max(tfr_shannon_bits))
 
-    return [tfr_info, tfr_shannon_bits,
-            np.log2(num_dof) - tfr_info, tfr_shannon_bits / ref_shannon_bits]
+    return [tfr_info, tfr_shannon_bits, np.log2(num_dof) - tfr_info, tfr_shannon_bits / ref_shannon_bits]
 
 
 # todo: parameter and return types
@@ -497,7 +517,7 @@ def shannon_stft_esnrt_per_time(tfr_power):
     ref_shannon_bits = np.log2(num_freq) / num_freq
 
     tfr_power_per_time = np.sum(tfr_power, axis=0) + scales.EPSILON64
-    tfr_power_per_time_pdf = um.d1tile_x_d0d1(d1=1 / tfr_power_per_time, d0d1=tfr_power)
+    tfr_power_per_time_pdf = d1tile_x_d0d1(d1=1 / tfr_power_per_time, d0d1=tfr_power)
     tfr_info_per_time = -scale_log2_64(tfr_power_per_time_pdf)
     tfr_isnr_per_time = np.log2(num_freq) - tfr_info_per_time
 
@@ -505,9 +525,9 @@ def shannon_stft_esnrt_per_time(tfr_power):
     # Relative to ref_bits
     tfr_esnr_per_time = tfr_shannon_per_time_bits / ref_shannon_bits
 
-    print('Ref tfr_shannon_per_time_bits')
+    print("Ref tfr_shannon_per_time_bits")
     print(ref_shannon_bits)
-    print('min max tfr_shannon_per_time_bits')
+    print("min max tfr_shannon_per_time_bits")
     print(np.min(tfr_shannon_per_time_bits), np.max(tfr_shannon_per_time_bits))
 
     return [tfr_info_per_time, tfr_shannon_per_time_bits, tfr_isnr_per_time, tfr_esnr_per_time]
@@ -533,7 +553,7 @@ def shannon_stft_esnrf_per_freq(tfr_power):
     # idx = np.argwhere(inv_tfr_power_per_freq > min_inv*2**32)
     # inv_tfr_power_per_freq[idx] = np.zeros(idx.shape)
 
-    tfr_power_per_freq_pdf = um.d0tile_x_d0d1(d0=1 / tfr_power_per_freq, d0d1=tfr_power)
+    tfr_power_per_freq_pdf = d0tile_x_d0d1(d0=1 / tfr_power_per_freq, d0d1=tfr_power)
     tfr_info_per_freq = -scale_log2_64(tfr_power_per_freq_pdf)
     tfr_isnr_per_freq = np.log2(num_time) - tfr_info_per_freq
 
@@ -542,12 +562,13 @@ def shannon_stft_esnrf_per_freq(tfr_power):
     # Relative to ref_bits
     tfr_esnr_per_freq = tfr_shannon_per_freq_bits / ref_shannon_bits
 
-    print('Ref tfr_esnr_per_freq bits')
+    print("Ref tfr_esnr_per_freq bits")
     print(ref_shannon_bits)
-    print('min max tfr_esnr_per_freq')
+    print("min max tfr_esnr_per_freq")
     print(np.min(tfr_esnr_per_freq), np.max(tfr_esnr_per_freq))
 
     return [tfr_info_per_freq, tfr_shannon_per_freq_bits, tfr_isnr_per_freq, tfr_esnr_per_freq]
+
 
 # def shannon_per_freq_order(tfr_power, order: float = 3):
 #     """

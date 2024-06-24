@@ -16,9 +16,9 @@ def columns_ops(sxx: np.ndarray, mode: str = "sum") -> np.ndarray:
     :return: ndarray with appropriate operation.
     """
     if not isinstance(sxx, np.ndarray):
-        raise TypeError('Input must be array.')
+        raise TypeError("Input must be array.")
     elif len(sxx) == 0:
-        raise ValueError('Cannot compute on empty array.')
+        raise ValueError("Cannot compute on empty array.")
 
     if mode == "sum":
         func = np.sum
@@ -35,7 +35,7 @@ def columns_ops(sxx: np.ndarray, mode: str = "sum") -> np.ndarray:
     elif len(sxx.shape) == 2:
         opd = func(sxx, axis=1)
     else:
-        raise TypeError(f'Cannot handle an array of shape {sxx.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {sxx.shape}.")
 
     return opd
 
@@ -75,7 +75,7 @@ def just_tile_d0(d0_array1d_in: Union[float, np.ndarray], d0d1_shape: tuple) -> 
     elif len(d0d1_shape) == 2 and d0d1_shape[0] == len(d0_array1d_in):
         tiled_matrix = np.tile(d0_array1d_in, (d0d1_shape[1], 1)).T
     else:
-        raise TypeError(f'Cannot handle an array of shape {d0_array1d_in.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {d0_array1d_in.shape}.")
 
     return tiled_matrix
 
@@ -94,11 +94,12 @@ def just_tile_d1(d1_array1d_in: Union[float, np.ndarray], d0d1_shape: tuple) -> 
     elif len(d0d1_shape) == 2 and d0d1_shape[1] == len(d1_array1d_in):
         tiled_matrix = np.tile(d1_array1d_in, (d0d1_shape[0], 1))
     else:
-        raise TypeError(f'Cannot handle an array of shape {d1_array1d_in.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {d1_array1d_in.shape}.")
 
     return tiled_matrix
 
 
+# can be used with other methods to tile the output to the original size
 def sum_tile(sxx: np.ndarray) -> np.ndarray:
     """
     Compute the sum of the columns in a 1D or 2D array and then re-tile to the original size
@@ -114,7 +115,7 @@ def sum_tile(sxx: np.ndarray) -> np.ndarray:
     elif len(sxx.shape) == 2:
         sum_c_matrix = np.tile(sum_c, (sxx.shape[1], 1)).T
     else:
-        raise TypeError(f'Cannot handle an array of shape {sxx.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {sxx.shape}.")
 
     return sum_c_matrix
 
@@ -135,7 +136,7 @@ def mean_tile(sxx: np.ndarray, shape_out: np.ndarray) -> np.ndarray:
     elif len(shape_out) == 2:
         sum_c_matrix = np.tile(sum_c, (shape_out[1], 1)).T
     else:
-        raise TypeError(f'Cannot handle an array of shape {sxx.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {sxx.shape}.")
 
     return sum_c_matrix
 
@@ -157,17 +158,16 @@ def d0tile_x_d0d1(d0: Union[float, np.ndarray], d0d1: np.ndarray) -> np.ndarray:
     elif len(shape_out) == 2:
         d0_matrix = np.tile(d0, (shape_out[1], 1)).T
     else:
-        raise TypeError(f'Cannot handle an array of shape {d0.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {d0.shape}.")
 
     if d0_matrix.shape == d0d1.shape:
         d0_x_d0d1 = d0_matrix * d0d1
     else:
-        raise TypeError(f'Cannot handle an array of shape {d0.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {d0.shape}.")
     return d0_x_d0d1
 
 
-def d1tile_x_d0d1(d1: Union[float, np.ndarray],
-                  d0d1: np.ndarray) -> np.ndarray:
+def d1tile_x_d0d1(d1: Union[float, np.ndarray], d0d1: np.ndarray) -> np.ndarray:
     """
     Create array of repeated values with dimensions that match those of energy array
     Useful to multiply time-dependent values to frequency-time matrices
@@ -184,15 +184,16 @@ def d1tile_x_d0d1(d1: Union[float, np.ndarray],
         # TODO: Test
         d1_matrix = np.tile(d1, (shape_out[0], 1))
     else:
-        raise TypeError(f'Cannot handle an array of shape {d1.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {d1.shape}.")
 
     if d1_matrix.shape == d0d1.shape:
         d1_x_d0d1 = d1_matrix * d0d1
     else:
-        raise TypeError(f'Cannot handle an array of shape {d1.shape}.')
+        raise TypeError(f"Cannot handle an array of shape {d1.shape}.")
     return d1_x_d0d1
 
 
+# added to sampling.py
 def decimate_array(sig_wf: np.array, downsampling_factor: int) -> np.ndarray:
     """
     Decimate data and timestamps for an individual station
