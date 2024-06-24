@@ -5,7 +5,7 @@ from typing import Tuple
 from enum import Enum
 
 import numpy as np
-from scipy.signal import resample
+from scipy.signal import resample, decimate
 
 
 class SubsampleMethod(Enum):
@@ -112,3 +112,25 @@ def subsample_2d(array: np.ndarray, subsample_factor: int, method: SubsampleMeth
         return np.max(array.reshape(array.shape[0], -1, subsample_factor), axis=2)
     elif method == SubsampleMethod.MIN:
         return np.min(array.reshape(array.shape[0], -1, subsample_factor), axis=2)
+
+
+# decimate a 1d array
+def decimate_timeseries(timeseries: np.ndarray, decimation_factor: int) -> np.ndarray:
+    """
+    Decimate a time series by a given factor using scipy.signal.decimate.
+    :param timeseries: input signal
+    :param decimation_factor: factor to decimate by
+    :return: decimated signal
+    """
+    return decimate(timeseries, decimation_factor, zero_phase=True)
+
+
+# decimate a collection of timeseries with the same sample rate at once
+def decimate_timeseries_collection(timeseries_collection: np.ndarray, decimation_factor: int) -> np.ndarray:
+    """
+    Decimate a collection of time series with the same sample rate at once using scipy.signal.decimate.
+    :param timeseries_collection: input signal
+    :param decimation_factor: factor to decimate by
+    :return: decimated signal
+    """
+    return decimate(timeseries_collection, decimation_factor, axis=1, zero_phase=True)
