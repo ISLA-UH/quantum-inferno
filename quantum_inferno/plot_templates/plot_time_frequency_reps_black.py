@@ -11,8 +11,10 @@ from matplotlib.colorbar import Colorbar
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable, AxesDivider
 from dataclasses import dataclass
-import redvox.common.date_time_utils as dt
+
+# import redvox.common.date_time_utils as dt
 from quantum_inferno import scales_dyadic
+from quantum_inferno.utilities.date_time import utc_timestamp_to_utc_datetime
 
 
 class FigureAttributes:
@@ -153,7 +155,7 @@ def origin_time_correction(time_input: np.ndarray, start_time_epoch: float, unit
         # Time sanitized if no input provided
         time_label: str = f"Time ({units_time})"
     else:
-        start_datetime_epoch = dt.datetime.utcfromtimestamp(start_time_epoch)
+        start_datetime_epoch = utc_timestamp_to_utc_datetime(start_time_epoch)
         dt_str: str = start_datetime_epoch.strftime("%Y-%m-%d %H:%M:%S")
         time_label: str = f"Time ({units_time}) from UTC {dt_str}"
 
@@ -293,7 +295,7 @@ def plot_wf_wf_wf_vert(
         wf_panel_b_time_zero = wf_panel_b_time - wf_panel_a_time[0]
         wf_panel_a_time_zero = wf_panel_a_time - wf_panel_a_time[0]
     else:
-        start_datetime_epoch = dt.datetime.utcfromtimestamp(start_time_epoch)
+        start_datetime_epoch = utc_timestamp_to_utc_datetime(start_time_epoch)
         dt_str: str = start_datetime_epoch.strftime("%Y-%m-%d %H:%M:%S")
         time_label: str = f"Time ({units_time}) from UTC {dt_str}"
         # top_time -= top_time[0]
