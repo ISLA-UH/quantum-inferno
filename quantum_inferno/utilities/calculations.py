@@ -105,7 +105,7 @@ def get_fill_from_filling_method(array_1d: np.ndarray, fill_type: FillType) -> f
     :param fill_type: The fill type
     :return: The fill value
     """
-    if np.shape(array_1d) != ():  # check if array_1d is a 1D array
+    if len(np.shape(array_1d)) != 1:  # check if array_1d is a 1D array
         raise ValueError(f"array_1d has shape {np.shape(array_1d)} but should be a 1D array")
 
     elif fill_type == FillType.ZERO:
@@ -126,6 +126,15 @@ def get_fill_from_filling_method(array_1d: np.ndarray, fill_type: FillType) -> f
         return array_1d[0]
     else:
         raise ValueError("Invalid fill type")
+
+
+# test get_fill_from_filling_method
+array_1d = np.array([1, 2, 3, 4, 5])
+print(get_fill_from_filling_method(array_1d, FillType.ZERO))
+print(get_fill_from_filling_method(array_1d, FillType.NAN))
+print(get_fill_from_filling_method(array_1d, FillType.MEAN))
+print(get_fill_from_filling_method(array_1d, FillType.MEDIAN))
+print(get_fill_from_filling_method(array_1d, FillType.MIN))
 
 
 def append_fill(array_1d: np.ndarray, fill_value: float, fill_loc: FillLoc) -> np.ndarray:
