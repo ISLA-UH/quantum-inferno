@@ -38,35 +38,35 @@ class CalculationsTest(unittest.TestCase):
         self.assertEqual(result[-1], 10)
 
     def test_get_fill_from_filling_method(self):
-        result = calc.get_fill_from_filling_method(self.timeseries, calc.FillType.ZERO)
+        result = calc.get_fill_from_filling_method(self.timeseries, "zero")
         self.assertEqual(result, 0)
-        result = calc.get_fill_from_filling_method(self.timeseries, calc.FillType.NAN)
-        self.assertEqual(result, np.nan)
-        result = calc.get_fill_from_filling_method(self.timeseries, calc.FillType.MEAN)
+        result = calc.get_fill_from_filling_method(self.timeseries, "nan")
+        self.assertTrue(np.isnan(result))  # np.nan does not equal itself
+        result = calc.get_fill_from_filling_method(self.timeseries, "mean")
         self.assertEqual(result, 3)
-        result = calc.get_fill_from_filling_method(self.timeseries, calc.FillType.MEDIAN)
+        result = calc.get_fill_from_filling_method(self.timeseries, "median")
         self.assertEqual(result, 3)
-        result = calc.get_fill_from_filling_method(self.timeseries, calc.FillType.MIN)
+        result = calc.get_fill_from_filling_method(self.timeseries, "min")
         self.assertEqual(result, 2)
-        result = calc.get_fill_from_filling_method(self.timeseries, calc.FillType.MAX)
+        result = calc.get_fill_from_filling_method(self.timeseries, "max")
         self.assertEqual(result, 4)
-        result = calc.get_fill_from_filling_method(self.timeseries, calc.FillType.TAIL)
+        result = calc.get_fill_from_filling_method(self.timeseries, "tail")
+        self.assertEqual(result, 4)
+        result = calc.get_fill_from_filling_method(self.timeseries, "head")
         self.assertEqual(result, 2)
-        result = calc.get_fill_from_filling_method(self.timeseries, calc.FillType.HEAD)
-        self.assertEqual(result, 4)
 
     def test_get_fill_from_filling_method_invalid(self):
         with self.assertRaises(ValueError):
-            calc.get_fill_from_filling_method(np.array([[1], [2]]), calc.FillType.ZERO)
+            calc.get_fill_from_filling_method(np.array([[1], [2]]), "zero")
 
     def test_append_fill_start(self):
-        result = calc.append_fill(self.timeseries, 0, calc.FillLoc.START)
+        result = calc.append_fill(self.timeseries, 0, "start")
         self.assertEqual(len(result), 10)
         self.assertEqual(result[0], 0)
         self.assertEqual(result[-1], 4)
 
     def test_append_fill_end(self):
-        result = calc.append_fill(self.timeseries, 0, calc.FillLoc.END)
+        result = calc.append_fill(self.timeseries, 0, "end")
         self.assertEqual(len(result), 10)
         self.assertEqual(result[0], 2)
         self.assertEqual(result[-1], 0)
@@ -84,15 +84,17 @@ class CalculationsTest(unittest.TestCase):
         self.assertEqual(result[-1], 0.1)
 
     def test_round_value(self):
-        result = calc.round_value(1.5, calc.RoundingType.FLOOR)
+        result = calc.round_value(1.5, "floor")
         self.assertEqual(result, 1)
-        result = calc.round_value(1.5, calc.RoundingType.CEIL)
+        result = calc.round_value(1.5, "ceil")
         self.assertEqual(result, 2)
-        result = calc.round_value(1.5, calc.RoundingType.ROUND)
+        result = calc.round_value(1.5, "round")
         self.assertEqual(result, 2)
 
     def test_get_num_points(self):
-        result = calc.get_num_points(10., 10., calc.RoundingType.ROUND, calc.OutputType.POINTS)
+        result = calc.get_num_points(10.0, 10.0, "round", "points")
         self.assertEqual(result, 100)
-        result = calc.get_num_points(10., 10., calc.RoundingType.ROUND, calc.OutputType.BITS)
+        result = calc.get_num_points(10.0, 10.0, "round", "log2")
         self.assertEqual(result, 7)
+        result = calc.get_num_points(5.0, 2.0, "round", "pow2")
+        self.assertEqual(result, 1024)
