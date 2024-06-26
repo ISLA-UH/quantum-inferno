@@ -842,7 +842,7 @@ def plot_wf_mesh_vert(
     mesh_panel_b_cbar.set_label(mesh_panel_b_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_b_cax.tick_params(labelsize="large")
     if figure_title_show:
-        mesh_panel_b.set_title(f"{figure_title} at Station {station_id}")
+        mesh_panel_b.set_title(f"{figure_title} {station_id}")
     mesh_panel_b.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
     mesh_panel_b.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
     mesh_panel_b.set_ylim(frequency_fix_ymin, frequency_fix_ymax)

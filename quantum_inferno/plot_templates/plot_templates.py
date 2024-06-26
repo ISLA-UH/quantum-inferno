@@ -41,7 +41,7 @@ def get_time_label(
     """
     label: str = f"Time ({units_time})"
     if start_time_epoch != 0:
-        start_datetime_epoch = dt.set_timestamp_to_utc(start_time_epoch, utc_offset_h)
+        start_datetime_epoch = dt.get_datetime_from_timestamp_to_utc(start_time_epoch, utc_offset_h)
         label += f' from UTC {start_datetime_epoch.strftime("%Y-%m-%d %H:%M:%S")}'
     return label
 

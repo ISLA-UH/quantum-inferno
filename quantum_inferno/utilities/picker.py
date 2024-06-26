@@ -65,7 +65,8 @@ def apply_bandpass(
     timeseries: np.ndarray, filter_band: Tuple[float, float], sample_rate_hz: float, filter_order: int = 7
 ) -> np.ndarray:
     """
-    Apply a bandpass filter to the timeseries data
+    Apply a bandpass filter to the timeseries data.
+    Apparently you need at least 46 values in the timeseries for this to work
 
     :param timeseries: input signal
     :param filter_band: bandpass filter band
@@ -201,6 +202,7 @@ def extract_signal_with_buffer_seconds(
     return timeseries[intro_index:outro_index]
 
 
+# todo: is there a simpler way to pass in the peaks values, like a list of integers?
 def find_peaks_to_comb_function(timeseries: np.ndarray, peaks: np.ndarray) -> np.ndarray:
     """
     Returns a comb function of the same length as the timeseries with 1s at the peak locations and 0s elsewhere

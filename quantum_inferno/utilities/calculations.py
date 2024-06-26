@@ -3,16 +3,16 @@ Methods for mathematical operations.
 (Can't be named "math" because it's a built-in module)
 """
 
+from enum import Enum
+
 from scipy.integrate import cumulative_trapezoid
 import numpy as np
-from enum import Enum
 
 
 class FillLoc(Enum):
     """
     Enumeration for fill locations
     """
-
     START = "start"
     END = "end"
 
@@ -21,7 +21,6 @@ class FillType(Enum):
     """
     Enumeration for fill types
     """
-
     ZERO = "zero"
     NAN = "nan"
     MEAN = "mean"
@@ -36,18 +35,20 @@ class RoundingType(Enum):
     """
     Enumeration for rounding types
     """
-
     FLOOR = "floor"
     CEIL = "ceil"
     ROUND = "round"
 
 
 class OutputType(Enum):
+    """
+    Enumeration for output types
+    """
     BITS = "bits"
     POINTS = "points"
 
 
-# cummulative trapazoidal integration
+# cumulative trapezoidal integration
 def integrate_with_cumtrapz_timestamps_s(
     timestamps_s: np.ndarray, timeseries: np.ndarray, initial_value: float = 0
 ) -> np.ndarray:
@@ -101,6 +102,7 @@ def derivative_with_gradient_sample_rate_hz(sample_rate_hz: float, timeseries: n
 def get_fill_from_filling_method(array_1d: np.ndarray, fill_type: FillType) -> float:
     """
     Returns the fill value based on the fill type
+
     :param array_1d: 1D array with data to be filled
     :param fill_type: The fill type
     :return: The fill value
@@ -193,6 +195,7 @@ def round_value(value: float, rounding: RoundingType) -> int:
     """
     Round value based on the rounding method for positive or negative floats
     For rounding type ROUND, if the decimals is halfway between two integers, it will round to the nearest even integer
+
     :param value: value to be rounded
     :param rounding: rounding type
     :return: rounded value
@@ -213,6 +216,7 @@ def get_num_points(sample_rate_hz: float, duration_s: float, round_type: Roundin
     TODO: Make defaults for RoundingType, OutputType, add POW2 option/function. BITS is maybe not the best descriptor?
     Get number of points in a waveform based on the sample rate and duration and round based on the rounding method
     For rounding type ROUND, if the decimals is halfway between two integers, it will round to the nearest even integer
+
     :param sample_rate_hz: sample rate in Hz
     :param duration_s: duration in seconds
     :param round_type: rounding type

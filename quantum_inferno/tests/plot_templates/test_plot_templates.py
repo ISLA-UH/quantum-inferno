@@ -12,6 +12,14 @@ class SanitizeTimestampsTest(unittest.TestCase):
         self.assertEqual(new_timestamps[0], 0)
 
 
+class GetTimeLabelTest(unittest.TestCase):
+    def test_get_time_label(self):
+        start_time_epoch = 1704067200  # 2024 Jan 1, 00:00
+        time_units = "s"
+        time_label = pt.get_time_label(start_time_epoch, time_units, 0.)
+        self.assertEqual(time_label, "Time (s) from UTC 2024-01-01 00:00:00")
+
+
 class MeshTimeFrequencyEdgesTest(unittest.TestCase):
     def test_mesh_time_freq_edge(self):
         frequency = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])

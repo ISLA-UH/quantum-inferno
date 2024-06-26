@@ -98,3 +98,15 @@ def set_timestamp_to_utc(timestamp: float, utc_offset_h: float, input_unit: str 
     """
     offset_in_input_unit = utc_offset_h * time_unit_dict["h"] / time_unit_dict[input_unit]
     return timestamp - offset_in_input_unit
+
+
+def get_datetime_from_timestamp_to_utc(timestamp: float, utc_offset_h: float, input_unit: str = "s") -> datetime:
+    """
+    Convert a timestamp to a UTC datetime object using the UTC offset.
+
+    :param timestamp: timestamp to convert into UTC time
+    :param utc_offset_h: UTC offset of the timestamp in hours
+    :param input_unit: time units (default: seconds)
+    :return: converted UTC datetime object
+    """
+    return utc_timestamp_to_utc_datetime(set_timestamp_to_utc(timestamp, utc_offset_h, input_unit))
