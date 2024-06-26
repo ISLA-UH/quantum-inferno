@@ -2,22 +2,16 @@
 This module contains methods used in resampling signals
 """
 from typing import Tuple
-from enum import Enum
 
 import numpy as np
 from scipy.signal import resample, decimate
 
 
-class SubsampleMethod(Enum):
-    AVG = "average"  # use the average of the subset of samples
-    MED = "median"  # use the median of the subset of samples
-    MAX = "max"  # use the maximum of the subset of samples
-    MIN = "min"  # use the minimum of the subset of samples
-    NTH = "nth"  # use every nth sample
+SUBSMAPLE_METHODS = ["average", "median", "max", "min", "nth"]
 
 
 def subsample(
-    timeseries: np.ndarray, sample_rate_hz: float, subsample_factor: int, method: SubsampleMethod = SubsampleMethod.NTH
+    timeseries: np.ndarray, sample_rate_hz: float, subsample_factor: int, method: str = "nth"
 ) -> Tuple[np.ndarray, float]:
     """
     Subsample a time series by given method (default is every nth sample).
@@ -36,21 +30,22 @@ def subsample(
 
     new_sample_rate = sample_rate_hz / subsample_factor
 
-    if method != SubsampleMethod.NTH and len(timeseries) % subsample_factor != 0:
-        print("here")
-        print(len(timeseries))
-        timeseries = timeseries[: -(len(timeseries) % subsample_factor)]
-        print(len(timeseries))
+    if method not in SUBSMAPLE_METHODS:
+        print(f"Warning: method {method} not recognized, using 'nth' method")
+        method = "nth"
 
-    if method == SubsampleMethod.NTH:
+    if method != "nth" and len(timeseries) % subsample_factor != 0:
+        timeseries = timeseries[: -(len(timeseries) % subsample_factor)]
+
+    if method == "nth":
         return timeseries[::subsample_factor], new_sample_rate
-    elif method == SubsampleMethod.AVG:
+    elif method == "average":
         return np.mean(timeseries.reshape(-1, subsample_factor), axis=1), new_sample_rate
-    elif method == SubsampleMethod.MED:
+    elif method == "median":
         return np.median(timeseries.reshape(-1, subsample_factor), axis=1), new_sample_rate
-    elif method == SubsampleMethod.MAX:
+    elif method == "max":
         return np.max(timeseries.reshape(-1, subsample_factor), axis=1), new_sample_rate
-    elif method == SubsampleMethod.MIN:
+    elif method == "min":
         return np.min(timeseries.reshape(-1, subsample_factor), axis=1), new_sample_rate
 
 
@@ -88,7 +83,7 @@ def resample_with_sample_rate(
 
 
 # subsample a 2d array along the second axis
-def subsample_2d(array: np.ndarray, subsample_factor: int, method: SubsampleMethod = SubsampleMethod.NTH) -> np.ndarray:
+def subsample_2d(array: np.ndarray, subsample_factor: int, method: str = "nth") -> np.ndarray:
     """
     Subsample a 2D array along the second axis.
     Truncates the signal if the length is not divisible by the subsample factor.
@@ -103,23 +98,25 @@ def subsample_2d(array: np.ndarray, subsample_factor: int, method: SubsampleMeth
         print(f"Warning: subsample factor is less than 2, returning the original signal")
         return array
 
-    if method != SubsampleMethod.NTH:
+    if method not in SUBSMAPLE_METHODS:
+        print(f"Warning: method {method} not recognized, using 'nth' method")
+        method = "nth"
+
+    if method != "nth":
         remainder = array.shape[1] % subsample_factor
         if remainder != 0:
-            array = array[:, : -remainder]
+            array = array[:, :-remainder]
 
-    if method == SubsampleMethod.NTH:
+    if method == "nth":
         return array[:, ::subsample_factor]
-    # todo: this doesn't work.  either do subsampling per subarray or just not do it
-    elif method == SubsampleMethod.AVG:
-        x = array.reshape((array.shape[0], -1))
-        return np.mean(array.reshape((array.shape[0], -1)), axis=1)
-    elif method == SubsampleMethod.MED:
-        return np.median(array.reshape(array.shape[0], -1), axis=1)
-    elif method == SubsampleMethod.MAX:
-        return np.max(array.reshape(array.shape[0], -1), axis=1)
-    elif method == SubsampleMethod.MIN:
-        return np.min(array.reshape(array.shape[0], -1), axis=1)
+    elif method == "average":
+        return np.mean(array.reshape(-1, subsample_factor), axis=1).reshape(array.shape[0], -1)
+    elif method == "median":
+        return np.median(array.reshape((-1, subsample_factor)), axis=1).reshape(array.shape[0], -1)
+    elif method == "max":
+        return np.max(array.reshape((-1, subsample_factor)), axis=1).reshape(array.shape[0], -1)
+    elif method == "min":
+        return np.min(array.reshape((-1, subsample_factor)), axis=1).reshape(array.shape[0], -1)
 
 
 # decimate a 1d array
