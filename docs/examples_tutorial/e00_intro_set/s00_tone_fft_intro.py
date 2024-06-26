@@ -13,6 +13,7 @@ RMS amplitude = 1/sqrt(2)
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from quantum_inferno.utilities import calculations
 print(__doc__)
 
 if __name__ == "__main__":

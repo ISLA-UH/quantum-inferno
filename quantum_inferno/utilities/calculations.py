@@ -182,7 +182,7 @@ def derivative_with_difference_sample_rate_hz(
 # return round based on the rounding method
 def round_value(value: float, rounding: RoundingType) -> int:
     """
-    Round value based on the rounding method
+    Round value based on the rounding method for positive or negative floats
     For rounding type ROUND, if the decimals is halfway between two integers, it will round to the nearest even integer
     :param value: value to be rounded
     :param rounding: rounding type
@@ -201,6 +201,7 @@ def round_value(value: float, rounding: RoundingType) -> int:
 # get number of points in a waveform based on the sample rate and duration and round based on the rounding method
 def get_num_points(sample_rate_hz: float, duration_s: float, round_type: RoundingType, unit: OutputType) -> int:
     """
+    TODO: Make defaults for RoundingType, OutputType, add POW2 option/function. BITS is maybe not the best descriptor?
     Get number of points in a waveform based on the sample rate and duration and round based on the rounding method
     For rounding type ROUND, if the decimals is halfway between two integers, it will round to the nearest even integer
     :param sample_rate_hz: sample rate in Hz
