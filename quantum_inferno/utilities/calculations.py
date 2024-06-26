@@ -3,49 +3,13 @@ Methods for mathematical operations.
 (Can't be named "math" because it's a built-in module)
 """
 
-from enum import Enum
-
 from scipy.integrate import cumulative_trapezoid
 import numpy as np
 
-
-class FillLoc(Enum):
-    """
-    Enumeration for fill locations
-    """
-    START = "start"
-    END = "end"
-
-
-class FillType(Enum):
-    """
-    Enumeration for fill types
-    """
-    ZERO = "zero"
-    NAN = "nan"
-    MEAN = "mean"
-    MEDIAN = "median"
-    MIN = "min"
-    MAX = "max"
-    TAIL = "tail"
-    HEAD = "head"
-
-
-class RoundingType(Enum):
-    """
-    Enumeration for rounding types
-    """
-    FLOOR = "floor"
-    CEIL = "ceil"
-    ROUND = "round"
-
-
-class OutputType(Enum):
-    """
-    Enumeration for output types
-    """
-    BITS = "bits"
-    POINTS = "points"
+FILL_LOCATIONS = ["start", "end"]
+FILL_TYPES = ["zero", "nan", "mean", "median", "min", "max", "tail", "head"]
+ROUNDING_TYPES = ["floor", "ceil", "round"]
+OUTPUT_TYPES = ["log2", "points", "pow2"]
 
 
 # cumulative trapezoidal integration
@@ -99,7 +63,7 @@ def derivative_with_gradient_sample_rate_hz(sample_rate_hz: float, timeseries: n
     return np.gradient(timeseries, 1 / sample_rate_hz)
 
 
-def get_fill_from_filling_method(array_1d: np.ndarray, fill_type: FillType) -> float:
+def get_fill_from_filling_method(array_1d: np.ndarray, fill_type: str) -> float:
     """
     Returns the fill value based on the fill type
 
@@ -110,36 +74,27 @@ def get_fill_from_filling_method(array_1d: np.ndarray, fill_type: FillType) -> f
     if len(np.shape(array_1d)) != 1:  # check if array_1d is a 1D array
         raise ValueError(f"array_1d has shape {np.shape(array_1d)} but should be a 1D array")
 
-    elif fill_type == FillType.ZERO:
+    if fill_type not in FILL_TYPES:
+        raise ValueError(f"Invalid fill type {fill_type}, must be one of {FILL_TYPES}")
+    elif fill_type == "zero":
         return 0
-    elif fill_type == FillType.NAN:
+    elif fill_type == "nan":
         return np.nan
-    elif fill_type == FillType.MEAN:
+    elif fill_type == "mean":
         return np.mean(array_1d)  # check in place to insure a float is returned
-    elif fill_type == FillType.MEDIAN:
+    elif fill_type == "median":
         return np.median(array_1d)  # check in place to insure a float is returned
-    elif fill_type == FillType.MIN:
+    elif fill_type == "min":
         return np.min(array_1d)
-    elif fill_type == FillType.MAX:
+    elif fill_type == "max":
         return np.max(array_1d)
-    elif fill_type == FillType.TAIL:
+    elif fill_type == "tail":
         return array_1d[-1]
-    elif fill_type == FillType.HEAD:
+    elif fill_type == "head":
         return array_1d[0]
-    else:
-        raise ValueError("Invalid fill type")
 
 
-# test get_fill_from_filling_method
-array_1d = np.array([1, 2, 3, 4, 5])
-print(get_fill_from_filling_method(array_1d, FillType.ZERO))
-print(get_fill_from_filling_method(array_1d, FillType.NAN))
-print(get_fill_from_filling_method(array_1d, FillType.MEAN))
-print(get_fill_from_filling_method(array_1d, FillType.MEDIAN))
-print(get_fill_from_filling_method(array_1d, FillType.MIN))
-
-
-def append_fill(array_1d: np.ndarray, fill_value: float, fill_loc: FillLoc) -> np.ndarray:
+def append_fill(array_1d: np.ndarray, fill_value: float, fill_loc: str) -> np.ndarray:
     """
     Append fill value to the array based on the fill location
 
@@ -148,70 +103,75 @@ def append_fill(array_1d: np.ndarray, fill_value: float, fill_loc: FillLoc) -> n
     :param fill_loc: fill location
     :return: array with fill value appended
     """
-    if fill_loc == FillLoc.START:
+    if fill_loc not in FILL_LOCATIONS:
+        raise ValueError(f"Invalid fill location {fill_loc}, must be one of {FILL_LOCATIONS}")
+    if fill_loc == "start":
         return np.insert(array_1d, 0, fill_value)
-    elif fill_loc == FillLoc.END:
+    elif fill_loc == "end":
         return np.append(array_1d, fill_value)
-    else:
-        raise ValueError("Invalid fill location")
 
 
 def derivative_with_difference_timestamps_s(
-    timestamps_s: np.ndarray, timeseries: np.ndarray, fill: FillType = FillType.ZERO, fill_loc: FillLoc = FillLoc.END
+    timestamps_s: np.ndarray, timeseries: np.ndarray, fill_type: str = "zero", fill_loc: str = "end"
 ) -> np.ndarray:
     """
     Derivative using numpy.diff with fill options to return the same length as the input
+    Default fill type is zero and fill location is end
 
     :param timestamps_s: timestamps in seconds
     :param timeseries: sensor waveform
-    :param fill: fill type
+    :param fill_type: fill type
     :param fill_loc: fill location
     :return: derivative waveform with the same length as the input
     """
     derivative = np.diff(timeseries) / np.diff(timestamps_s)
-    fill_value = get_fill_from_filling_method(derivative, fill)
+    fill_value = get_fill_from_filling_method(derivative, fill_type)
     return append_fill(derivative, fill_value, fill_loc)
 
 
 def derivative_with_difference_sample_rate_hz(
-    sample_rate_hz: float, timeseries: np.ndarray, fill: FillType = FillType.ZERO, fill_loc: FillLoc = FillLoc.END
+    sample_rate_hz: float, timeseries: np.ndarray, fill_type: str = "zero", fill_loc: str = "end"
 ) -> np.ndarray:
     """
     Derivative using numpy.diff with fill options to return the same length as the input
+    Default fill type is zero and fill location is end
 
     :param sample_rate_hz: sample rate in Hz
     :param timeseries: sensor waveform
-    :param fill: fill type
+    :param fill_type: fill type
     :param fill_loc: fill location
     :return: derivative waveform with the same length as the input
     """
     derivative = np.diff(timeseries) * sample_rate_hz
-    fill_value = get_fill_from_filling_method(derivative, fill)
+    fill_value = get_fill_from_filling_method(derivative, fill_type)
     return append_fill(derivative, fill_value, fill_loc)
 
 
 # return round based on the rounding method
-def round_value(value: float, rounding: RoundingType) -> int:
+def round_value(value: float, rounding_type: str = "round") -> int:
     """
     Round value based on the rounding method for positive or negative floats
     For rounding type ROUND, if the decimals is halfway between two integers, it will round to the nearest even integer
+    Default rounding type is round
 
     :param value: value to be rounded
-    :param rounding: rounding type
+    :param rounding_type: rounding type
     :return: rounded value
     """
-    if rounding == RoundingType.FLOOR:
+    if rounding_type not in ROUNDING_TYPES:
+        raise ValueError(f"Invalid rounding type {rounding_type}, must be one of {ROUNDING_TYPES}")
+    elif rounding_type == "floor":
         return int(np.floor(value))
-    elif rounding == RoundingType.CEIL:
+    elif rounding_type == "ceil":
         return int(np.ceil(value))
-    elif rounding == RoundingType.ROUND:
+    elif rounding_type == "round":
         return int(np.round(value))
     else:
         raise ValueError("Invalid rounding type")
 
 
 # get number of points in a waveform based on the sample rate and duration and round based on the rounding method
-def get_num_points(sample_rate_hz: float, duration_s: float, round_type: RoundingType, unit: OutputType) -> int:
+def get_num_points(sample_rate_hz: float, duration_s: float, rounding_type: str, output_unit: str) -> int:
     """
     TODO: Make defaults for RoundingType, OutputType, add POW2 option/function. BITS is maybe not the best descriptor?
     Get number of points in a waveform based on the sample rate and duration and round based on the rounding method
@@ -219,13 +179,16 @@ def get_num_points(sample_rate_hz: float, duration_s: float, round_type: Roundin
 
     :param sample_rate_hz: sample rate in Hz
     :param duration_s: duration in seconds
-    :param round_type: rounding type
-    :param unit: output type (POINTS or BITS)
+    :param rounding_type: rounding type
+    :param output_unit: output unit (points, log2, or pow2)
     :return: number of points
     """
-    if unit == OutputType.POINTS:
-        return round_value(sample_rate_hz * duration_s, round_type)
-    elif unit == OutputType.BITS:
-        return round_value(np.log2(sample_rate_hz * duration_s), round_type)
-    else:
-        raise ValueError("Invalid output type")
+
+    if output_unit not in OUTPUT_TYPES:
+        raise ValueError(f"Invalid output unit {output_unit}, must be one of {OUTPUT_TYPES}")
+    elif output_unit == "points":
+        return round_value(sample_rate_hz * duration_s, rounding_type)
+    elif output_unit == "log2":
+        return round_value(np.log2(sample_rate_hz * duration_s), rounding_type)
+    elif output_unit == "pow2":
+        return round_value(2 ** (sample_rate_hz * duration_s), rounding_type)
