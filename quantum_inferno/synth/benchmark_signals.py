@@ -438,16 +438,16 @@ def well_tempered_tone(
         # Antialias (AA)
         synthetics_NEW.antialias_half_nyquist(mic_sig)
 
-    print("WELL TEMPERED TONE SYNTHETIC")
-    print("Nyquist frequency:", frequency_sample_rate_hz / 2)
-    print("Nominal signal frequency, hz:", frequency_center_hz)
-    print("FFT signal frequency, hz:", frequency_center_fft_hz)
-    print("Nominal spectral resolution, hz", frequency_resolution_hz)
-    print("FFT spectral resolution, hz", frequency_resolution_fft_hz)
-    print("Number of signal points:", time_duration_nd)
-    print("log2(points):", np.log2(time_duration_nd))
-    print("Number of FFT points:", time_fft_nd)
-    print("log2(FFT points):", np.log2(time_fft_nd))
+    # print("WELL TEMPERED TONE SYNTHETIC")
+    # print("Nyquist frequency:", frequency_sample_rate_hz / 2)
+    # print("Nominal signal frequency, hz:", frequency_center_hz)
+    # print("FFT signal frequency, hz:", frequency_center_fft_hz)
+    # print("Nominal spectral resolution, hz", frequency_resolution_hz)
+    # print("FFT spectral resolution, hz", frequency_resolution_fft_hz)
+    # print("Number of signal points:", time_duration_nd)
+    # print("log2(points):", np.log2(time_duration_nd))
+    # print("Number of FFT points:", time_fft_nd)
+    # print("log2(FFT points):", np.log2(time_fft_nd))
 
     return mic_sig, time_s, time_fft_nd, frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz
 

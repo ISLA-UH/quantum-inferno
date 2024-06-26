@@ -23,6 +23,7 @@ def subsample(
     Subsample a time series by given method (default is every nth sample).
     Truncates the signal if the length is not divisible by the subsample factor, except for the nth method.
     if subsample_factor is less than 2, return the original signal.
+
     :param timeseries: input signal
     :param sample_rate_hz: sample rate of the signal
     :param subsample_factor: factor to subsample by (returns every nth sample)
@@ -59,6 +60,7 @@ def resample_uneven_timeseries(
     """
     Resample uneven time series using linear interpolation.
     If new_sample_rate_hz is None, the new sample rate is the average sample rate of the input signal.
+
     :param timeseries: input signal
     :param timestamps_s: timestamps of the input signal in seconds
     :param new_sample_rate_hz: the sample rate to resample to in Hz (default is None)
@@ -75,6 +77,7 @@ def resample_with_sample_rate(
 ) -> Tuple[np.ndarray, float]:
     """
     Resample a time series to a new sample rate using scipy.signal.resample.
+
     :param timeseries: input signal
     :param sample_rate_hz: sample rate of the input signal
     :param new_sample_rate_hz: the sample rate to resample to in Hz
@@ -87,9 +90,10 @@ def resample_with_sample_rate(
 # subsample a 2d array along the second axis
 def subsample_2d(array: np.ndarray, subsample_factor: int, method: SubsampleMethod = SubsampleMethod.NTH) -> np.ndarray:
     """
-    Subsample a 2D array along the second axis. (
+    Subsample a 2D array along the second axis.
     Truncates the signal if the length is not divisible by the subsample factor.
     if subsample_factor is less than 2, return the original signal.
+
     :param array: input 2D array
     :param subsample_factor: factor to subsample
     :param method: method to use for subsampling (default is every nth sample)
@@ -99,25 +103,31 @@ def subsample_2d(array: np.ndarray, subsample_factor: int, method: SubsampleMeth
         print(f"Warning: subsample factor is less than 2, returning the original signal")
         return array
 
-    if method != SubsampleMethod.NTH and array.shape[1] % subsample_factor != 0:
-        array = array[:, : -(array.shape[1] % subsample_factor)]
+    if method != SubsampleMethod.NTH:
+        remainder = array.shape[1] % subsample_factor
+        if remainder != 0:
+            array = array[:, : -remainder]
 
     if method == SubsampleMethod.NTH:
         return array[:, ::subsample_factor]
+    # todo: this doesn't work.  either do subsampling per subarray or just not do it
     elif method == SubsampleMethod.AVG:
-        return np.mean(array.reshape(array.shape[0], -1, subsample_factor), axis=2)
+        x = array.reshape((array.shape[0], -1))
+        return np.mean(array.reshape((array.shape[0], -1)), axis=1)
     elif method == SubsampleMethod.MED:
-        return np.median(array.reshape(array.shape[0], -1, subsample_factor), axis=2)
+        return np.median(array.reshape(array.shape[0], -1), axis=1)
     elif method == SubsampleMethod.MAX:
-        return np.max(array.reshape(array.shape[0], -1, subsample_factor), axis=2)
+        return np.max(array.reshape(array.shape[0], -1), axis=1)
     elif method == SubsampleMethod.MIN:
-        return np.min(array.reshape(array.shape[0], -1, subsample_factor), axis=2)
+        return np.min(array.reshape(array.shape[0], -1), axis=1)
 
 
 # decimate a 1d array
 def decimate_timeseries(timeseries: np.ndarray, decimation_factor: int) -> np.ndarray:
     """
     Decimate a time series by a given factor using scipy.signal.decimate.
+    Timeseries must be 28 samples or longer.
+
     :param timeseries: input signal
     :param decimation_factor: factor to decimate by
     :return: decimated signal
@@ -129,6 +139,8 @@ def decimate_timeseries(timeseries: np.ndarray, decimation_factor: int) -> np.nd
 def decimate_timeseries_collection(timeseries_collection: np.ndarray, decimation_factor: int) -> np.ndarray:
     """
     Decimate a collection of time series with the same sample rate at once using scipy.signal.decimate.
+    Each timeseries must be 28 samples or longer.
+
     :param timeseries_collection: input signal
     :param decimation_factor: factor to decimate by
     :return: decimated signal
