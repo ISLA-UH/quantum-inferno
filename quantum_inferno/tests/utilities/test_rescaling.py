@@ -5,7 +5,9 @@ from quantum_inferno.utilities import rescaling
 
 class MyTestCase(unittest.TestCase):
     def test_to_log2_with_epsilon(self):
-        result = rescaling.to_log2_with_epsilon(100.)
+        result = rescaling.to_log2_with_epsilon(100.0)
+        self.assertAlmostEqual(result, 6.64, 2)
+        result = rescaling.to_log2_with_epsilon(-100.0)
         self.assertAlmostEqual(result, 6.64, 2)
 
     def test_is_power_of_two(self):
@@ -15,7 +17,11 @@ class MyTestCase(unittest.TestCase):
         self.assertFalse(result)
 
     def test_to_decibel_with_epsilon(self):
-        result = rescaling.to_decibel_with_epsilon(100., 1.0, rescaling.DataScaleType.AMP)
-        self.assertEqual(result, 40.)
-        result = rescaling.to_decibel_with_epsilon(100., 1.0, rescaling.DataScaleType.POW)
-        self.assertEqual(result, 20.)
+        result = rescaling.to_decibel_with_epsilon(100.0, 1.0)
+        self.assertEqual(result, 40.0)
+        result = rescaling.to_decibel_with_epsilon(-100.0, 1.0)
+        self.assertEqual(result, 40.0)
+        result = rescaling.to_decibel_with_epsilon(100.0, 1.0, "amplitude")
+        self.assertEqual(result, 40.0)
+        result = rescaling.to_decibel_with_epsilon(100.0, 1.0, "power")
+        self.assertEqual(result, 20.0)

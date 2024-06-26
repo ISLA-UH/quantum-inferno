@@ -2,26 +2,20 @@
 A set of functions to rescale data.
 """
 from typing import Union
-
-from enum import Enum
 import numpy as np
-
 from quantum_inferno.scales_dyadic import get_epsilon
 
 
-class DataScaleType(Enum):
-    AMP: str = "amplitude"  # Provided data is in amplitude (waveform, etc.)
-    POW: str = "power"  # Provided data is in power (psd, etc.)
+DATA_SCALE_TYPE = ["amplitude", "power"]
 
 
-# todo: apparently you can encounter invalid values while executing this function.  refer to test_picker test functions
-# such as test_scale_signal_by_extraction_type_bit() for an example
 def to_log2_with_epsilon(x: Union[np.ndarray, float]) -> Union[np.ndarray, float]:
     """
+    Convert the absolute value of the data to log2 with epsilon added to avoid log(0) and log(<0) errors.
     :param x: data or value to rescale
     :return: rescaled data or value
     """
-    return np.log2(x + get_epsilon())
+    return np.log2(np.abs(x) + get_epsilon())
 
 
 def is_power_of_two(n: int) -> bool:
@@ -32,17 +26,19 @@ def is_power_of_two(n: int) -> bool:
     return n > 0 and not (n & (n - 1))
 
 
-# TODO: would reference option to be min max etc be better rather than setting reference manually?
 def to_decibel_with_epsilon(
-    x: Union[np.ndarray, float], reference: float = 1.0, scaling: DataScaleType = DataScaleType.AMP
+    x: Union[np.ndarray, float], reference: float = 1.0, input_scaling: str = "amplitude"
 ) -> Union[np.ndarray, float]:
     """
     Convert data to decibels with epsilon added to avoid log(0) errors.
 
     :param x: data or value to rescale
     :param reference: reference value for the decibel scaling (default is None)
-    :param scaling: the scaling type of the data (default is amplitude)
+    :param input_scaling: the scaling type of the data (default is amplitude)
     :return: rescaled data or value as decibels
     """
-    scale_val = 10 if scaling == DataScaleType.POW else 20
+    if input_scaling not in DATA_SCALE_TYPE:
+        print("Invalid input scaling type.  Defaulting to amplitude.")
+        input_scaling = "amplitude"
+    scale_val = 10 if input_scaling == "power" else 20
     return scale_val * np.log10(np.abs(x / reference) + get_epsilon())

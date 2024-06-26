@@ -2,7 +2,6 @@
 A set of functions to pick key portions of a signal.
 """
 
-from enum import Enum
 from typing import Tuple, Optional
 
 import numpy as np
@@ -13,22 +12,8 @@ from quantum_inferno.utilities.date_time import convert_time_unit
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 
-class ExtractionType(Enum):
-    """
-    Type of extraction to perform on signal
-    """
-    SIGMAX: str = "sigmax"  # Extract signal using the largest positive value
-    SIGMIN: str = "sigmin"  # Extract signal using the largest negative value
-    SIGABS: str = "sigabs"  # Extract signal using the largest absolute value
-    SIGBIT: str = "sigbit"  # Extract signal using the largest absolute value in bits
-
-
-class ScalingType(Enum):
-    """
-    Units of the signal
-    """
-    AMPS: str = "amps"  # Signal is in amplitudes
-    BITS: str = "bits"  # Signal is in bits
+INPUT_SCALE_TYPE = ["amplitude", "log2"]
+EXTRACTION_TYPE = ["sigmax", "sigmin", "sigabs", "log2", "log2max"]
 
 
 def find_sample_rate_hz_from_timestamps(timestamps: np.ndarray, time_unit: str = "s") -> float:
@@ -43,7 +28,7 @@ def find_sample_rate_hz_from_timestamps(timestamps: np.ndarray, time_unit: str =
     return 1.0 / np.mean(np.diff(timestamps_seconds))
 
 
-def scale_signal_by_extraction_type(in_signal: np.ndarray, extraction_type: ExtractionType) -> np.ndarray:
+def scale_signal_by_extraction_type(in_signal: np.ndarray, extraction_type: str = "sigmax") -> np.ndarray:
     """
     Normalize the signal based on the extraction type
 
@@ -51,14 +36,20 @@ def scale_signal_by_extraction_type(in_signal: np.ndarray, extraction_type: Extr
     :param extraction_type: extraction type
     :return: normalized signal
     """
-    if extraction_type == ExtractionType.SIGMAX:
+    if extraction_type not in EXTRACTION_TYPE:
+        print("Invalid extraction type.  Defaulting to sigmax.")
+        extraction_type = "sigmax"
+
+    if extraction_type == "sigmax":
         return in_signal / np.nanmax(in_signal)
-    elif extraction_type == ExtractionType.SIGMIN:
+    elif extraction_type == "sigmin":
         return in_signal / np.nanmax(-in_signal)
-    elif extraction_type == ExtractionType.SIGABS:
+    elif extraction_type == "sigabs":
         return in_signal / np.nanmax(np.abs(in_signal))
-    elif extraction_type == ExtractionType.SIGBIT:
+    elif extraction_type == "log2":
         return to_log2_with_epsilon(in_signal)
+    elif extraction_type == "log2max":
+        return to_log2_with_epsilon(in_signal) / np.nanmax(to_log2_with_epsilon(in_signal))
 
 
 def apply_bandpass(
@@ -89,7 +80,7 @@ def find_peaks_by_extraction_type_with_bandpass(
     filter_band: Tuple[float, float],
     sample_rate_hz: float,
     filter_order: int = 7,
-    extraction_type: ExtractionType = ExtractionType.SIGMAX,
+    extraction_type: str = "sigmax",
     height: Optional[float] = 0.7,
     *args,
 ) -> np.ndarray:
@@ -112,8 +103,7 @@ def find_peaks_by_extraction_type_with_bandpass(
 
 
 def find_peaks_by_extraction_type(
-    timeseries: np.ndarray, extraction_type: ExtractionType = ExtractionType.SIGMAX,
-        height: Optional[float] = 0.7, *args
+    timeseries: np.ndarray, extraction_type: str = "sigmax", height: Optional[float] = 0.7, *args
 ) -> np.ndarray:
     """
     Find peaks in the timeseries data by extraction type
@@ -132,7 +122,7 @@ def find_peaks_by_extraction_type(
 def find_peaks_with_bits(
     timeseries: np.ndarray,
     sample_rate_hz: float,
-    scaling_type: ScalingType = ScalingType.AMPS,
+    scaling_type: str = "amplitude",  # "amplitude" or "log2
     threshold_bits: Optional[int] = 1,
     time_distance_seconds: Optional[float] = 0.1,
     *args,
@@ -142,7 +132,7 @@ def find_peaks_with_bits(
 
     :param timeseries: time series
     :param sample_rate_hz: sample rate of the signal
-    :param scaling_type: scaling type of the signal (default AMPS)
+    :param scaling_type: scaling type of the signal (default amplitude)
     :param threshold_bits: threshold in bits (default 1)
     :param time_distance_seconds: minimum time distance between peaks in seconds (default 0.1)
     :param args: additional arguments for scipy's find_peaks
@@ -150,7 +140,7 @@ def find_peaks_with_bits(
     """
     timeseries_in_bits = to_log2_with_epsilon(timeseries)
 
-    if scaling_type == ScalingType.BITS:
+    if scaling_type == "log2":
         height = np.max(timeseries_in_bits) - threshold_bits
     else:
         height = np.max(timeseries) - 2 ** threshold_bits
@@ -202,8 +192,7 @@ def extract_signal_with_buffer_seconds(
     return timeseries[intro_index:outro_index]
 
 
-# todo: is there a simpler way to pass in the peaks values, like a list of integers?
-def find_peaks_to_comb_function(timeseries: np.ndarray, peaks: np.ndarray) -> np.ndarray:
+def find_peaks_to_comb_function(timeseries: np.ndarray, peaks: list or int or np.ndarray) -> np.ndarray:
     """
     Returns a comb function of the same length as the timeseries with 1s at the peak locations and 0s elsewhere
 
@@ -211,6 +200,9 @@ def find_peaks_to_comb_function(timeseries: np.ndarray, peaks: np.ndarray) -> np
     :param peaks: peak locations
     :return: a comb function with the peak locations
     """
+    if isinstance(peaks, np.ndarray):
+        peaks = peaks.tolist()
+
     comb_function = np.zeros(len(timeseries))
     comb_function[peaks] = 1
     return comb_function
