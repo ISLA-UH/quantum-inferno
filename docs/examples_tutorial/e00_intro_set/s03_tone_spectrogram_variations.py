@@ -31,19 +31,18 @@ if __name__ == "__main__":
         frequency_sample_rate_hz,
         frequency_center_fft_hz,
         frequency_resolution_fft_hz,
-    ] = benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz, add_noise_taper_aa=True)
+    ] = benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz,
+                                             add_noise_taper_aa=True)
 
     # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window
     # inside the cosine tapered region.
     # If zero, the Tukey window is equivalent to a rectangular window.
     # If one, the Tukey window is equivalent to a Hann window.
-    alpha = 0.25  # 25% Tukey (Cosine) window
-    # Changing alpha can change the 'alternate' scalings, where the weights depend on the window
+    alpha = 0.25  # 0.25=25% Tukey (Cosine) window. Dropping towards 0. will make it more rectangular.
+    # Changing alpha can change the 'alternate' scalings, where the weights depend on the window.
+    # This is more pronounced in the density option; alpha=0 returns identical results between density and spectrum.
 
     # Computed and nominal values
-    # mic_sig_rms = np.std(mic_sig)
-    # mic_sig_rms_nominal = 1 / np.sqrt(2)
-
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1 / 2
 
@@ -52,6 +51,7 @@ if __name__ == "__main__":
     plt.figure()
     plt.plot(time_s, mic_sig)
     plt.title("Synthetic sinusoid with unit amplitude")
+    plt.xlabel("Time (s)")
 
     # Welch
     welch_frequency_hz, Pxx = signal.welch(
@@ -172,7 +172,8 @@ if __name__ == "__main__":
     print("Scipy signal.welch and signal.spectrogram provide compatible estimates.")
     print("Mode psd returns Welch power, whereas mode magnitude complex returns STFT coefficients.")
     print("The Welch power is reproduced by averaging the spectrogram over the time dimension.")
-    print("This example uses the variance.")
+    print("This example uses the signal variance as a reference power.")
+    print("The spectrum option is preferred over density for the spectrogram as it is less sensitive to the % taper.")
 
     plt.figure()
     # Scales with the signal variance
@@ -191,13 +192,14 @@ if __name__ == "__main__":
         "--",
         label="spec, complex",
     )
-    plt.title("Scaled PSD amplitude returns near-unity at peak: preferred forms")
+    plt.title("Spectrum scaling returns near-unity at peak: preferred forms")
     plt.xlim(frequency_center_fft_hz - 10, frequency_center_fft_hz + 10)
     plt.xlabel("Frequency, hz")
-    plt.ylabel("FFT VAR/SIG VAR")
+    plt.ylabel("Power/VAR(signal)")
     plt.grid(True)
     plt.legend()
 
+    # Density scaling option is more sensitive to the taper
     # Power spectral density is scaled by spectral resolution in Hz.
     plt.figure()
     plt.plot(
@@ -219,10 +221,10 @@ if __name__ == "__main__":
         "--",
         label="density, complex",
     )
-    plt.title("Spectral Density Scaling")
+    plt.title("Density Scaling has stronger % taper dependence")
     plt.xlim(frequency_center_fft_hz - 10, frequency_center_fft_hz + 10)
     plt.xlabel("Frequency, hz")
-    plt.ylabel("sqrt(df) * FFT VAR/SIG VAR")
+    plt.ylabel("df * Power/VAR(signal)")
     plt.grid(True)
     plt.legend()
 

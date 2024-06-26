@@ -156,7 +156,7 @@ if __name__ == "__main__":
     ax2.semilogx(frequency_stft_hz, stft_over_var, ".-", label="STFT")
     ax2.set_title("Welch, Spect, and STFT Power, f = " + str(round(frequency_center_fft_hz * 100) / 100) + " Hz")
     ax2.set_xlabel("Frequency, hz")
-    ax2.set_ylabel("|Power|/VAR(signal)")
+    ax2.set_ylabel("Power/VAR(signal)")
     ax2.grid(True)
     ax2.legend()
 
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("Norm")
     ax2.plot(sig_time_istft, (mic_sig - sig_wf_istft) ** 2)
-    ax2.set_title("(original-inverse FFT)**2")
+    ax2.set_title("(original-inverse ISTFT)**2")
     ax2.set_xlabel("Time, s")
     ax2.set_ylabel("Norm")
 
