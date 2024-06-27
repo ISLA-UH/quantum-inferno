@@ -7,26 +7,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import benchmark_signals
-import quantum_inferno.plot_templates.plot_time_frequency_reps_black as pltq
-from quantum_inferno import scales_dyadic
-from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
-from quantum_inferno.styx_stx import tfr_stx_fft
+# TODO: SWAP OUT NEW PLOTTING TEMPLATE
+
+import quantum_inferno.plot_templates.plot_cyberspectral as pltq
+from quantum_inferno import styx_stx, styx_cwt, styx_fft
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
-
 print(__doc__)
-EVENT_NAME = "tone test"
-station_id_str = "synth"
-# alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
-# If zero, the Tukey window is equivalent to a rectangular window.
-# If one, the Tukey window is equivalent to a Hann window.
-alpha = 1
-
-# Set tone parameters
-frequency_tone_hz = 60
-order_number_input = 3
 
 if __name__ == "__main__":
+    # Set tone parameters. Play with order number to learn things about the methods
+    frequency_tone_hz = 60
+    order_number_input = 12
+    EVENT_NAME = str(frequency_tone_hz) + " Hz Tone Test"
+    ORDER_NUM = ", Dyadic Order " + str(order_number_input)
+
+    # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the tapered region.
+    # If zero, the Tukey window is equivalent to a rectangular window.
+    # If one, the Tukey window is equivalent to a Hann window.
+    alpha = 0.5
+
     """
     Compute the spectrogram over sliding windows.
     The Welch method is equivalent to averaging the spectrogram over the columns.
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1 / 2.0
 
-    # TODO: CLEAN UP!! Construct functions in s01 Welch
+    # TODO: Construct functions in s01 Welch with defaults that match Styx defaults
     # Compute the Welch PSD; averaged spectrum over sliding windows
     frequency_welch_hz, psd_welch_power = signal.welch(
         x=mic_sig,
@@ -83,14 +83,8 @@ if __name__ == "__main__":
 
     stft_power = 2 * np.abs(stft_complex) ** 2
 
-    # TODO: CLEAN UP!! This is a mess
-    # Compute complex wavelet transform (cwt)
-    frequencies_cwt_hz = scales_dyadic.log_frequency_hz_from_fft_points(
-        frequency_sample_hz=frequency_sample_rate_hz, fft_points=len(mic_sig), scale_order=order_number_input
-    )
-
-    # TODO: BUILD frequency_cwt_hz INTO METHOD
-    [frequency_cwt_hz, time_cwt_s, cwt_complex] = cwt_complex_any_scale_pow2(
+    # Compute the CWT
+    [frequency_cwt_hz, time_cwt_s, cwt_complex] = styx_cwt.cwt_complex_any_scale_pow2(
         band_order_nth=order_number_input,
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
@@ -100,35 +94,27 @@ if __name__ == "__main__":
 
     cwt_power = 2 * np.abs(cwt_complex) ** 2
 
-    # Compute Stockwell transform
-    [stx_complex, _, frequency_stx_hz, frequency_stx_fft_hz, W] = tfr_stx_fft(
+    # Compute Stockwell transform (STX)
+    frequency_stx_hz, time_stx_s, stx_complex = styx_stx.stx_complex_any_scale_pow2(
+        band_order_nth=order_number_input,
         sig_wf=mic_sig,
-        n_fft_in=8192,  # needs to have value or error pops up in sig_pad_up_to_pow2(sig_wf, n_fft_in)
-        time_sample_interval=1 / frequency_sample_rate_hz,
-        frequency_min=frequency_resolution_fft_hz,
-        frequency_max=frequency_sample_rate_hz / 2,
-        scale_order_input=order_number_input,
-        scale_ref_input=1 / 59.66796875,
-        is_geometric=True,
-        is_inferno=False,
+        frequency_sample_rate_hz=frequency_sample_rate_hz
     )
 
     stx_power = 2 * np.abs(stx_complex) ** 2
 
     # print("STX Frequency:", frequency_stx_fft_hz)
-    # TODO: Reconcile STX frequency with STFT
-    # Compute the 'equivalent' fft rms amplitude
+    # TODO: Reconcile STX, CWT frequency with STFT; could be its own exercise
+    # Compute the spectral power over signal variance; should be close to unity at tone frequency
     fft_var_norm_welch = np.abs(psd_welch_power) / mic_sig_var
     fft_var_norm_stft = np.average(stft_power, axis=1) / mic_sig_var
     fft_var_norm_cwt = np.average(cwt_power, axis=1) / mic_sig_var
     fft_var_norm_stx = np.average(stx_power, axis=1) / mic_sig_var
 
-    # Express in bits; revisit
-    # TODO: What units shall we use? Evaluate CWT and Stockwell first
-
-    mic_stft_bits = to_log2_with_epsilon(np.sqrt(stft_power))
-    mic_cwt_bits = to_log2_with_epsilon(np.sqrt(cwt_power))
-    mic_stx_bits = to_log2_with_epsilon(np.sqrt(stx_power))
+    # Express in log2(power)
+    mic_stft_bits = to_log2_with_epsilon(stft_power)
+    mic_cwt_bits = to_log2_with_epsilon(cwt_power)
+    mic_stx_bits = to_log2_with_epsilon(stx_power)
 
     print("Max stft bits:", np.max(mic_stft_bits))
     print("Max cwt bits:", np.max(mic_cwt_bits))
@@ -151,15 +137,14 @@ if __name__ == "__main__":
     ax2.grid(True)
     ax2.legend()
 
-    # plt.show()
-    # exit()
+    # Show the STFT, CWT, and STX
     # Select plot frequencies
     fmin = 2 * frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
 
-    # TODO: Change redvox_id to station_id
+    # Plot the STFT
     pltq.plot_wf_mesh_vert(
-        redvox_id="00",
+        station_id="",
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_stft_s,
@@ -167,31 +152,16 @@ if __name__ == "__main__":
         mesh_panel_b_tfr=mic_stft_bits,
         mesh_panel_b_colormap_scaling="range",
         wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
+        mesh_panel_b_cbar_units="Log2(Power)",
         start_time_epoch=0,
         figure_title="STFT for " + EVENT_NAME,
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
 
+    # Plot the CWT
     pltq.plot_wf_mesh_vert(
-        redvox_id="00",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_s,
-        mesh_frequency=frequency_stx_hz,
-        mesh_panel_b_tfr=mic_stx_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title="STX for " + EVENT_NAME,
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
-
-    pltq.plot_wf_mesh_vert(
-        redvox_id="00",
+        station_id="",
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_cwt_s,
@@ -199,9 +169,26 @@ if __name__ == "__main__":
         mesh_panel_b_tfr=mic_cwt_bits,
         mesh_panel_b_colormap_scaling="range",
         wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
+        mesh_panel_b_cbar_units="Log2(Power)",
         start_time_epoch=0,
-        figure_title="CWT for " + EVENT_NAME,
+        figure_title="CWT for " + EVENT_NAME + ORDER_NUM,
+        frequency_hz_ymin=fmin,
+        frequency_hz_ymax=fmax,
+    )
+
+    # Plot the STX
+    pltq.plot_wf_mesh_vert(
+        station_id="",
+        wf_panel_a_sig=mic_sig,
+        wf_panel_a_time=time_s,
+        mesh_time=time_s,
+        mesh_frequency=frequency_stx_hz,
+        mesh_panel_b_tfr=mic_stx_bits,
+        mesh_panel_b_colormap_scaling="range",
+        wf_panel_a_units="Norm",
+        mesh_panel_b_cbar_units="Log2(Power)",
+        start_time_epoch=0,
+        figure_title="STX for " + EVENT_NAME + ORDER_NUM,
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
