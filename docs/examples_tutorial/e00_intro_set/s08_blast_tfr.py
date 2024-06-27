@@ -1,5 +1,6 @@
 """
-libquantum example: s08_blast_tfr
+Quantum inferno example: s08_blast_tfr
+Use GT blast synthetic to compare time-frequency representations of explosion transients.
 
 """
 import numpy as np
@@ -12,20 +13,18 @@ import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 from quantum_inferno.utilities.window import get_tukey
 
-
 print(__doc__)
-EVENT_NAME = "grain test"
-station_id_str = "synth"
-# alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
-# If zero, the Tukey window is equivalent to a rectangular window.
-# If one, the Tukey window is equivalent to a Hann window.
-alpha = 1
+
 
 if __name__ == "__main__":
     """
     Blast test
     """
 
+    # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
+    # If zero, the Tukey window is equivalent to a rectangular window.
+    # If one, the Tukey window is equivalent to a Hann window.
+    alpha = 1
     order_number_input = 6
     EVENT_NAME = "Blast Test"
     station_id_str = "Synth"
@@ -59,6 +58,8 @@ if __name__ == "__main__":
     frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
     frequency_resolution_fft_hz = frequency_sample_rate_hz / time_fft_nd
 
+    # TODO: Workflow is the same for all these examples - create template!!
+    # TODO: Use variance instead of RMS
     # Computed and nominal values
     mic_sig_rms = np.std(mic_sig)
     # TODO: Get RMS
