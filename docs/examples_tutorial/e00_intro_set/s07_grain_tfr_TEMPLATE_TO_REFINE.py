@@ -1,5 +1,7 @@
 """
-libquantum example: s07_grain_tfr
+Quantum inferno example: s07_grain_tfr
+Time frequency representation (TFR) of a Gabor atom, or sound grain
+TODO: Select better scaling units to assess grain performance
 
 """
 import numpy as np
@@ -8,9 +10,7 @@ from quantum_inferno import styx_stx, styx_cwt, styx_fft
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
-
 print(__doc__)
-
 
 if __name__ == "__main__":
     """
@@ -18,8 +18,6 @@ if __name__ == "__main__":
     The Welch method is equivalent to averaging the spectrogram over the columns.
     """
 
-    EVENT_NAME = "grain test"
-    station_id_str = "synth"
     # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window
     # inside the cosine tapered region.
     # If zero, the Tukey window is equivalent to a rectangular window.
@@ -30,6 +28,9 @@ if __name__ == "__main__":
     frequency_center_hz = 100
     frequency_sample_rate_hz = 800
     order_number_input = 12
+
+    EVENT_NAME = "Gabor atom centered at " + str(frequency_center_hz) + " Hz"
+    station_id_str = ", Dyadic Order: " + str(order_number_input)
 
     # TODO: ADD Averaging frequency for fft_nd
     time_nd = 2 ** 11
@@ -133,20 +134,6 @@ if __name__ == "__main__":
 
     stft_power = 2 * np.abs(stft_complex) ** 2
 
-    # # Information overload methods
-    # (
-    #     stft_power,
-    #     stft_power_per_band,
-    #     stft_power_per_sample,
-    #     stft_power_total,
-    #     stft_power_scaled,
-    #     stft_information_bits,
-    #     stft_information_bits_per_band,
-    #     stft_information_bits_per_sample,
-    #     stft_information_bits_total,
-    #     stft_information_scaled,
-    # ) = styx_fft.power_and_information_shannon_stft(stft_complex)
-
     # CWT
     frequency_cwt_hz, time_cwt_s, cwt_complex = styx_cwt.cwt_complex_any_scale_pow2(
         sig_wf=mic_sig,
@@ -157,42 +144,12 @@ if __name__ == "__main__":
 
     cwt_power = 2 * np.abs(cwt_complex) ** 2
 
-    # TODO, maybe: Make power_and_information_shannon_cwt() function
-    # Information overload methods
-    # (
-    #     cwt_power,
-    #     cwt_power_per_band,
-    #     cwt_power_per_sample,
-    #     cwt_power_total,
-    #     cwt_power_scaled,
-    #     cwt_information_bits,
-    #     cwt_information_bits_per_band,
-    #     cwt_information_bits_per_sample,
-    #     cwt_information_bits_total,
-    #     cwt_information_scaled,
-    # ) = info.power_and_information_shannon_cwt(cwt_complex)
-    #
     # Stockwell transform
     frequency_stx_hz, time_stx_s, stx_complex = styx_stx.stx_complex_any_scale_pow2(
         band_order_nth=order_number_input, sig_wf=mic_sig, frequency_sample_rate_hz=frequency_sample_rate_hz
     )
 
     stx_power = 2 * np.abs(stx_complex) ** 2
-
-    #
-    # # Information overload methods
-    # (
-    #     stx_power,
-    #     stx_power_per_band,
-    #     stx_power_per_sample,
-    #     stx_power_total,
-    #     stx_power_scaled,
-    #     stx_information_bits,
-    #     stx_information_bits_per_band,
-    #     stx_information_bits_per_sample,
-    #     stx_information_bits_total,
-    #     stx_information_scaled,
-    # ) = info.power_and_information_shannon_stx(stx_complex)
 
     # Scale power by variance
     welch_over_var = psd_welch_power / mic_sig_var
@@ -206,23 +163,12 @@ if __name__ == "__main__":
     print("Sum CWT:", np.sum(cwt_over_var))
     print("Sum STX:", np.sum(stx_over_var))
 
-    # Express in bits; revisit
-    # TODO: What units shall we use? Evaluate CWT and Stockwell first
+    # Express in Log2(Power)
+    mic_stft_bits = to_log2_with_epsilon(stft_power)
+    mic_cwt_bits = to_log2_with_epsilon(cwt_power)
+    mic_stx_bits = to_log2_with_epsilon(stx_power)
 
-    mic_stft_bits = to_log2_with_epsilon(np.sqrt(stft_power))
-    mic_cwt_bits = to_log2_with_epsilon(np.sqrt(cwt_power))
-    mic_stx_bits = to_log2_with_epsilon(np.sqrt(stx_power))
-    #
-    # print("Sum cwt_power_scaled :", np.sum(cwt_power_scaled))
-    # print("Sum cwt_information_scaled :", np.sum(cwt_information_scaled))
-
-    # exit()
-    # # Express in bits; revisit
-    # # TODO: What units shall we use? Evaluate CWT and Stockwell first
-    # mic_stft_bits = utils.log2epsilon(np.sqrt(stft_power))
-    # mic_cwt_bits = utils.log2epsilon(np.sqrt(cwt_power))
-    # mic_stx_bits = utils.log2epsilon(np.sqrt(stx_power))
-
+    # TODO: Choose better units for grains!!
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
@@ -239,17 +185,12 @@ if __name__ == "__main__":
     ax2.grid(True)
     ax2.legend()
 
-    # plt.show()
-    # exit()
-    # plt.figure()
-    # plt.plot(cwt_information_bits_per_sample)
-
     # Select plot frequencies
     fmin = 2 * frequency_resolution_stft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
 
     pltq.plot_wf_mesh_vert(
-        station_id="00",
+        station_id="",
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_stft_s,
@@ -265,7 +206,7 @@ if __name__ == "__main__":
     )
 
     pltq.plot_wf_mesh_vert(
-        station_id="00",
+        station_id=station_id_str,
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_cwt_s,
@@ -275,13 +216,13 @@ if __name__ == "__main__":
         wf_panel_a_units="Norm",
         mesh_panel_b_cbar_units="bits",
         start_time_epoch=0,
-        figure_title="cwt for " + EVENT_NAME,
+        figure_title="CWT for " + EVENT_NAME,
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
 
     pltq.plot_wf_mesh_vert(
-        station_id="00",
+        station_id=station_id_str,
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_s,
