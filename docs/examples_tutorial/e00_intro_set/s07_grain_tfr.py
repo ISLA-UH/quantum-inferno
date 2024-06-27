@@ -61,6 +61,7 @@ if __name__ == "__main__":
     frequency_cwt_fft_hz = frequency_stft_pos_hz[2:]
     # frequency_inferno_hz = frequency_cwt_pos_hz[1:]
 
+    # TODO: SPELL OUT NORMALIZATION
     mic_sig_complex, time_s, scale, omega, amp = styx_cwt.wavelet_centered_4cwt(
         band_order_nth=order_number_input,
         duration_points=time_nd,
@@ -143,18 +144,30 @@ if __name__ == "__main__":
     cwt_over_var = np.average(cwt_power, axis=1) / mic_sig_var
     stx_over_var = np.average(stx_power, axis=1) / mic_sig_var
 
-    print("\nSum scaled spectral power")
-    print("Sum Welch:", np.sum(welch_over_var))
-    print("Sum STFT:", np.sum(stft_over_var))
-    print("Sum CWT:", np.sum(cwt_over_var))
-    print("Sum STX:", np.sum(stx_over_var))
+    # Express variance-scaled TFR in Log2
+    mic_stft_bits = to_log2_with_epsilon(stft_power/mic_sig_var)
+    mic_cwt_bits = to_log2_with_epsilon(cwt_power/mic_sig_var)
+    mic_stx_bits = to_log2_with_epsilon(stx_power/mic_sig_var)
 
-    # Express in Log2(Power)
-    mic_stft_bits = to_log2_with_epsilon(stft_power)
-    mic_cwt_bits = to_log2_with_epsilon(cwt_power)
-    mic_stx_bits = to_log2_with_epsilon(stx_power)
+    print("\nSum variance-scaled power spectral density (PSD)")
+    print("Welch PSD, Scaled:", np.sum(welch_over_var))
+    print("STFT PSD, Scaled:", np.sum(stft_over_var))
+    print("CWT PSD, Scaled:", np.sum(cwt_over_var))
+    print("STX PSD, Scaled:", np.sum(stx_over_var))
 
-    # TODO: Choose better units for grains!!
+    print("\nMax variance-scaled spectral power")
+    print("1/sqrt(2):", 1 / np.sqrt(2))
+    print("Max Scaled Welch PSD", np.max(welch_over_var))
+    print("Max Scaled STFT PSD:", np.max(stft_over_var))
+    print("Max Scaled CWT PSD:", np.max(cwt_over_var))
+    print("Max Scaled STX PSD:", np.max(stx_over_var))
+
+    print("\nMax variance-scaled TFR power")
+    print("Max Scaled CWT Power:", np.max(cwt_power/mic_sig_var))
+    print("Max Log2 Scaled STFT:", np.max(mic_stft_bits))
+    print("Max Log2 Scaled CWT:", np.max(mic_cwt_bits))
+    print("Max Log2 Scaled STX:", np.max(mic_stx_bits))
+
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
