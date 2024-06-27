@@ -50,7 +50,7 @@ if __name__ == "__main__":
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1 / 2.0
 
-    # TODO: Construct functions in s01 Welch with defaults that match Styx defaults
+    # TODO: Construct functions in styx.fft or styx.stft with defaults that match dwt, cwt, stx, and wv defaults
     # Compute the Welch PSD; averaged spectrum over sliding windows
     frequency_welch_hz, psd_welch_power = signal.welch(
         x=mic_sig,
