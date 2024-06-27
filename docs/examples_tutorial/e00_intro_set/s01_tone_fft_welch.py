@@ -1,9 +1,8 @@
 """
-libquantum example: s01_tone_fft_welch.py
+Quantum inferno example: s01_tone_fft_welch.py
 Compute Welch power spectral density (PSD) on simple tone to verify amplitudes
 Case study: Sinusoid input with unit amplitude
-Validate: Welch power averaged over the signal duration is 1/2
-RMS amplitude = 1/sqrt(2)
+Validate: Nominal Welch power averaged over the signal duration is 1/2
 TODO: Add the quantum functions to compute the Welch PSD; add to fft or construct styx_welch
 
 """

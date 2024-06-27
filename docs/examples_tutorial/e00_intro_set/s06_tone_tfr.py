@@ -1,16 +1,15 @@
 """
-libquantum example: s06_stft_tone_stft_atom_styx
-Compute stft spectrogram with libquantum
-TODO: Turn into functions with hard-coded defaults
+Quantum inferno example: s06_tone_tfr.py
+Compute and compare Welch, STFT, CWT, and STWV on simple tone with a taper window.
+TODO: Turn signal welch and stft into functions with hard-coded defaults
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import benchmark_signals
-# TODO: SWAP OUT NEW PLOTTING TEMPLATE
-
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
-from quantum_inferno import styx_stx, styx_cwt, styx_fft
+from quantum_inferno import styx_stx, styx_cwt
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 print(__doc__)

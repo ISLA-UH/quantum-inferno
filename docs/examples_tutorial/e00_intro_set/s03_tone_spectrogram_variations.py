@@ -1,5 +1,5 @@
 """
-libquantum example: s03_tone_spect_variations.py
+Quantum inferno example: s03_tone_spectrogram_variations.py
 Compute spectrogram with different scaling and mode options.
 scaling{ ‘density’, ‘spectrum’ }
 mode{‘psd’, ‘complex’, ‘magnitude’}
@@ -7,10 +7,10 @@ Contract over the columns and compare to Welch power spectral density (PSD) to v
 Tukey taper (w/ alpha) on each Welch and Spectrogram subwindow.
 Case study:
 Sinusoid input with unit amplitude
+Nominal (untapered) tone variance = 1/2
 Validate:
-Welch power averaged over the signal duration is 1/2
-RMS amplitude = 1/sqrt(2)
-Variance = 1/2
+Nominal spectral power at tone frequency and averaged over the signal duration is ~1/2
+
 """
 import numpy as np
 import matplotlib.pyplot as plt

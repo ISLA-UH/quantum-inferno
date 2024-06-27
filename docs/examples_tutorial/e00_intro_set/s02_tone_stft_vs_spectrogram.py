@@ -7,7 +7,6 @@ Case study:
 Sinusoid input with unit amplitude
 Validate:
 Welch power averaged over the signal duration is 1/2
-RMS amplitude = 1/sqrt(2)
 
 """
 import numpy as np

@@ -1,12 +1,10 @@
 """
 libquantum example: s07_grain_tfr
-todo: does not run, missing segment_points arguments for functions like welch_power_pow2()
-todo: EPSILON is not an integer type
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
 from quantum_inferno import styx_stx, styx_cwt, styx_fft
-from quantum_inferno import scales_dyadic as scales
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
