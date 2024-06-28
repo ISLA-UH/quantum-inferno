@@ -23,8 +23,9 @@ time_unit_dict = {
 }
 
 
-def convert_time_unit(input_time: Union[np.ndarray, float], input_unit: str, output_unit: str) \
-        -> Union[np.ndarray, float]:
+def convert_time_unit(
+    input_time: Union[np.ndarray, float], input_unit: str, output_unit: str
+) -> Union[np.ndarray, float]:
     """
     Convert time data from a given time unit to another time unit.
 
@@ -96,6 +97,8 @@ def set_timestamp_to_utc(timestamp: float, utc_offset_h: float, input_unit: str 
     :param input_unit: time unit of the timestamp (default: seconds)
     :return: converted timestamp in UTC while keeping the same unit
     """
+    if input_unit not in time_unit_dict.keys():
+        raise ValueError(f"Invalid time unit, please use one of the following: {time_unit_dict.keys()}")
     offset_in_input_unit = utc_offset_h * time_unit_dict["h"] / time_unit_dict[input_unit]
     return timestamp - offset_in_input_unit
 
@@ -109,4 +112,6 @@ def get_datetime_from_timestamp_to_utc(timestamp: float, utc_offset_h: float, in
     :param input_unit: time units (default: seconds)
     :return: converted UTC datetime object
     """
+    if input_unit not in time_unit_dict.keys():
+        raise ValueError(f"Invalid time unit, please use one of the following: {time_unit_dict.keys()}")
     return utc_timestamp_to_utc_datetime(set_timestamp_to_utc(timestamp, utc_offset_h, input_unit))
