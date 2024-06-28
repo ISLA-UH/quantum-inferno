@@ -43,7 +43,7 @@ def scale_signal_by_extraction_type(in_signal: np.ndarray, extraction_type: str 
     if extraction_type == "sigmax":
         return in_signal / np.nanmax(in_signal)
     elif extraction_type == "sigmin":
-        return in_signal / np.nanmax(-in_signal)
+        return in_signal / np.nanmin(in_signal)
     elif extraction_type == "sigabs":
         return in_signal / np.nanmax(np.abs(in_signal))
     elif extraction_type == "log2":
