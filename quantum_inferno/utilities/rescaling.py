@@ -9,7 +9,7 @@ from quantum_inferno.scales_dyadic import get_epsilon
 DATA_SCALE_TYPE = ["amplitude", "power"]
 
 
-def to_log2_with_epsilon(x: Union[np.ndarray, float]) -> Union[np.ndarray, float]:
+def to_log2_with_epsilon(x: Union[np.ndarray, float, list]) -> Union[np.ndarray, float]:
     """
     Convert the absolute value of the data to log2 with epsilon added to avoid log(0) and log(<0) errors.
     :param x: data or value to rescale
@@ -27,7 +27,7 @@ def is_power_of_two(n: int) -> bool:
 
 
 def to_decibel_with_epsilon(
-    x: Union[np.ndarray, float], reference: float = 1.0, input_scaling: str = "amplitude"
+    x: Union[np.ndarray, float, list], reference: float = 1.0, input_scaling: str = "amplitude"
 ) -> Union[np.ndarray, float]:
     """
     Convert data to decibels with epsilon added to avoid log(0) errors.
@@ -41,4 +41,10 @@ def to_decibel_with_epsilon(
         print("Invalid input scaling type.  Defaulting to amplitude.")
         input_scaling = "amplitude"
     scale_val = 10 if input_scaling == "power" else 20
-    return scale_val * np.log10(np.abs(x / reference) + get_epsilon())
+
+    if reference == 0:
+        raise ValueError("Reference value cannot be zero.")
+    elif reference == 1:
+        return scale_val * np.log10(np.abs(x) + get_epsilon())
+    else:
+        return scale_val * np.log10(np.abs(x) + get_epsilon()) - scale_val * np.log10(reference + get_epsilon())

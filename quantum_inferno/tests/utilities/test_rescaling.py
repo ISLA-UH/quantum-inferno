@@ -9,6 +9,10 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(result, 6.64, 2)
         result = rescaling.to_log2_with_epsilon(-100.0)
         self.assertAlmostEqual(result, 6.64, 2)
+        values = [100.0, -100.0]
+        result = rescaling.to_log2_with_epsilon(values)
+        self.assertAlmostEqual(result[0], 6.64, 2)
+        self.assertAlmostEqual(result[1], 6.64, 2)
 
     def test_is_power_of_two(self):
         result = rescaling.is_power_of_two(8)
@@ -25,3 +29,5 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(result, 40.0)
         result = rescaling.to_decibel_with_epsilon(100.0, 1.0, "power")
         self.assertEqual(result, 20.0)
+        result = rescaling.to_decibel_with_epsilon(100.0, 100.0)
+        self.assertEqual(result, 0)
