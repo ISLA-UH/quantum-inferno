@@ -31,3 +31,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(result, 20.0)
         result = rescaling.to_decibel_with_epsilon(100.0, 100.0)
         self.assertEqual(result, 0)
+        values = [100.0, -100.0]
+        result = rescaling.to_decibel_with_epsilon(values, 1.0)
+        self.assertEqual(result[0], 40.0)
+        self.assertEqual(result[1], 40.0)
