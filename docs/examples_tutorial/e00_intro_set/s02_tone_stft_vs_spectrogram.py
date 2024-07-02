@@ -214,6 +214,4 @@ if __name__ == "__main__":
         frequency_hz_ymax=fmax,
     )
 
-    print(time_s[-1], time_spect_s[-1], time_stft_s[-1])
-
     plt.show()
