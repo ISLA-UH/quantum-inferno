@@ -18,7 +18,7 @@ station_id_str = "synth"
 alpha = 1
 
 
-# TODO: ADD THIS TO SYNTHETICS
+# TODO: ADD N WAVE TO SYNTHETICS and TDR REPS
 def n_wave_period_center(
     intro_s: float, n_wave_duration_s: float, outro_s: float, sample_rate_hz: float
 ) -> [np.ndarray, np.ndarray, np.ndarray]:
