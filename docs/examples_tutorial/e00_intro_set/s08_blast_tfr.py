@@ -59,6 +59,7 @@ if __name__ == "__main__":
     frequency_resolution_fft_hz = frequency_sample_rate_hz / time_fft_nd
 
     # TODO: Workflow is the same for all these examples - create template!!
+    # TODO: Stabilize units, do the math for both wavelet, GT, and Waxler pulse
     # TODO: Use variance instead of RMS
     # Computed and nominal values
     mic_sig_rms = np.std(mic_sig)
