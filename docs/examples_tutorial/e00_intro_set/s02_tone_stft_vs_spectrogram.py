@@ -93,6 +93,7 @@ if __name__ == "__main__":
         mode="psd",
     )
 
+    # TODO: RECONCILE STFT AND SPECTROGRAM
     # Shift the time_spect_s to start at the first time point since it returns the center of the window
     time_spect_s = time_spect_s - time_spect_s[0]
 
