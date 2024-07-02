@@ -74,8 +74,8 @@ if __name__ == "__main__":
         scaling="spectrum",
         average="mean",
     )
-
-    # Zero padd the mic_sig to get the full time for signal.spectrogram as it truncates by 1/2 window size
+    # TODO: Why is spectrogram truncating the edge windows?
+    # Zero pad the mic_sig to get the full time for signal.spectrogram as it truncates by 1/2 window size
     mic_sig_zero_padded_by_half_window = np.pad(mic_sig, (time_fft_nd // 2, time_fft_nd // 2), "constant")
 
     # Compute the spectrogram with the spectrum option
