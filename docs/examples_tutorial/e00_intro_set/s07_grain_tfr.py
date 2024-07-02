@@ -61,13 +61,13 @@ if __name__ == "__main__":
     frequency_cwt_fft_hz = frequency_stft_pos_hz[2:]
     # frequency_inferno_hz = frequency_cwt_pos_hz[1:]
 
-    # TODO: SPELL OUT NORMALIZATION
+    # Can choose unit spectrum or canonical normalized
     mic_sig_complex, time_s, scale, omega, amp = styx_cwt.wavelet_centered_4cwt(
         band_order_nth=order_number_input,
         duration_points=time_nd,
         scale_frequency_center_hz=frequency_center_stft_hz,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
-        dictionary_type="norm",
+        dictionary_type="spect",
     )
 
     time_s -= time_s[0]
@@ -78,19 +78,10 @@ if __name__ == "__main__":
     mic_sig_real_var = np.var(mic_sig_real)
     mic_sig_imag_var = np.var(mic_sig_imag)
 
-    # Theoretical variance TODO: construct function
-    mic_sig_real_var_nominal = (
-        amp ** 2 / len(time_s) * 0.5 * np.sqrt(np.pi) * scale * (1 + np.exp(-((scale * omega) ** 2)))
-    )
-    mic_sig_imag_var_nominal = (
-        amp ** 2 / len(time_s) * 0.5 * np.sqrt(np.pi) * scale * (1 - np.exp(-((scale * omega) ** 2)))
-    )
+    # Theoretical variance
+    mic_sig_real_var_nominal, mic_sig_imag_var_nominal = styx_cwt.wavelet_variance_theory(amp, time_s, scale, omega)
 
-    # Mathematical integral ~ computed Variance * Number of Samples. The dictionary type = "norm" returns 1/2.
-    mic_sig_real_integral = np.var(mic_sig_real) * len(mic_sig_real)
-    mic_sig_imag_integral = np.var(mic_sig_imag) * len(mic_sig_real)
-
-    print("\nAtom Variance")
+    print("\nGabor atom Variance")
     print("mic_sig_real_variance:", mic_sig_real_var)
     print("real_variance_nominal:", mic_sig_real_var_nominal)
     print("mic_sig_imag_variance:", mic_sig_imag_var)
@@ -101,7 +92,11 @@ if __name__ == "__main__":
     mic_sig_var = mic_sig_real_var
     mic_sig_var_nominal = mic_sig_real_var_nominal
     print("\nChoose real part as signal:")
-    print("var/nominal var:", mic_sig_var / mic_sig_var_nominal)
+    print("Computed variance/theoretical variance:", mic_sig_var / mic_sig_var_nominal)
+
+    # Scale by RMS; power is scaled by variance
+    # TODO: Reconcile factor of 2
+    mic_sig /= 2*np.sqrt(mic_sig_var)
 
     # Compute the Welch PSD; averaged spectrum over sliding windows
     frequency_welch_hz, psd_welch_power = styx_fft.welch_power_pow2(
@@ -139,15 +134,15 @@ if __name__ == "__main__":
     stx_power = 2 * np.abs(stx_complex) ** 2
 
     # Scale power by variance
-    welch_over_var = psd_welch_power / mic_sig_var
-    stft_over_var = np.average(stft_power, axis=1) / mic_sig_var
-    cwt_over_var = np.average(cwt_power, axis=1) / mic_sig_var
-    stx_over_var = np.average(stx_power, axis=1) / mic_sig_var
+    welch_over_var = psd_welch_power
+    stft_over_var = np.average(stft_power, axis=1)
+    cwt_over_var = np.average(cwt_power, axis=1)
+    stx_over_var = np.average(stx_power, axis=1)
 
     # Express variance-scaled TFR in Log2
-    mic_stft_bits = to_log2_with_epsilon(stft_power/mic_sig_var)
-    mic_cwt_bits = to_log2_with_epsilon(cwt_power/mic_sig_var)
-    mic_stx_bits = to_log2_with_epsilon(stx_power/mic_sig_var)
+    mic_stft_bits = to_log2_with_epsilon(stft_power)
+    mic_cwt_bits = to_log2_with_epsilon(cwt_power)
+    mic_stx_bits = to_log2_with_epsilon(stx_power)
 
     print("\nSum variance-scaled power spectral density (PSD)")
     print("Welch PSD, Scaled:", np.sum(welch_over_var))
@@ -156,14 +151,14 @@ if __name__ == "__main__":
     print("STX PSD, Scaled:", np.sum(stx_over_var))
 
     print("\nMax variance-scaled spectral power")
-    print("1/sqrt(2):", 1 / np.sqrt(2))
+    print("1/[4 sqrt(2)]:", 1 / (4*np.sqrt(2)))
     print("Max Scaled Welch PSD", np.max(welch_over_var))
     print("Max Scaled STFT PSD:", np.max(stft_over_var))
     print("Max Scaled CWT PSD:", np.max(cwt_over_var))
     print("Max Scaled STX PSD:", np.max(stx_over_var))
 
     print("\nMax variance-scaled TFR power")
-    print("Max Scaled CWT Power:", np.max(cwt_power/mic_sig_var))
+    print("Max Scaled CWT Power:", np.max(cwt_power))
     print("Max Log2 Scaled STFT:", np.max(mic_stft_bits))
     print("Max Log2 Scaled CWT:", np.max(mic_cwt_bits))
     print("Max Log2 Scaled STX:", np.max(mic_stx_bits))
@@ -173,7 +168,7 @@ if __name__ == "__main__":
     ax1.plot(time_s, mic_sig)
     ax1.set_title("Synthetic CW, with taper")
     ax1.set_xlabel("Time, s")
-    ax1.set_ylabel("Norm")
+    ax1.set_ylabel("sig")
     ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
     ax2.semilogx(frequency_stft_hz, stft_over_var, ".-", label="STFT")
     ax2.semilogx(frequency_cwt_hz, cwt_over_var, "-.", label="CWT")
@@ -199,7 +194,7 @@ if __name__ == "__main__":
         wf_panel_a_units="Norm",
         mesh_panel_b_cbar_units="bits",
         start_time_epoch=0,
-        figure_title="stft for " + EVENT_NAME,
+        figure_title="STFT for " + EVENT_NAME,
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
