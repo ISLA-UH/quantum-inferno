@@ -59,6 +59,7 @@ if __name__ == "__main__":
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1 / 2.0
 
+    # sig_s = 10.23875, time_spect_s = 9.92, time_stft_s = 10.24
     # Compute the Welch PSD; averaged spectrum over sliding windows
     frequency_welch_hz, psd_welch_power = signal.welch(
         x=mic_sig,
@@ -74,9 +75,12 @@ if __name__ == "__main__":
         average="mean",
     )
 
+    # Zero padd the mic_sig to get the full time for signal.spectrogram as it truncates by 1/2 window size
+    mic_sig_zero_padded_by_half_window = np.pad(mic_sig, (time_fft_nd // 2, time_fft_nd // 2), "constant")
+
     # Compute the spectrogram with the spectrum option
     frequency_spect_hz, time_spect_s, psd_spec_power = signal.spectrogram(
-        x=mic_sig,
+        x=mic_sig_zero_padded_by_half_window,
         fs=frequency_sample_rate_hz,
         window=("tukey", alpha),
         nperseg=time_fft_nd,
@@ -88,6 +92,9 @@ if __name__ == "__main__":
         scaling="spectrum",
         mode="psd",
     )
+
+    # Shift the time_spect_s to start at the first time point since it returns the center of the window
+    time_spect_s = time_spect_s - time_spect_s[0]
 
     # Compute the spectrogram with the stft option
     frequency_stft_hz, time_stft_s, stft_complex = signal.stft(
@@ -103,6 +110,7 @@ if __name__ == "__main__":
         boundary="zeros",
         padded=True,
     )
+    print(time_stft_s[0], time_stft_s[-1])
 
     # Since one-sided, multiply by 2 to get the full power
     stft_power = 2 * np.abs(stft_complex) ** 2
@@ -145,7 +153,7 @@ if __name__ == "__main__":
     )
 
     # Show the waveform and the averaged FFT over the whole record:
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(11, 6))
     ax1.plot(time_s, mic_sig)
     ax1.set_title("Synthetic CW, with taper")
     ax1.set_xlabel("Time, s")
@@ -160,11 +168,12 @@ if __name__ == "__main__":
     ax2.legend()
 
     # Plot the inverse stft (full recovery)
-    fig2, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
+    fig2, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, constrained_layout=True, figsize=(11, 6), sharex="all")
     ax1.plot(sig_time_istft, sig_wf_istft)
     ax1.set_title("Inverse CW from ISTFT")
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("Norm")
+    ax1.set_xlim([-0.25, 10.5])
     ax2.plot(sig_time_istft, (mic_sig - sig_wf_istft) ** 2)
     ax2.set_title("(original-inverse ISTFT)**2")
     ax2.set_xlabel("Time, s")
