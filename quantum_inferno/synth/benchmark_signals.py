@@ -1,149 +1,25 @@
 """
-This module provides benchmark synthetic functions and some quick plotting routines
+This module provides benchmark synthetic functions
 
 """
+from typing import Tuple
+
 import numpy as np
 import scipy.signal as signal
-from quantum_inferno.scales_dyadic import get_epsilon
-from quantum_inferno.synth import synthetics_NEW
-from typing import Tuple
-import matplotlib.pyplot as plt
+
 from quantum_inferno.utilities.window import get_tukey
-
-
-""" Quick plotting routines """
-
-
-def plot_tdr_sig(sig_wf, sig_time, signal_time_base: str = "seconds"):
-    """
-    Waveform
-    :param sig_wf:
-    :param sig_time:
-    :param sig_rms_wf:
-    :param sig_rms_time:
-    :param signal_time_base:
-    :return:
-    """
-
-    plt.figure()
-    plt.plot(sig_time, sig_wf)
-    plt.title("Input waveform")
-    plt.xlabel("Time, " + signal_time_base)
-
-
-def plot_tdr_rms(sig_wf, sig_time, sig_rms_wf, sig_rms_time, signal_time_base: str = "seconds"):
-    """
-    Waveform
-    :param sig_wf:
-    :param sig_time:
-    :param sig_rms_wf:
-    :param sig_rms_time:
-    :param signal_time_base:
-    :return:
-    """
-
-    plt.figure()
-    plt.plot(sig_time, sig_wf)
-    plt.plot(sig_rms_time, sig_rms_wf)
-    plt.title("Input waveform and RMS")
-    plt.xlabel("Time, " + signal_time_base)
-
-
-def plot_tfr_lin(tfr_power, tfr_frequency, tfr_time, title_str: str = "TFR, power", signal_time_base: str = "seconds"):
-    """
-    TFR in linear power
-    :param sig_tfr:
-    :param sig_tfr_frequency:
-    :param sig_tfr_time:
-    :param signal_time_base:
-    :return:
-    """
-
-    plt.figure()
-    plt.pcolormesh(tfr_time, tfr_frequency, tfr_power, cmap="RdBu_r")
-    plt.title(title_str)
-    plt.ylabel("Frequency, samples per " + signal_time_base)
-    plt.xlabel("Time, " + signal_time_base)
-
-
-def plot_tfr_bits(
-    tfr_power,
-    tfr_frequency,
-    tfr_time,
-    bits_min: float = -8,
-    bits_max: float = 0,
-    title_str: str = "TFR, top bits",
-    y_scale: str = None,
-    tfr_x_str: str = "Time, seconds",
-    tfr_y_str: str = "Frequency, hz",
-    tfr_y_flip: bool = False,
-):
-    """
-    TFR in bits
-    :param tfr_y_flip:
-    :param sig_tfr:
-    :param sig_tfr_frequency:
-    :param sig_tfr_time:
-    :param bits_max:
-    :param bits_min:
-    :param y_scale:
-    :param title_str:
-    :param tfr_x_str:
-    :param tfr_y_str:
-    :return: figure
-    """
-
-    tfr_bits = 0.5 * np.log2(tfr_power / np.max(tfr_power))
-
-    fig = plt.figure()
-    plt.pcolormesh(tfr_time, tfr_frequency, tfr_bits, cmap="RdBu_r", vmin=bits_min, vmax=bits_max, shading="nearest")
-    if y_scale is None:
-        plt.yscale("linear")
-    else:
-        plt.yscale("log")
-
-    if tfr_y_flip:
-        plt.ylim(np.max(tfr_frequency), np.min(tfr_frequency))
-    plt.title(title_str)
-    plt.ylabel(tfr_y_str)
-    plt.xlabel(tfr_x_str)
-
-    return fig
-
-
-def plot_st_window_tdr_lin(window, freq_sx, time_fft):
-    plt.figure(figsize=(8, 8))
-    for j, freq in enumerate(freq_sx):
-        plt.plot(time_fft, np.abs(window[j, :]), label=freq)
-    plt.legend()
-    plt.title("TDR window, linear")
-
-
-def plot_st_window_tfr_bits(window, frequency_sx, frequency_fft):
-    plt.figure(figsize=(8, 8))
-    for j, freq in enumerate(frequency_sx):
-        plt.plot(frequency_fft, np.log2(np.abs(window[j, :]) + get_epsilon()), label=freq)
-    plt.legend()
-    plt.title("TFR window, bits")
-
-
-def plot_st_window_tfr_lin(window, frequency_sx, frequency_fft):
-    plt.figure(figsize=(8, 8))
-    for j, freq in enumerate(frequency_sx):
-        plt.plot(frequency_fft, np.abs(window[j, :]), label=freq)
-    plt.legend()
-    plt.title("TFR window, lin")
+from quantum_inferno.synth import synthetics_NEW
 
 
 """ Signal conditioning  """
 
 
-def signal_gate(wf, t, tmin, tmax, fraction_cosine: float = 0):
+def signal_gate(wf: np.ndarray, t: np.ndarray, tmin: float, tmax: float, fraction_cosine: float = 0) -> np.ndarray:
     """
     Time gate and apply Tukey window, rectangular is the default
 
     :param wf: waveform
-    :param t: time
+    :param t: timestamp array
     :param tmin: lower time limit
     :param tmax: upper time limit
     :param fraction_cosine: 0 = rectangular, 1 = Hann
@@ -156,9 +32,10 @@ def signal_gate(wf, t, tmin, tmax, fraction_cosine: float = 0):
     return wf
 
 
-def oversample_time(time_duration, time_sample_interval, oversample_scale):
+def oversample_time(time_duration: float, time_sample_interval: float, oversample_scale: float) -> np.ndarray:
     """
     Return an oversampled time by a factor oversample_scale
+
     :param time_duration:
     :param time_sample_interval:
     :param oversample_scale:
@@ -173,7 +50,13 @@ def oversample_time(time_duration, time_sample_interval, oversample_scale):
 """ Reference Signatures, starting with the quantized Gabor chirp"""
 
 
-def quantum_chirp(omega: float, order: float = 12, gamma: float = 0, gauss: bool = True, oversample_scale: int = 2):
+def quantum_chirp(
+        omega: float,
+        order: float = 12,
+        gamma: float = 0,
+        gauss: bool = True,
+        oversample_scale: int = 2
+) -> Tuple[np.ndarray, int]:
     """
     Constructs a tone or a sweep with a gaussian window option and a duration of 2^n points
 
@@ -232,10 +115,10 @@ def synth_00(
     time_sample_interval: float = 1 / 1000,
     time_duration: float = 1,
     oversample_scale: int = 2,
-):
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate three sine waves, oversample and decimate to AA
-    Always work with  nondimensionalized units (number of points, Nyquist, etc.)
+    Always work with non-dimensionalized units (number of points, Nyquist, etc.)
 
     :param frequency_0:
     :param frequency_1:
@@ -245,7 +128,7 @@ def synth_00(
     :param time_sample_interval:
     :param time_duration:
     :param oversample_scale: oversample synthetic, then decimate by scale
-    :return:
+    :return: synth waveform and timestamps
     """
     # Oversample, then decimate
     oversample_interval = time_sample_interval / oversample_scale
@@ -278,16 +161,17 @@ def synth_01(
     time_sample_interval: float = 1 / 1000,
     time_duration: float = 1,
     oversample_scale: int = 2,
-):
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Example Synthetic 1
+
     :param a:
     :param b:
     :param f:
     :param time_sample_interval:
     :param time_duration:
     :param oversample_scale:
-    :return:
+    :return: synth waveform and timestamps
     """
     # Oversample, then decimate, essentially an AA filter
     time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
@@ -313,9 +197,10 @@ def synth_02(
     time_sample_interval: float = 1 / 1000,
     time_duration: float = 1,
     oversample_scale: int = 2,
-):
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Example Synthetic 2
+
     :param t1:
     :param t2:
     :param t3:
@@ -325,7 +210,7 @@ def synth_02(
     :param time_sample_interval:
     :param time_duration:
     :param oversample_scale:
-    :return:
+    :return: synth waveform and timestamps
     """
     t = oversample_time(time_duration, time_sample_interval, oversample_scale)
 
@@ -350,8 +235,9 @@ def synth_03(
     time_sample_interval: float = 1 / 1000,
     time_duration: float = 1,
     oversample_scale: int = 2,
-):
+) -> Tuple[np.ndarray, np.ndarray]:
     """
+    Example Synthetic 3
 
     :param a:
     :param b:
@@ -359,7 +245,7 @@ def synth_03(
     :param time_sample_interval:
     :param time_duration:
     :param oversample_scale:
-    :return:
+    :return: synth waveform and timestamps
     """
     # Oversample, then decimate
     time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
@@ -385,17 +271,19 @@ def well_tempered_tone(
     time_fft_s: float = 1.0,
     use_fft_frequency: bool = True,
     add_noise_taper_aa: bool = False,
+    output_desc: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray, int, float, float, float]:
     """
-    Return a tone of unit amplitude and fixed frequency
-    with a constant sample rate
+    Return a tone of unit amplitude and fixed frequency with a constant sample rate
+
     :param frequency_sample_rate_hz:
     :param frequency_center_hz:
     :param time_duration_s:
     :param time_fft_s: Split the record into segments. Previous example showed 1s duration was adequate
     :param use_fft_frequency:
     :param add_noise_taper_aa:
-    :return:
+    :param output_desc: if True, output description of waveform.  Default False
+    :return: waveform, timestamps, fft duration, sample rate, center frequency, frequency resolution
     """
     # The segments determine the spectral resolution
     frequency_resolution_hz = 1 / time_fft_s
@@ -413,21 +301,21 @@ def well_tempered_tone(
     frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
     frequency_resolution_fft_hz = frequency_sample_rate_hz / time_fft_nd
 
-    # Convert to dimensionless time and frequency, which is typically used in mathematical formulas.
-    # Scale by the sample rate.
-    # Dimensionless center frequency
-    frequency_center = frequency_center_hz / frequency_sample_rate_hz
-    frequency_center_fft = frequency_center_fft_hz / frequency_sample_rate_hz
     # Dimensionless time (samples)
     time_nd = np.arange(time_duration_nd)
     time_s = time_nd / frequency_sample_rate_hz
 
+    # Convert to dimensionless time and frequency, which is typically used in mathematical formulas.
+    # Scale by the sample rate.
     if use_fft_frequency:
+        frequency_center_fft = frequency_center_fft_hz / frequency_sample_rate_hz
         # Construct synthetic tone with 2^n points and max FFT amplitude at exact fft frequency
         mic_sig = np.cos(2 * np.pi * frequency_center_fft * time_nd)
     else:
-        # # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
-        # # It does NOT return unit amplitude (but it's close)
+        # Dimensionless center frequency
+        frequency_center = frequency_center_hz / frequency_sample_rate_hz
+        # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
+        # It does NOT return unit amplitude (but it's close)
         mic_sig = np.cos(2 * np.pi * frequency_center * time_nd)
 
     if add_noise_taper_aa:
@@ -438,39 +326,16 @@ def well_tempered_tone(
         # Antialias (AA)
         synthetics_NEW.antialias_half_nyquist(mic_sig)
 
-    print("WELL TEMPERED TONE SYNTHETIC")
-    print("Nyquist frequency:", frequency_sample_rate_hz / 2)
-    print("Nominal signal frequency, hz:", frequency_center_hz)
-    print("FFT signal frequency, hz:", frequency_center_fft_hz)
-    print("Nominal spectral resolution, hz", frequency_resolution_hz)
-    print("FFT spectral resolution, hz", frequency_resolution_fft_hz)
-    print("Number of signal points:", time_duration_nd)
-    print("log2(points):", np.log2(time_duration_nd))
-    print("Number of FFT points:", time_fft_nd)
-    print("log2(FFT points):", np.log2(time_fft_nd))
+    if output_desc:
+        print("WELL TEMPERED TONE SYNTHETIC")
+        print("Nyquist frequency:", frequency_sample_rate_hz / 2)
+        print("Nominal signal frequency, hz:", frequency_center_hz)
+        print("FFT signal frequency, hz:", frequency_center_fft_hz)
+        print("Nominal spectral resolution, hz", frequency_resolution_hz)
+        print("FFT spectral resolution, hz", frequency_resolution_fft_hz)
+        print("Number of signal points:", time_duration_nd)
+        print("log2(points):", np.log2(time_duration_nd))
+        print("Number of FFT points:", time_fft_nd)
+        print("log2(FFT points):", np.log2(time_fft_nd))
 
     return mic_sig, time_s, time_fft_nd, frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz
-
-
-if __name__ == "__main__":
-    sig_wf, sig_t = synth_00()
-    plt.figure()
-    plt.plot(sig_t, sig_wf)
-    plt.title("Synth 00")
-
-    sig_wf, sig_t = synth_01()
-    plt.figure()
-    plt.plot(sig_t, sig_wf)
-    plt.title("Synth 01")
-
-    sig_wf, sig_t = synth_02()
-    plt.figure()
-    plt.plot(sig_t, sig_wf)
-    plt.title("Synth 02")
-
-    sig_wf, sig_t = synth_03()
-    plt.figure()
-    plt.plot(sig_t, sig_wf)
-    plt.title("Synth 03")
-
-    plt.show()

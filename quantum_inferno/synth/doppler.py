@@ -1,10 +1,9 @@
 """
 This module contains functions for constructing and examining doppler shift in signals
-
 """
+from typing import Tuple
 
 import numpy as np
-from typing import Tuple
 
 
 def time_duration(time_vector: np.ndarray) -> float:
@@ -34,7 +33,7 @@ def space_4d_mx(space_column_vector: np.ndarray, time_number_samples: int) -> np
     """
     Input XYZ space vector and convert to spacetime matrix [time x XYZ]
 
-    :param space_column_vector: an array representing 3 dimensional space
+    :param space_column_vector: an array representing 3-dimensional space
     :param time_number_samples: number of time samples
     :return: spacetime matrix
     """

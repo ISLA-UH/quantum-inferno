@@ -3,57 +3,57 @@ import unittest
 import numpy as np
 
 import quantum_inferno.utilities.calculations as calc
+import quantum_inferno.synth.benchmark_signals as sigs
 
 
 class CalculationsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.timestamps = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])  # this equates to 10s intervals = 0.1Hz
-        cls.timeseries = np.array([2, 3, 4, 2, 3, 4, 2, 3, 4])
+        cls.timeseries, cls.timestamps, _, cls.sample_rate, _, _ = sigs.well_tempered_tone()
 
     def test_integrate_with_cumtrapz_timestamps_s(self):
         result = calc.integrate_with_cumtrapz_timestamps_s(self.timestamps, self.timeseries)
-        self.assertEqual(len(result), len(self.timeseries))
+        self.assertEqual(len(result), 8192)
         self.assertEqual(result[0], 0)
-        self.assertEqual(result[-1], 240)
+        self.assertAlmostEqual(result[-1], -0.0012, 4)
 
     def test_integrate_with_cumtrapz_sample_rate_hz(self):
-        result = calc.integrate_with_cumtrapz_sample_rate_hz(0.1, self.timeseries)
-        self.assertEqual(len(result), len(self.timeseries))
+        result = calc.integrate_with_cumtrapz_sample_rate_hz(self.sample_rate, self.timeseries)
+        self.assertEqual(len(result), 8192)
         self.assertEqual(result[0], 0)
-        self.assertEqual(result[-1], 240)
+        self.assertAlmostEqual(result[-1], -0.0012, 4)
 
     def test_derivative_with_gradient_timestamps_s(self):
         result = calc.derivative_with_gradient_timestamps_s(self.timestamps, self.timeseries)
-        self.assertEqual(len(result), len(self.timeseries))
-        self.assertEqual(result[0], 0.1)
-        self.assertEqual(result[3], -0.05)
-        self.assertEqual(result[-1], 0.1)
+        self.assertEqual(len(result), 8192)
+        self.assertAlmostEqual(result[0], -85.42, 2)
+        self.assertAlmostEqual(result[3], -354.39, 2)
+        self.assertAlmostEqual(result[-1], 238.02, 2)
 
     def test_derivative_with_gradient_sample_rate_hz(self):
-        result = calc.derivative_with_gradient_sample_rate_hz(0.1, self.timeseries)
-        self.assertEqual(len(result), len(self.timeseries))
-        self.assertEqual(result[0], 0.1)
-        self.assertEqual(result[3], -0.05)
-        self.assertEqual(result[-1], 0.1)
+        result = calc.derivative_with_gradient_sample_rate_hz(self.sample_rate, self.timeseries)
+        self.assertEqual(len(result), 8192)
+        self.assertAlmostEqual(result[0], -85.42, 2)
+        self.assertAlmostEqual(result[3], -354.39, 2)
+        self.assertAlmostEqual(result[-1], 238.02, 2)
 
     def test_get_fill_from_filling_method(self):
         result = calc.get_fill_from_filling_method(self.timeseries, "zero")
         self.assertEqual(result, 0)
         result = calc.get_fill_from_filling_method(self.timeseries, "nan")
-        self.assertTrue(np.isnan(result))  # np.nan does not equal itself
+        self.assertTrue(np.isnan(result))
         result = calc.get_fill_from_filling_method(self.timeseries, "mean")
-        self.assertEqual(result, np.mean(self.timeseries))
+        self.assertAlmostEqual(result, -1.7e-16, 2)
         result = calc.get_fill_from_filling_method(self.timeseries, "median")
-        self.assertEqual(result, np.median(self.timeseries))
+        self.assertAlmostEqual(result, 1.46e-15, 2)
         result = calc.get_fill_from_filling_method(self.timeseries, "min")
-        self.assertEqual(result, np.min(self.timeseries))
+        self.assertEqual(result, -1.)
         result = calc.get_fill_from_filling_method(self.timeseries, "max")
-        self.assertEqual(result, np.max(self.timeseries))
+        self.assertEqual(result, 1.)
         result = calc.get_fill_from_filling_method(self.timeseries, "tail")
-        self.assertEqual(result, self.timeseries[-1])
+        self.assertAlmostEqual(result, 0.89, 2)
         result = calc.get_fill_from_filling_method(self.timeseries, "head")
-        self.assertEqual(result, self.timeseries[0])
+        self.assertEqual(result, 1.)
 
     def test_get_fill_from_filling_method_invalid(self):
         with self.assertRaises(ValueError):
@@ -61,27 +61,27 @@ class CalculationsTest(unittest.TestCase):
 
     def test_append_fill_start(self):
         result = calc.append_fill(self.timeseries, 0, "start")
-        self.assertEqual(len(result), 10)
+        self.assertEqual(len(result), 8193)
         self.assertEqual(result[0], 0)
-        self.assertEqual(result[-1], self.timeseries[-1])
+        self.assertAlmostEqual(result[-1], .89, 2)
 
     def test_append_fill_end(self):
         result = calc.append_fill(self.timeseries, 0, "end")
-        self.assertEqual(len(result), len(self.timeseries) + 1)
-        self.assertEqual(result[0], self.timeseries[0])
+        self.assertEqual(len(result), 8193)
+        self.assertEqual(result[0], 1.)
         self.assertEqual(result[-1], 0)
 
     def test_derivative_with_difference_timestamps_s(self):
         result = calc.derivative_with_difference_timestamps_s(self.timestamps, self.timeseries)
-        self.assertEqual(len(result), len(self.timeseries))
-        self.assertEqual(result[0], 0.1)
-        self.assertEqual(result[-1], 0.0)
+        self.assertEqual(len(result), 8192)
+        self.assertAlmostEqual(result[0], -85.42, 2)
+        self.assertEqual(result[-1], 0.)
 
     def test_derivative_with_difference_sample_rate_hz(self):
-        result = calc.derivative_with_difference_sample_rate_hz(0.1, self.timeseries)
-        self.assertEqual(len(result), len(self.timeseries))
-        self.assertEqual(result[0], 0.1)
-        self.assertEqual(result[-1], 0.0)
+        result = calc.derivative_with_difference_sample_rate_hz(10, self.timeseries)
+        self.assertEqual(len(result), 8192)
+        self.assertAlmostEqual(result[0], -1.07, 2)
+        self.assertEqual(result[-1], 0.)
 
     def test_round_value(self):
         result = calc.round_value(1.5, "floor")

@@ -7,7 +7,7 @@ import numpy as np
 from scipy.signal import resample, decimate
 
 
-SUBSMAPLE_METHODS = ["average", "median", "max", "min", "nth"]
+SUBSAMPLE_METHODS = ["average", "median", "max", "min", "nth"]
 
 
 def subsample(
@@ -30,7 +30,7 @@ def subsample(
 
     new_sample_rate = sample_rate_hz / subsample_factor
 
-    if method not in SUBSMAPLE_METHODS:
+    if method not in SUBSAMPLE_METHODS:
         print(f"Warning: method {method} not recognized, using 'nth' method")
         method = "nth"
 
@@ -98,7 +98,7 @@ def subsample_2d(array: np.ndarray, subsample_factor: int, method: str = "nth") 
         print(f"Warning: subsample factor is less than 2, returning the original signal")
         return array
 
-    if method not in SUBSMAPLE_METHODS:
+    if method not in SUBSAMPLE_METHODS:
         print(f"Warning: method {method} not recognized, using 'nth' method")
         method = "nth"
 

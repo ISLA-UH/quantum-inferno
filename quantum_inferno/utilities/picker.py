@@ -2,7 +2,7 @@
 A set of functions to pick key portions of a signal.
 """
 
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 import numpy as np
 from scipy import signal
@@ -122,7 +122,7 @@ def find_peaks_by_extraction_type(
 def find_peaks_with_bits(
     timeseries: np.ndarray,
     sample_rate_hz: float,
-    scaling_type: str = "amplitude",  # "amplitude" or "log2
+    scaling_type: str = "amplitude",
     threshold_bits: Optional[int] = 1,
     time_distance_seconds: Optional[float] = 0.1,
     *args,
@@ -132,7 +132,7 @@ def find_peaks_with_bits(
 
     :param timeseries: time series
     :param sample_rate_hz: sample rate of the signal
-    :param scaling_type: scaling type of the signal (default amplitude)
+    :param scaling_type: scaling type of the signal; either "amplitude" or "log2". (default "amplitude")
     :param threshold_bits: threshold in bits (default 1)
     :param time_distance_seconds: minimum time distance between peaks in seconds (default 0.1)
     :param args: additional arguments for scipy's find_peaks
@@ -192,7 +192,7 @@ def extract_signal_with_buffer_seconds(
     return timeseries[intro_index:outro_index]
 
 
-def find_peaks_to_comb_function(timeseries: np.ndarray, peaks: list or int or np.ndarray) -> np.ndarray:
+def find_peaks_to_comb_function(timeseries: np.ndarray, peaks: Union[list, int, np.ndarray]) -> np.ndarray:
     """
     Returns a comb function of the same length as the timeseries with 1s at the peak locations and 0s elsewhere
 
