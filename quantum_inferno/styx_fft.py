@@ -10,12 +10,12 @@ from typing import Tuple
 
 # TODO: Standardize inputs
 def butter_bandpass(
-        sig_wf: np.ndarray,
-        frequency_sample_rate_hz: float,
-        frequency_cut_low_hz,
-        frequency_cut_high_hz,
-        filter_order: int = 4,
-        tukey_alpha: float = 0.5
+    sig_wf: np.ndarray,
+    frequency_sample_rate_hz: float,
+    frequency_cut_low_hz,
+    frequency_cut_high_hz,
+    filter_order: int = 4,
+    tukey_alpha: float = 0.5,
 ) -> np.ndarray:
     """
     Butterworth bandpass filter
@@ -33,21 +33,19 @@ def butter_bandpass(
     edge_high = frequency_cut_high_hz / nyquist
     if edge_high >= 1:
         edge_high = 0.5  # Half of nyquist
-    [b, a] = signal.butter(N=filter_order,
-                           Wn=[edge_low, edge_high],
-                           btype='bandpass')
+    [b, a] = signal.butter(N=filter_order, Wn=[edge_low, edge_high], btype="bandpass")
     sig_taper = np.copy(sig_wf)
     sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
     return signal.filtfilt(b, a, sig_taper)
 
 
-# todo: return value if failed edge_low comparison
+# todo: return value if failed edge_low comparison (added error handling)
 def butter_highpass(
-        sig_wf: np.ndarray,
-        frequency_sample_rate_hz: float,
-        frequency_cut_low_hz,  # todo: typing
-        filter_order: int = 4,
-        tukey_alpha: float = 0.5
+    sig_wf: np.ndarray,
+    frequency_sample_rate_hz: float,
+    frequency_cut_low_hz: float or int,
+    filter_order: int = 4,
+    tukey_alpha: float = 0.5,
 ) -> np.ndarray:
     """
     Butterworth bandpass filter
@@ -60,23 +58,24 @@ def butter_highpass(
     :return:
     """
     edge_low = frequency_cut_low_hz / (0.5 * frequency_sample_rate_hz)
+
     if edge_low >= 1:
-        print('Cutoff greater than Nyquist')
-        exit()
-    [b, a] = signal.butter(N=filter_order,
-                           Wn=[edge_low],
-                           btype='highpass')
-    sig_taper = np.copy(sig_wf)
-    sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
-    return signal.filtfilt(b, a, sig_taper)
+        raise ValueError(
+            f"Frequency cutoff {frequency_cut_low_hz} is greater than Nyquist {0.5*frequency_sample_rate_hz}"
+        )
+    else:
+        [b, a] = signal.butter(N=filter_order, Wn=[edge_low], btype="highpass")
+        sig_taper = np.copy(sig_wf)
+        sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
+        return signal.filtfilt(b, a, sig_taper)
 
 
 def butter_lowpass(
-        sig_wf: np.ndarray,
-        frequency_sample_rate_hz: float,
-        frequency_cut_high_hz,  # todo: typing
-        filter_order: int = 4,
-        tukey_alpha: float = 0.5
+    sig_wf: np.ndarray,
+    frequency_sample_rate_hz: float,
+    frequency_cut_high_hz: float or int,
+    filter_order: int = 4,
+    tukey_alpha: float = 0.5,
 ) -> np.ndarray:
     """
     Butterworth bandpass filter
@@ -89,24 +88,25 @@ def butter_lowpass(
     :return:
     """
     edge_high = frequency_cut_high_hz / (0.5 * frequency_sample_rate_hz)
+
     if edge_high >= 1:
-        print('Cutoff greater than Nyquist')
-        exit()
-    [b, a] = signal.butter(N=filter_order,
-                           Wn=[edge_high],
-                           btype='lowpass')
-    sig_taper = np.copy(sig_wf)
-    sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
-    return signal.filtfilt(b, a, sig_taper)
+        raise ValueError(
+            f"Frequency cutoff {frequency_cut_high_hz} is greater than Nyquist {0.5*frequency_sample_rate_hz}"
+        )
+    else:
+        [b, a] = signal.butter(N=filter_order, Wn=[edge_high], btype="lowpass")
+        sig_taper = np.copy(sig_wf)
+        sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
+        return signal.filtfilt(b, a, sig_taper)
 
 
 def stft_complex_pow2(
-        sig_wf: np.ndarray,
-        frequency_sample_rate_hz: float,
-        segment_points: int,
-        overlap_points: int = None,
-        nfft_points: int = None,
-        alpha: float = 0.25
+    sig_wf: np.ndarray,
+    frequency_sample_rate_hz: float,
+    segment_points: int,
+    overlap_points: int = None,
+    nfft_points: int = None,
+    alpha: float = 0.25,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Simplest, with 50% overlap and built-in defaults
@@ -120,29 +120,31 @@ def stft_complex_pow2(
     :return: frequency_stft_hz, time_stft_s, stft_complex
     """
     if nfft_points is None:
-        nfft_points = int(2**np.ceil(np.log2(segment_points)))
+        nfft_points = int(2 ** np.ceil(np.log2(segment_points)))
     if overlap_points is None:
         overlap_points = int(segment_points / 2)
-    return signal.stft(x=sig_wf,
-                       fs=frequency_sample_rate_hz,
-                       window=('tukey', alpha),
-                       nperseg=segment_points,
-                       noverlap=overlap_points,
-                       nfft=nfft_points,
-                       detrend='constant',
-                       return_onesided=True,
-                       axis=-1,
-                       boundary='zeros',
-                       padded=True)
+    return signal.stft(
+        x=sig_wf,
+        fs=frequency_sample_rate_hz,
+        window=("tukey", alpha),
+        nperseg=segment_points,
+        noverlap=overlap_points,
+        nfft=nfft_points,
+        detrend="constant",
+        return_onesided=True,
+        axis=-1,
+        boundary="zeros",
+        padded=True,
+    )
 
 
 def gtx_complex_pow2(
-        sig_wf: np.ndarray,
-        frequency_sample_rate_hz: float,
-        segment_points: int,
-        gaussian_sigma: int = None,
-        overlap_points: int = None,
-        nfft_points: int = None
+    sig_wf: np.ndarray,
+    frequency_sample_rate_hz: float,
+    segment_points: int,
+    gaussian_sigma: int = None,
+    overlap_points: int = None,
+    nfft_points: int = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Gaussian taper with 50% overlap and built-in defaults
@@ -156,7 +158,7 @@ def gtx_complex_pow2(
     :return: frequency_stft_hz, time_stft_s, stft_complex
     """
     if nfft_points is None:
-        nfft_points = int(2**np.ceil(np.log2(segment_points)))
+        nfft_points = int(2 ** np.ceil(np.log2(segment_points)))
     # Wyatt spec is overlap_points = int(segment_points / np.sqrt(np.pi) / 8.)
     if overlap_points is None:
         overlap_points = int(segment_points / 2)
@@ -164,25 +166,29 @@ def gtx_complex_pow2(
     # Wyatt spec is gaussian_sigma = (segment_points + 1) / 6
     if gaussian_sigma is None:
         gaussian_sigma = int(segment_points / 4)
-    return signal.stft(x=sig_wf,
-                       fs=frequency_sample_rate_hz,
-                       window=('gaussian', gaussian_sigma),
-                       nperseg=segment_points,
-                       noverlap=overlap_points,
-                       nfft=nfft_points,
-                       detrend='constant',
-                       return_onesided=True,
-                       axis=-1,
-                       boundary='zeros',
-                       padded=True)
+    return signal.stft(
+        x=sig_wf,
+        fs=frequency_sample_rate_hz,
+        window=("gaussian", gaussian_sigma),
+        nperseg=segment_points,
+        noverlap=overlap_points,
+        nfft=nfft_points,
+        detrend="constant",
+        return_onesided=True,
+        axis=-1,
+        boundary="zeros",
+        padded=True,
+    )
 
 
-def welch_power_pow2(sig_wf: np.ndarray,
-                     frequency_sample_rate_hz: float,
-                     segment_points: int,
-                     nfft_points: int = None,
-                     overlap_points: int = None,
-                     alpha: float = 0.25) -> Tuple[np.ndarray, np.ndarray]:
+def welch_power_pow2(
+    sig_wf: np.ndarray,
+    frequency_sample_rate_hz: float,
+    segment_points: int,
+    nfft_points: int = None,
+    overlap_points: int = None,
+    alpha: float = 0.25,
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Simplest, with 50% overlap and built-in defaults
 
@@ -195,21 +201,23 @@ def welch_power_pow2(sig_wf: np.ndarray,
     :return: frequency_welch_hz, welch_power
     """
     if nfft_points is None:
-        nfft_points = int(2**np.ceil(np.log2(segment_points)))
+        nfft_points = int(2 ** np.ceil(np.log2(segment_points)))
     if overlap_points is None:
         overlap_points = int(segment_points / 2)
     # Compute the Welch PSD; averaged spectrum over sliding windows
-    return signal.welch(x=sig_wf,
-                        fs=frequency_sample_rate_hz,
-                        window=('tukey', alpha),
-                        nperseg=segment_points,
-                        noverlap=overlap_points,
-                        nfft=nfft_points,
-                        detrend='constant',
-                        return_onesided=True,
-                        axis=-1,
-                        scaling='spectrum',
-                        average='mean')
+    return signal.welch(
+        x=sig_wf,
+        fs=frequency_sample_rate_hz,
+        window=("tukey", alpha),
+        nperseg=segment_points,
+        noverlap=overlap_points,
+        nfft=nfft_points,
+        detrend="constant",
+        return_onesided=True,
+        axis=-1,
+        scaling="spectrum",
+        average="mean",
+    )
 
 
 # todo: lots of return values, consider an object
@@ -224,15 +232,24 @@ def power_and_information_shannon_stft(stft_complex):
     power_per_band = np.sum(power, axis=-1)
     power_per_sample = np.sum(power, axis=0)
     power_total = np.sum(power) + scales.EPSILON64
-    power_scaled = power/power_total
-    information_bits = -power_scaled*np.log2(power_scaled + scales.EPSILON64)
+    power_scaled = power / power_total
+    information_bits = -power_scaled * np.log2(power_scaled + scales.EPSILON64)
     information_bits_per_band = np.sum(information_bits, axis=-1)
     information_bits_per_sample = np.sum(information_bits, axis=0)
     information_bits_total = np.sum(information_bits) + scales.EPSILON64
-    information_scaled = information_bits/information_bits_total
-    return power, power_per_band, power_per_sample, power_total, power_scaled, \
-        information_bits, information_bits_per_band, information_bits_per_sample, \
-        information_bits_total, information_scaled
+    information_scaled = information_bits / information_bits_total
+    return (
+        power,
+        power_per_band,
+        power_per_sample,
+        power_total,
+        power_scaled,
+        information_bits,
+        information_bits_per_band,
+        information_bits_per_sample,
+        information_bits_total,
+        information_scaled,
+    )
 
 
 # todo: lots of return values, consider an object
@@ -247,15 +264,25 @@ def power_and_information_shannon_welch(welch_power):
     power_per_band = np.sum(power, axis=-1)
     power_per_sample = np.sum(power, axis=0)
     power_total = np.sum(power) + scales.EPSILON64
-    power_scaled = power/power_total
-    information_bits = -power_scaled*np.log2(power_scaled + scales.EPSILON64)
+    power_scaled = power / power_total
+    information_bits = -power_scaled * np.log2(power_scaled + scales.EPSILON64)
     information_bits_per_band = np.sum(information_bits, axis=-1)
     information_bits_per_sample = np.sum(information_bits, axis=0)
     information_bits_total = np.sum(information_bits) + scales.EPSILON64
-    information_scaled = information_bits/information_bits_total
-    return power, power_per_band, power_per_sample, power_total, power_scaled, \
-        information_bits, information_bits_per_band, information_bits_per_sample, \
-        information_bits_total, information_scaled
+    information_scaled = information_bits / information_bits_total
+    return (
+        power,
+        power_per_band,
+        power_per_sample,
+        power_total,
+        power_scaled,
+        information_bits,
+        information_bits_per_band,
+        information_bits_per_sample,
+        information_bits_total,
+        information_scaled,
+    )
+
 
 # def stft_from_sig(sig_wf: np.ndarray,
 #                   frequency_sample_rate_hz: float,
