@@ -8,7 +8,7 @@ import numpy as np
 
 FILL_LOCATIONS = ["start", "end"]
 FILL_TYPES = ["zero", "nan", "mean", "median", "min", "max", "tail", "head"]
-ROUNDING_TYPES = ["floor", "ceil", "round"]
+ROUNDING_TYPES = ["floor", "ceil", "round", "ceil_power_of_two", "floor_power_of_two"]
 OUTPUT_TYPES = ["log2", "points", "pow2"]
 
 
@@ -166,6 +166,10 @@ def round_value(value: float, rounding_type: str = "round") -> int:
         return int(np.ceil(value))
     elif rounding_type == "round":
         return int(np.round(value))
+    elif rounding_type == "ceil_power_of_two":
+        return 2 ** int(np.ceil(np.log2(value)))
+    elif rounding_type == "floor_power_of_two":
+        return 2 ** int(np.floor(np.log2(value)))
     else:
         raise ValueError("Invalid rounding type")
 
