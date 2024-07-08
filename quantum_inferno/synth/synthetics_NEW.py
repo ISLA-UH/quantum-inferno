@@ -28,14 +28,14 @@ def gabor_grain_frequencies(
     :param frequency_sample_rate_input: sample rate
     :param frequency_base_input: G2 or G3. Default is G2
     :param frequency_ref_input: reference frequency. Default is 1.0
-    :return: three numpy arrays with center frequency, start frequency and end frequency
+    :return: numpy arrays of center, start and end frequencies
     """
     (
-        scale_order,
-        scale_base,
         _,
-        frequency_ref,
-        frequency_center_algebraic,
+        _,
+        _,
+        _,
+        _,
         frequency_center,
         frequency_start,
         frequency_end,
@@ -63,7 +63,7 @@ def chirp_rdvxm_noise_16bit(
     :param duration_points: number of points, length of signal. Default is 2 ** 12
     :param sample_rate_hz: sample rate in Hz. Default is 80.0
     :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
-    :param frequency_center_hz: center frequency fc in Hz. Optional
+    :param frequency_center_hz: Optional center frequency fc in Hz.  Default None
     :return: numpy ndarray with anti-aliased chirp with white noise
     """
     if not frequency_center_hz:
@@ -95,7 +95,7 @@ def sawtooth_rdvxm_noise_16bit(
     :param duration_points: number of points, length of signal. Default is 2 ** 12
     :param sample_rate_hz: sample rate in Hz. Default is 80.0
     :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
-    :param frequency_center_hz: center frequency fc in Hz. Optional
+    :param frequency_center_hz: Optional center frequency fc in Hz.  Default None
     :return: numpy ndarray with anti-aliased sawtooth signal with white noise
     """
     frequency_center_hz = frequency_center_hz if frequency_center_hz else 8.0 / (duration_points / sample_rate_hz)
@@ -164,7 +164,7 @@ def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -> np.ndarray:
     """
     Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
 
-    :param sig: input signal, detrended
+    :param sig: detrended input signal
     :param std_bit_loss: number of bits below signal standard deviation
     :return: gaussian noise with zero mean
     """
@@ -204,7 +204,7 @@ def frequency_algebraic_nth(frequency_geometric: np.ndarray, band_order_nth: flo
     Compute algebraic frequencies in band order
 
     :param frequency_geometric: geometric frequencies
-    :param band_order_nth:  Nth order of constant Q bands
-    :return:
+    :param band_order_nth: Nth order of constant Q bands
+    :return: algebraic frequencies from band order
     """
     return frequency_geometric * (np.sqrt(1 + 1 / (8 * band_order_nth ** 2)))

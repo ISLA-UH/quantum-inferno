@@ -4,7 +4,6 @@ import numpy as np
 
 from quantum_inferno.synth.benchmark_signals import well_tempered_tone
 from quantum_inferno.utilities import picker
-from matplotlib import pyplot as plt
 
 
 class TestPicker(unittest.TestCase):

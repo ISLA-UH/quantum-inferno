@@ -1,5 +1,4 @@
 """
-scales_dyadic.py
 Physical to cyber conversion with preferred quasi-dyadic orders.
 Compute the complete set of Nth order bands from Nyquist to the averaging frequency.
 Compute the standard deviation of the Gaussian envelope for the averaging frequency.
@@ -7,9 +6,10 @@ Example: base10, base2, dB, bits
 
 """
 
-import numpy as np
-from typing import Tuple, Union
 import sys
+from typing import List, Tuple, Union
+
+import numpy as np
 
 """ 
 Smallest number > 0 for 64-, 32-, and 16-bit floats.  
@@ -27,7 +27,6 @@ Standardized scales
 """
 
 
-# return epsilon for float64, float32, float16 by detecting system max size
 def get_epsilon() -> float:
     """
     Return epsilon for float64, float32, float16 by detecting current interpreter's max size
@@ -44,11 +43,10 @@ class Slice:
     """
     Constants for slice calculations, supersedes inferno/slice
     """
-
     # Preferred Orders
     ORD1 = 1.0  # Octaves; repeats nearly every three decades (1mHz, 1Hz, 1kHz)
     ORD3 = 3.0  # 1/3 octaves; reduced temporal uncertainty for sharp transients and good for decade cycles
-    ORD6 = 6.0  # 1/6 octaves, good compromise for time-frequency resolition
+    ORD6 = 6.0  # 1/6 octaves, good compromise for time-frequency resolution
     ORD12 = 12.0  # Musical tones, continuous waves, long duration sweeps
     ORD24 = 24.0  # High resolution; long duration widow, 24 bands per octave
     ORD48 = 48.0  # Ultra-high spectral resolution for blowing minds and interstellar communications
@@ -89,59 +87,73 @@ DEFAULT_SCALE_BASE = Slice.G3
 DEFAULT_SCALE_ORDER = Slice.ORD3
 DEFAULT_REF_FREQUENCY_HZ = Slice.F1HZ
 
+# compute maximum size for FFT calculations
+__SIZE_MAX = get_epsilon()
+if __SIZE_MAX == EPSILON64:
+    __MAX_FFT_LIMIT_BY_SYSTEM = 63
+elif __SIZE_MAX == EPSILON32:
+    __MAX_FFT_LIMIT_BY_SYSTEM = 31
+else:
+    __MAX_FFT_LIMIT_BY_SYSTEM = 15
+
 DEFAULT_SCALE_ORDER_MIN: float = 0.75  # Garces (2022)
-DEFAULT_FFT_POW2_POINTS_MAX: int = 2 ** 15  # Computational FFT limit, tune to computing system
+DEFAULT_FFT_POW2_POINTS_MAX: int = 2 ** __MAX_FFT_LIMIT_BY_SYSTEM  # Computational FFT limit, tuned to computing system
 DEFAULT_FFT_POW2_POINTS_MIN: int = 2 ** 8  # For a tolerable display
 DEFAULT_MESH_POW2_PIXELS: int = 2 ** 19  # Total of pixels per mesh, tune to plotting engine
 DEFAULT_TIME_DISPLAY_S: float = 60.0  # Physical time to display; sets display truncation
+VALID_SCALE_ORDERS: List[float] = [0.75, 1, 1.5, 3, 6, 12, 24, 48]  # list of valid scale orders
 
 
-def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER):
+# todo used
+def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER, show_warning: bool = True) -> float:
     """
     Ensure no negative, complex, or unreasonably small orders are passed; override to 1/3 octave band
-    Standard orders are scale_order = [1, 3, 6, 12, 24]. Order must be >= 0.75 or reverts to N=3
+    Standard orders are one of: 1, 3, 6, 12, 24. If order < 0.75 it reverts to order = 3
 
-    :param scale_order: Band order,
+    :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24
+    :param show_warning: if True, prints warning of invalid scale_order.  Default True
+    :return: sanitized scale order
     """
-    # TODO: Refine
-    # I'm confident there are better admissibility tests
-    scale_order = np.abs(scale_order)  # Should be real, positive float
+    scale_order = np.abs(scale_order)  # Force to be a real, positive float
     if scale_order < DEFAULT_SCALE_ORDER_MIN:
-        print(
-            f"** Warning from scales_dyadic.scale_order_check:\n"
-            f"N < {DEFAULT_SCALE_ORDER_MIN} specified, overriding using N = {DEFAULT_SCALE_ORDER_MIN}"
-        )
+        if show_warning:
+            print(
+                f"** Warning from scales_dyadic.scale_order_check:\n"
+                f"N < {DEFAULT_SCALE_ORDER_MIN} specified, overriding using N = {DEFAULT_SCALE_ORDER_MIN}"
+            )
         scale_order = DEFAULT_SCALE_ORDER_MIN
     return scale_order
 
 
+# todo used
 def scale_multiplier(scale_order: float = DEFAULT_SCALE_ORDER):
     """
-    Scale multiplier for scale bands of order N > 0.75
     :param scale_order: scale order
-    :return:
+    :return: Scale multiplier for scale bands of order N > 0.75
     """
     return M_OVER_N * scale_order_check(scale_order)
 
 
+# todo used
 def cycles_from_order(scale_order: float) -> float:
     """
     Compute the number of cycles M for a specified band order N.
     N is the quantization parameter for the constant Q wavelet filters
 
     :param scale_order: Band order, must be > 0.75 or reverts to N=0.75
-    :return: cycles_M, number of cycled per normalized angular frequency
+    :return: number of cycled per normalized angular frequency
     """
     return scale_multiplier(scale_order)
 
 
+# todo used
 def order_from_cycles(cycles_per_scale: float) -> float:
     """
     Compute the number of cycles M for a specified band order N
     where N is the quantization parameter for the constant Q wavelet filters
 
     :param cycles_per_scale: Should be greater than or equal than one
-    :return: cycles_M, number of cycled per normalized angular frequency
+    :return: number of cycled per normalized angular frequency
     """
     # A single cycle is the min req
     if np.abs(cycles_per_scale) < 1:
@@ -149,17 +161,17 @@ def order_from_cycles(cycles_per_scale: float) -> float:
     return scale_order_check(cycles_per_scale / M_OVER_N)
 
 
+# todo used
 def base_multiplier(scale_order: float = DEFAULT_SCALE_ORDER, scale_base: float = DEFAULT_SCALE_BASE):
     """
-    Dyadic (log2) foundation for arbitrary base
-
     :param scale_order:
     :param scale_base:
-    :return:
+    :return: Dyadic (log2) foundation for arbitrary base
     """
     return scale_order_check(scale_order) / np.log2(scale_base)
 
 
+# todo used
 def scale_from_frequency_hz(
     scale_order: float, scale_frequency_center_hz: Union[np.ndarray, float], frequency_sample_rate_hz: float
 ) -> Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
@@ -176,6 +188,7 @@ def scale_from_frequency_hz(
     return scale_atom, scale_angular_frequency
 
 
+# todo used
 # band_Frequency_low_high from libquantum -> used in synthetics
 def band_frequency_low_high(
     frequency_order_input: float,
@@ -191,7 +204,7 @@ def band_frequency_low_high(
     :param frequency_order_input: Nth order
     :param frequency_base_input: G2 or G3
     :param frequency_ref_input: reference frequency
-    :param frequency_low_input: lowest frequency of interest
+    :param frequency_low_input: the lowest frequency of interest
     :param frequency_high_input: highest frequency of interest
     :param frequency_sample_rate_input: sample rate
     :return:scale_order (Band order N > 1, defaults to 1.),
@@ -203,7 +216,6 @@ def band_frequency_low_high(
         frequency_start (first frequency),
         frequency_end (last frequency)
     """
-
     scale_ref_input = 1 / frequency_ref_input
     scale_nyquist_input = 2 / frequency_sample_rate_input
     scale_low_input = 1 / frequency_high_input
@@ -242,6 +254,7 @@ def band_frequency_low_high(
     )
 
 
+# todo used
 # band_intervals_periods from libquantum -> used in band_frequency_low_high
 def band_intervals_periods(
     scale_order_input: float,
@@ -249,76 +262,52 @@ def band_intervals_periods(
     scale_ref_input: float,
     scale_low_input: float,
     scale_high_input: float,
+    show_warnings: bool = True,
 ) -> Tuple[float, float, np.ndarray, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Evaluate Standard Logarithmic Interval Scale Parameters using time scales in seconds
+    """
+    Evaluate Standard Logarithmic Interval Scale Parameters using time scales in seconds
     If scales are provided as frequency, previous computations convert to time.
     Designed to take bappsband to just below Nyquist, within a band edge.
     ALWAYS CONVERT TO SECONDS
     Last updated: 20200905
 
-    Parameters
-    ----------
-    scale_order_input: float
-        Band order N, for ISO3 use N = 1.0 or 3.0 or 6.0 or 12.0 or 24.0
-    scale_base_input: float
-        reference base G; i.e. G3 = 10.**0.3 or G2 = 2.0
-    scale_ref_input: float
-        time reference: in seconds
-    scale_low_input: float
-        Lowest scale. If Nyquist scale, 2 * sample interval in seconds.
-    scale_high_input: float
-        Highest scale of interest in seconds
-
-    Returns
-    -------
-    scale_order: float
-        Band order N > 1, defaults to 1.
-    scale_base: float
-        positive reference Base G > 1, defaults to G3
-    scale_ref: float
-        positive reference scale
-    scale_band_number: numpy ndarray
-        Band number n
-    scale_center_algebraic: numpy ndarray
-        Algebraic center band scale
-    scale_center_geometric: numpy ndarray
-        Geometric center band scale
-    scale_start: numpy ndarray
-        Lower band edge scale
-    scale_end: numpy ndarray
-        Upper band edge scale
+    :param scale_order_input: Band order N, for ISO3 use N = 1.0 or 3.0 or 6.0 or 12.0 or 24.0
+    :param scale_base_input: reference base G; i.e. G3 = 10.**0.3 or G2 = 2.0
+    :param scale_ref_input: time reference: in seconds
+    :param scale_low_input: Lowest scale. If Nyquist scale, 2 * sample interval in seconds.
+    :param scale_high_input: Highest scale of interest in seconds
+    :param show_warnings: if True, show any warnings encountered.  Default True
+    :return: scale_order, scale_base, scale_band_number, scale_ref, scale_center_algebraic,
+            scale_center_geometric, scale_start, scale_end
     """
     # Initiate error handling, all inputs should be numeric, positive, and real
-    # Need error check for string inputs
     # If not real and positive, make them so
     [scale_ref, scale_low, scale_high, scale_base, scale_order] = np.absolute(
         [scale_ref_input, scale_low_input, scale_high_input, scale_base_input, scale_order_input]
     )
 
-    # print('\nConstructing standard band intervals')
     # Check for compliance with ISO3 and/or ANSI S1.11 and for scale_order = 1, 3, 6, 12, and 24
-    if scale_base == Slice.G3:
-        pass
-    elif scale_base == Slice.G2:
+    if scale_base == Slice.G3 or scale_base == Slice.G2:
         pass
     elif scale_base < 1.0:
-        print("\nWARNING: Base must be greater than unity. Overriding to G = 2")
+        if show_warnings:
+            print("\nWARNING: Base must be greater than unity. Overriding to G = 2")
         scale_base = Slice.G2
-    else:
+    elif show_warnings:
         print("\nWARNING: Base is not ISO3 or ANSI S1.11 compliant")
-        print(("Continuing With Non-standard base = " + repr(scale_base) + " ..."))
+        print(f"Continuing With Non-standard base = {scale_base}...")
 
     # Check for compliance with ISO3 for scale_order = 1, 3, 6, 12, and 24
     # and the two 'special' orders 0.75 and 1.5
-    valid_scale_orders = (0.75, 1, 1.5, 3, 6, 12, 24, 48)
-    if scale_order in valid_scale_orders:
+    if scale_order in VALID_SCALE_ORDERS:
         pass
     elif scale_order < 0.75:
-        print("Order must be greater than 0.75. Overriding to Order 1")
+        if show_warnings:
+            print("Order must be greater than 0.75. Overriding to Order 1")
         scale_order = 1
-    else:
-        print(("\nWARNING: Recommend Orders " + str(valid_scale_orders)))
-        print(("Continuing With Non-standard Order = " + repr(scale_order) + " ..."))
+    elif show_warnings:
+        print(f"\nWARNING: Recommend Orders {VALID_SCALE_ORDERS}")
+        print(f"Continuing With Non-standard Order = {scale_order}...")
 
     # Compute scale edge and width parameters
     scale_edge = scale_base ** (1.0 / (2.0 * scale_order))
@@ -327,11 +316,13 @@ def band_intervals_periods(
     if scale_low < Slice.T0S:
         scale_low = Slice.T0S / scale_edge
     if scale_high < scale_low:
-        print("\nWARNING: Upper scale must be larger than the lowest scale")
-        print("Overriding to min = max/G  \n")
+        if show_warnings:
+            print("\nWARNING: Upper scale must be larger than the lowest scale")
+            print("Overriding to min = max/G\n")
         scale_low = scale_high / scale_base
     if scale_high == scale_low:
-        print("\nWARNING: Upper scale = lowest scale, returning closest band edges")
+        if show_warnings:
+            print("\nWARNING: Upper scale = lowest scale, returning closest band edges")
         scale_high *= scale_edge
         scale_low /= scale_edge
 
@@ -346,10 +337,11 @@ def band_intervals_periods(
 
     # Check for band number anomalies
     if n_max < n_min:
-        print("\nSPECMOD: Insufficient bandwidth for Nth band specification")
-        print(("Minimum scaled bandwidth (scale_high - scale_low)/scale_center = " + repr(scale_width) + "\n"))
-        print("Correct scale High/Low input parameters \n")
-        print("Apply one order  \n")
+        if show_warnings:
+            print("\nSPECMOD: Insufficient bandwidth for Nth band specification")
+            print(f"Minimum scaled bandwidth (scale_high - scale_low)/scale_center = {scale_width}")
+            print("Correct scale High/Low input parameters")
+            print("Apply one order")
         n_max = np.floor(np.log10(scale_high) / np.log10(scale_base))
         n_min = n_max - scale_order
 
@@ -399,7 +391,7 @@ def scale_bands_from_ave(
     scale_order: float = DEFAULT_SCALE_BASE,
     scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
     scale_base: float = DEFAULT_SCALE_BASE,
-):
+) -> List[int]:
     """
 
     :param frequency_sample_hz:
@@ -407,7 +399,7 @@ def scale_bands_from_ave(
     :param scale_order:
     :param scale_ref_hz:
     :param scale_base:
-    :return: Shortest period (Nyquist limit), Closest period band, Longest period band,
+    :return: List containing: Shortest period (Nyquist limit), Closest period band, Longest period band,
              Closest largest power of two to averaging frequency
     """
     # Framework constants
@@ -431,7 +423,7 @@ def scale_band_from_frequency(
     scale_order: float = DEFAULT_SCALE_BASE,
     scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
     scale_base: float = DEFAULT_SCALE_BASE,
-):
+) -> List[Union[int, float]]:
     """
     For any one mid frequencies; not meant to be vectorized, only for comparing expectations.
     DOES NOT DEPEND ON SAMPLE RATE
@@ -458,7 +450,7 @@ def scale_bands_from_pow2(
     scale_order: float = DEFAULT_SCALE_BASE,
     scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
     scale_base: float = DEFAULT_SCALE_BASE,
-):
+) -> List[float]:
     """
     :param frequency_sample_hz:
     :param log2_ave_life_dyad:
@@ -485,7 +477,7 @@ def period_from_bands(
     scale_order: float = DEFAULT_SCALE_BASE,
     scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
     scale_base: float = DEFAULT_SCALE_BASE,
-):
+) -> np.ndarray:
     """
 
     :param band_min:
@@ -505,7 +497,7 @@ def frequency_from_bands(
     scale_order: float = DEFAULT_SCALE_BASE,
     scale_ref_hz: float = DEFAULT_REF_FREQUENCY_HZ,
     scale_base: float = DEFAULT_SCALE_BASE,
-):
+) -> np.ndarray:
     """
 
     :param band_min:
@@ -519,6 +511,7 @@ def frequency_from_bands(
     return np.flip(scale_ref_hz * scale_base ** (-np.arange(band_min, band_max + 1) / scale_order))
 
 
+# todo used
 def log_frequency_hz_from_fft_points(
     frequency_sample_hz: float,
     fft_points: int,
@@ -549,14 +542,12 @@ def log_frequency_hz_from_fft_points(
     log2_ref = np.log2(frequency_sample_hz / scale_ref_hz)
 
     # Shortest period, Nyquist limit
-    # band_nyq = int(np.ceil(order_over_log2base*(1-log2_ref)))
     # Shortest period, nominal 8/10 of Nyquist
     band_aa = int(np.ceil(order_over_log2base * (np.log2(2.5) - log2_ref)))
     # Longest period band
     band_max = int(np.floor(order_over_log2base * (log2_ave_life_dyad - log2_scale_mult - log2_ref)))
 
     # Stopped before Nyquist, before max
-    # bands_old = np.arange(band_nyq+1, band_max+1)
     # Stopped at 0.8 of Nyquist
     bands = np.arange(band_aa, band_max + 1)
     # Flip so frequency increases up to one band below Nyquist

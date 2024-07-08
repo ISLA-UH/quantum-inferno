@@ -51,8 +51,7 @@ def hadamard_dot_product_mx(x_mx: np.ndarray, y_mx: np.ndarray) -> np.ndarray:
     return np.sum(x_mx * y_mx, 1)
 
 
-def range_vector_sr(x_initial_position_vector: np.array,
-                    x_final_position_vector: np.array) -> np.array:
+def range_vector_sr(x_initial_position_vector: np.array, x_final_position_vector: np.array) -> np.array:
     """
     Start to end direction, or source vs receiver
 
@@ -63,8 +62,7 @@ def range_vector_sr(x_initial_position_vector: np.array,
     return x_final_position_vector - x_initial_position_vector
 
 
-def range_matrix_sr(x_source_mx: np.ndarray,
-                    x_receiver_mx: np.ndarray) -> np.ndarray:
+def range_matrix_sr(x_source_mx: np.ndarray, x_receiver_mx: np.ndarray) -> np.ndarray:
     """
     start to end position, source vs receiver matrix
 
@@ -97,12 +95,14 @@ def range_scalar(x_source_vector: np.array, x_receiver_vector: np.array) -> floa
     return np.sqrt(np.sum(range_vector * range_vector))
 
 
-def _get_setup(time_array_s: np.array,
-               num_space_dimensions: int,
-               src_position_vector_init_xyz_m: np.array,
-               src_position_vector_final_xyz_m: np.array,
-               rcvr_position_vector_init_xyz_m: np.array,
-               rcvr_position_vector_final_xyz_m: np.array) -> Tuple[int, np.array, float, float]:
+def _get_setup(
+        time_array_s: np.array,
+        num_space_dimensions: int,
+        src_position_vector_init_xyz_m: np.array,
+        src_position_vector_final_xyz_m: np.array,
+        rcvr_position_vector_init_xyz_m: np.array,
+        rcvr_position_vector_final_xyz_m: np.array
+) -> Tuple[int, np.array, float, float]:
     """
     Apply a doppler shift on a source moving towards the receiver
 
@@ -112,7 +112,7 @@ def _get_setup(time_array_s: np.array,
     :param src_position_vector_final_xyz_m: final source position in space
     :param rcvr_position_vector_init_xyz_m: position in space where receiver initially started
     :param rcvr_position_vector_final_xyz_m: position in space where receiver ends up
-    :return: number of time samples, matrix for time, matrix for trajectory range for source and receiver
+    :return: number of time samples, matrix for time, source trajectory magnitude, receiver trajectory magnitude
     """
     temp_mx_s = time_4d_mx(time_array_s, num_space_dimensions)
     source_trajectory_m = range_scalar(src_position_vector_init_xyz_m, src_position_vector_final_xyz_m)
@@ -121,11 +121,13 @@ def _get_setup(time_array_s: np.array,
     return len(time_array_s), temp_mx_s, source_trajectory_m, receiver_trajectory_m
 
 
-def _get_velocity_mps(speed_mps: float,
-                      trajectory_m: float,
-                      num_samples: int,
-                      position_vector_init_xyz_m: np.array,
-                      position_vector_final_xyz_m: np.array) -> np.array:
+def _get_velocity_mps(
+        speed_mps: float,
+        trajectory_m: float,
+        num_samples: int,
+        position_vector_init_xyz_m: np.array,
+        position_vector_final_xyz_m: np.array
+) -> np.array:
     """
     Compute velocity (in meter per second)
 
@@ -144,17 +146,19 @@ def _get_velocity_mps(speed_mps: float,
     return space_4d_mx(velocity_mps, num_samples)
 
 
-def _get_final_vals(spacetime_matrix: np.array,
-                    receiver_velocity_mx_mps: np.array,
-                    source_velocity_mx_mps: np.array,
-                    time_array_s: np.array,
-                    rcvr_position_vector_init_xyz_m: np.array,
-                    src_position_vector_init_xyz_m: np.array,
-                    signal_speed_mps: float,
-                    object_speed_mps: float,
-                    num_dimensions: int,
-                    num_samples: int,
-                    inverse: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _get_final_vals(
+        spacetime_matrix: np.array,
+        receiver_velocity_mx_mps: np.array,
+        source_velocity_mx_mps: np.array,
+        time_array_s: np.array,
+        rcvr_position_vector_init_xyz_m: np.array,
+        src_position_vector_init_xyz_m: np.array,
+        signal_speed_mps: float,
+        object_speed_mps: float,
+        num_dimensions: int,
+        num_samples: int,
+        inverse: bool = False
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Compute array of times in seconds, Magnitude of range and time, omega over omega center
 
@@ -203,15 +207,17 @@ def _get_final_vals(spacetime_matrix: np.array,
     return time_s, range_time_m, omega_over_omega_center
 
 
-def doppler_forward(tau_source_s: np.array,
-                    signal_speed_mps: float,
-                    source_speed_mps: float,
-                    receiver_speed_mps: float,
-                    space_dimensions: int,
-                    source_position_vector_initial_xyz_m: np.array,
-                    source_position_vector_final_xyz_m: np.array,
-                    receiver_position_vector_initial_xyz_m: np.array,
-                    receiver_position_vector_final_xyz_m: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def doppler_forward(
+        tau_source_s: np.array,
+        signal_speed_mps: float,
+        source_speed_mps: float,
+        receiver_speed_mps: float,
+        space_dimensions: int,
+        source_position_vector_initial_xyz_m: np.array,
+        source_position_vector_final_xyz_m: np.array,
+        receiver_position_vector_initial_xyz_m: np.array,
+        receiver_position_vector_final_xyz_m: np.array
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Apply a doppler shift on a source moving towards the receiver
 

@@ -12,6 +12,7 @@ DATA_SCALE_TYPE = ["amplitude", "power"]
 def to_log2_with_epsilon(x: Union[np.ndarray, float, list]) -> Union[np.ndarray, float]:
     """
     Convert the absolute value of the data to log2 with epsilon added to avoid log(0) and log(<0) errors.
+
     :param x: data or value to rescale
     :return: rescaled data or value
     """

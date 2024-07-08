@@ -10,8 +10,8 @@ import scipy.signal as signal
 
 from quantum_inferno import scales_dyadic as scales
 
-
 # TODO: LOOK AT ATOMS_TO_REPLACE and scaled_dyadic for inline cwt frequency. Same for STX.
+
 
 def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale: float, omega: float) -> Tuple[float, float]:
     """
@@ -27,6 +27,7 @@ def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale: float, omega:
     return base_var / (1 + np.exp(-(scale * omega)**2)), base_var / (1 - np.exp(-(scale * omega)**2))
 
 
+# todo: move description of variables into function itself, along with giving the correct names.
 def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
@@ -48,6 +49,7 @@ def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
     return amp_canonical, amp_unit_spectrum
 
 
+# todo: move description of variables into function itself, along with giving the correct names.
 def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
@@ -69,9 +71,7 @@ def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
     return amp_norm2spect
 
 
-def wavelet_time(time_s: np.ndarray,
-                 offset_time_s: float,
-                 frequency_sample_rate_hz: float) -> np.ndarray:
+def wavelet_time(time_s: np.ndarray, offset_time_s: float, frequency_sample_rate_hz: float) -> np.ndarray:
     """
     Scaled time-shifted time
 
@@ -102,7 +102,7 @@ def wavelet_complex(
     :param offset_time_s: offset time in seconds, should be between min and max of time_s
     :param scale_frequency_center_hz: center frequency fc in Hz
     :param frequency_sample_rate_hz: sample rate on Hz
-    :return: waveform_complex, time_shifted_s
+    :return: waveform_complex, time_shifted_s  # todo: finish return values
     """
     # Center and nondimensionalize time
     xtime_shifted = wavelet_time(time_s, offset_time_s, frequency_sample_rate_hz)
@@ -139,14 +139,15 @@ def wavelet_centered_4cwt(
 ) -> Tuple[np.ndarray, np.ndarray, Union[np.ndarray, float], Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
     Gabor atoms for CWT computation centered on the duration of signal
-    defaults to "norm" for dictionary_type.
+
+    Options for dictionary_type: "norm" (Canonical unit-norm), "spect" (unit spectrum), or "unit" (unit modulus)
 
     :param duration_points: number of points in the signal
     :param band_order_nth: Nth order of constant Q bands
     :param scale_frequency_center_hz: center frequency fc in Hz
     :param frequency_sample_rate_hz: sample rate is Hz
-    :param dictionary_type: Canonical unit-norm ("norm"), unit spectrum ("spect"), or unit modulus ("unit")
-    :return: waveform_complex, time_shifted_s
+    :param dictionary_type: determines amplification value.  Default "norm"
+    :return: waveform_complex, time_shifted_s  # todo: finish return values
     """
     time_s = np.arange(duration_points)/frequency_sample_rate_hz
 
@@ -163,6 +164,7 @@ def wavelet_centered_4cwt(
     return amp * wavelet_gabor, xtime_shifted / frequency_sample_rate_hz, scale, omega, amp
 
 
+# todo: is this the replacement or what?
 def cwt_complex_any_scale_pow2(
         band_order_nth: float,
         sig_wf: np.ndarray,
@@ -218,6 +220,7 @@ def cwt_complex_any_scale_pow2(
     return frequency_cwt_hz, time_cwt_s, cwt
 
 
+# todo: did this get replaced by above or not?
 def cwt_complex_any_scale_pow2_TO_REPLACE(
         band_order_nth: float,
         sig_wf: np.ndarray,

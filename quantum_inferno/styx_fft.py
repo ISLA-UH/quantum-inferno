@@ -1,14 +1,17 @@
 """
 This module calculates spectra: STFT, FFT
 """
+from typing import Tuple, Union
 
 import numpy as np
 import scipy.signal as signal
+
 from quantum_inferno import scales_dyadic as scales
-from typing import Tuple
 
 
 # TODO: Standardize inputs
+# todo: typing for params
+# todo: describe parameters and return value
 def butter_bandpass(
     sig_wf: np.ndarray,
     frequency_sample_rate_hz: float,
@@ -42,11 +45,12 @@ def butter_bandpass(
     return signal.filtfilt(b, a, sig_taper)
 
 
+# todo: describe parameters and return value
 # todo: return value if failed edge_low comparison (added error handling)
 def butter_highpass(
     sig_wf: np.ndarray,
     frequency_sample_rate_hz: float,
-    frequency_cut_low_hz: float or int,
+    frequency_cut_low_hz: Union[float, int],
     filter_order: int = 4,
     tukey_alpha: float = 0.5,
 ) -> np.ndarray:
@@ -73,10 +77,11 @@ def butter_highpass(
         return signal.filtfilt(b, a, sig_taper)
 
 
+# todo: describe parameters and return value
 def butter_lowpass(
     sig_wf: np.ndarray,
     frequency_sample_rate_hz: float,
-    frequency_cut_high_hz: float or int,
+    frequency_cut_high_hz: Union[float, int],
     filter_order: int = 4,
     tukey_alpha: float = 0.5,
 ) -> np.ndarray:
@@ -103,6 +108,7 @@ def butter_lowpass(
         return signal.filtfilt(b, a, sig_taper)
 
 
+# todo: describe parameters
 def stft_complex_pow2(
     sig_wf: np.ndarray,
     frequency_sample_rate_hz: float,
@@ -141,6 +147,7 @@ def stft_complex_pow2(
     )
 
 
+# todo: describe parameters
 def gtx_complex_pow2(
     sig_wf: np.ndarray,
     frequency_sample_rate_hz: float,
@@ -184,6 +191,7 @@ def gtx_complex_pow2(
     )
 
 
+# todo: describe parameters
 def welch_power_pow2(
     sig_wf: np.ndarray,
     frequency_sample_rate_hz: float,
@@ -224,6 +232,7 @@ def welch_power_pow2(
 
 
 # todo: lots of return values, consider an object
+# confirm this is different from info.py functions
 def power_and_information_shannon_stft(stft_complex):
     """
     Computes power and information metrics
@@ -256,6 +265,7 @@ def power_and_information_shannon_stft(stft_complex):
 
 
 # todo: lots of return values, consider an object
+# confirm this is different from info.py functions
 def power_and_information_shannon_welch(welch_power):
     """
     Computes power and information metrics

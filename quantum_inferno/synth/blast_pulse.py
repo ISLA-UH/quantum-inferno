@@ -72,7 +72,7 @@ def gt_hilbert_blast_period_center(time_center_s: np.ndarray, pseudo_period_s: f
 
 
 def gt_blast_center_fast(
-    frequency_peak_hz: float = 6.3, sample_rate_hz: float = 100.0, noise_std_loss_bits: float = 16
+    frequency_peak_hz: float = 6.3, sample_rate_hz: float = 100.0, noise_std_loss_bits: float = 16.
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Fast computation of GT pulse with noise
@@ -92,15 +92,16 @@ def gt_blast_center_fast(
 
 
 def gt_blast_center_noise(
-    duration_s: float = 16, frequency_peak_hz: float = 6.3, sample_rate_hz: float = 100, noise_std_loss_bits: float = 16
+    duration_s: float = 16., frequency_peak_hz: float = 6.3,
+    sample_rate_hz: float = 100., noise_std_loss_bits: float = 16.
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Fast computation of GT pulse with noise for a specified duration in seconds
 
-    :param duration_s: signal duration in seconds
-    :param frequency_peak_hz: peak frequency, nominal 6.3 Hz for 1 tonne TNT
-    :param sample_rate_hz: sample rate, nominal 100 Hz
-    :param noise_std_loss_bits: noise loss relative to signal variance
+    :param duration_s: signal duration in seconds.  Default 16
+    :param frequency_peak_hz: peak frequency.  Default 6.3 Hz for 1 tonne TNT
+    :param sample_rate_hz: sample rate.  Default 100 Hz
+    :param noise_std_loss_bits: noise loss relative to signal variance.  Default 16
     :return: centered time in seconds, GT pulse with white noise
     """
     time_center_s = np.arange(int(duration_s * sample_rate_hz)) / sample_rate_hz
@@ -111,7 +112,7 @@ def gt_blast_center_noise(
 
 
 def gt_blast_center_noise_uneven(
-    sensor_epoch_s: np.array, noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None
+    sensor_epoch_s: np.array, noise_std_loss_bits: float = 2., frequency_center_hz: Optional[float] = None
 ) -> np.ndarray:
     """
     Construct the GT explosion pulse of Garces (2019) for even or uneven sensor time
@@ -120,7 +121,7 @@ def gt_blast_center_noise_uneven(
 
     :param sensor_epoch_s: array with timestamps for signal in epoch seconds
     :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 2
-    :param frequency_center_hz: center frequency in Hz. Optional
+    :param frequency_center_hz: Optional center frequency in Hz
     :return: numpy array with anti-aliased GT explosion pulse with Gaussian noise
     """
     time_duration_s = sensor_epoch_s[-1] - sensor_epoch_s[0]

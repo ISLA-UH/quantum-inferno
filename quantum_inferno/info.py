@@ -12,12 +12,12 @@ import scipy.fft as sfft
 
 # TODO: verify that utilities.matrix are correctly used in this module
 
+
 # TODO: Use 'em or lose 'em
 def log2_ceil(x: float, epsilon: float = scales.EPSILON64) -> float:
     """
     Compute ceiling of log2 of a positive input argument.
-    Corrects for negative, complex or zero inputs by
-    taking the absolute value and adding EPSILON
+    Corrects for negative, complex or zero inputs by taking the absolute value and adding EPSILON
 
     :param x: input, converts to positive real
     :param epsilon: override zero, negative, and imaginary values
@@ -29,8 +29,7 @@ def log2_ceil(x: float, epsilon: float = scales.EPSILON64) -> float:
 def log2_round(x: float, epsilon: float = scales.EPSILON64) -> float:
     """
     Compute rounded value of log2 of a positive input argument.
-    Corrects for negative, complex or zero inputs by
-    taking the absolute value and adding EPSILON
+    Corrects for negative, complex or zero inputs by taking the absolute value and adding EPSILON
 
     :param x: input, converts to positive real
     :param epsilon: override zero, negative, and imaginary values
@@ -42,8 +41,7 @@ def log2_round(x: float, epsilon: float = scales.EPSILON64) -> float:
 def log2_floor(x: float, epsilon: float = scales.EPSILON64) -> float:
     """
     Compute floor of log2 of a positive input argument.
-    Corrects for negative, complex or zero inputs by
-    taking the absolute value and adding EPSILON
+    Corrects for negative, complex or zero inputs by taking the absolute value and adding EPSILON
 
     :param x: input, converts to positive real
     :param epsilon: override zero, negative, and imaginary values
@@ -68,6 +66,7 @@ def mat_min_idx(a: np.ndarray) -> Tuple[np.ndarray]:
     return np.unravel_index(a.argmin(), a.shape)
 
 
+# todo: used
 def scale_log2_64(in_array: np.ndarray) -> np.ndarray:
     """
     :param in_array: input array
@@ -76,6 +75,7 @@ def scale_log2_64(in_array: np.ndarray) -> np.ndarray:
     return np.log2(in_array + scales.EPSILON64)
 
 
+# todo: used
 def scale_power_bits(power: np.ndarray) -> np.ndarray:
     """
     :param power: power from time-frequency representation
@@ -211,6 +211,7 @@ def shannon_esnrf_per_freq(tfr_power):
     return [tfr_info_per_freq, tfr_shannon_per_freq_bits, tfr_isnr_per_freq, tfr_esnr_per_freq]
 
 
+# todo: used
 def get_info_and_entropy_32(marginal: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     :param marginal: array of values to start with
@@ -245,10 +246,9 @@ class ShannonTDR(Shannon):
     """
     class for Shannon TDR information
     """
-
     def __init__(self, sig_in_real: np.ndarray):
         """
-        :param sig_in_real: # todo
+        :param sig_in_real: data to process
         """
         self.sig: np.ndarray = sig_in_real / np.sqrt(np.sum(sig_in_real ** 2))
         super().__init__(self.sig ** 2)
@@ -268,12 +268,11 @@ class ShannonFFT(Shannon):
     """
     class for Shannon FFT information
     """
-
     def __init__(self, sig_in_real: np.ndarray):
         """
-        :param sig_in_real: # todo
+        :param sig_in_real: data to process
         """
-        self.sig = sfft.rfft(x=sig_in_real)
+        self.sig: np.ndarray = sfft.rfft(x=sig_in_real)
         self.angle_rads: np.ndarray = np.unwrap(np.angle(self.sig))
         self.frequency: np.ndarray = np.arange(len(self.angle_rads)) / len(self.angle_rads) / 2.0
         fft_sq = np.abs(self.sig) ** 2
@@ -287,6 +286,16 @@ class ShannonFFT(Shannon):
 
     def print_total_marginal(self):
         print("Sum of frequency marginal:", np.sum(self.marginal))
+
+
+def shannon_tdr_fft_class(sig_in_real: np.ndarray) -> Tuple[ShannonTDR, ShannonFFT]:
+    """
+    Shannon information and entropy using classes
+
+    :param sig_in_real: data to process
+    :return: ShannonTDR and ShannonFFT of the data
+    """
+    return ShannonTDR(sig_in_real), ShannonFFT(sig_in_real)
 
 
 # todo: parameter and return types
@@ -512,7 +521,7 @@ def shannon_stft_esnrt_per_time(tfr_power):
     # num_time = tfr_power.shape[1]
     num_freq = tfr_power.shape[0]
 
-    # # TODO: Clean up!
+    # TODO: Clean up!
     # num_dof = num_time    # Degrees of freedom
     ref_shannon_bits = np.log2(num_freq) / num_freq
 

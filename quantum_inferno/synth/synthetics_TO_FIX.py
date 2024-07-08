@@ -31,7 +31,7 @@ def gabor_loose_grain(
     :return: numpy array with Tukey grain
     """
     # Fundamental chirp parameters
-    cycles_m, quality_factor_q, gamma = atoms_FOR_CWT.chirp_MQG_from_N(
+    cycles_m, quality_factor_q, gamma = atoms_FOR_CWT.chirp_mqg_from_n(
         band_order_nth, index_shift, frequency_base_input
     )
     scale_atom = atoms_FOR_CWT.chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)
@@ -67,7 +67,7 @@ def gabor_tight_grain(
     """
 
     # Fundamental chirp parameters
-    cycles_m, quality_factor_q, gamma = atoms_FOR_CWT.chirp_MQG_from_N(
+    cycles_m, quality_factor_q, gamma = atoms_FOR_CWT.chirp_mqg_from_n(
         band_order_nth, index_shift, frequency_base_input
     )
     scale_atom = atoms_FOR_CWT.chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)
@@ -105,7 +105,7 @@ def tukey_tight_grain(
     """
 
     # Fundamental chirp parameters
-    cycles_m, quality_factor_q, gamma = atoms_FOR_CWT.chirp_MQG_from_N(
+    cycles_m, quality_factor_q, gamma = atoms_FOR_CWT.chirp_mqg_from_n(
         band_order_nth, index_shift, frequency_base_input
     )
     scale_atom = atoms_FOR_CWT.chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)

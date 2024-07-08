@@ -14,6 +14,7 @@ from quantum_inferno.utilities.rescaling import is_power_of_two
 # TODO: LOOK AT ATOMS_TO_REPLACE and scaled_dyadic for inline STX frequency. Same for CWT.
 
 # TODO: Place this def somewhere more useful, like quantum_inferno/utilities/sampling.py. Use native fft padding.
+# todo: parameter descriptions and return values
 def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int, verbosity: bool = False):
     """
     Zero-pad signal to the higher 2**n points for FFT
@@ -26,9 +27,10 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int, verbosity: bool = False):
     # Flatten to 2D and memorize original shape
     n_times = sig_wf.shape[-1]
 
-    print(n_fft, n_times)
+    if verbosity:
+        print(n_fft, n_times)
     if n_fft < n_times:
-        raise ValueError("n_fft cannot be smaller than signal size. " "Got %s < %s." % (n_fft, n_times))
+        raise ValueError(f"n_fft cannot be smaller than signal size. Got {n_fft} < {n_times}.")
 
     if n_fft is None or (not is_power_of_two(n_fft) and n_times > n_fft):
         # Compute next power of 2
@@ -37,8 +39,8 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int, verbosity: bool = False):
     if n_times < n_fft:
         if verbosity:
             print(
-                'The input signal is shorter ({}) than "n_fft" ({}). '
-                "Applying zero padding.".format(sig_wf.shape[-1], n_fft)
+                f'The input signal is shorter ({sig_wf.shape[-1]}) than "n_fft" ({n_fft}). '
+                "Applying zero padding."
             )
         zero_pad: int = n_fft - n_times
         sig_wf = np.concatenate((sig_wf, np.zeros(sig_wf.shape[:-1] + (zero_pad,), sig_wf.dtype)), axis=-1)
@@ -66,8 +68,9 @@ def tfr_stx_fft(
     scale_ref_input: float = scales.Slice.T1S,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    # Stockwell transform, fft implementation.
-    # Optimized version has more free variables in sigma_scaling; testing in progress
+    Stockwell transform, fft implementation.
+    Optimized version has more free variables in sigma_scaling; testing in progress
+
     :param sig_wf: input waveform. If not 2**n points, it will zero pad up
     :param time_sample_interval: sample interval, inverse of sample rate
     :param scale_order_input: fractional octave band order; 12 is the musical standard
@@ -82,11 +85,10 @@ def tfr_stx_fft(
     :param is_inferno: are frequencies geometrically spaced and standardized as in inferno?
     :param scale_base_input: scale base; default is base 10, base 2 octaves is scales.Slice.G2
     :param scale_ref_input: scale reference time; default is 1 s
-    # :return: tfr_stx, psd_stx, frequency_stx_hz, frequency_stx_fft, windows_fft
-    #"""
-
+    :return: tfr_stx, psd_stx, frequency_stx_hz, frequency_stx_fft, windows_fft
+    """
     frequency_sample_rate: float = 1 / time_sample_interval
-    cycles_M: float = 12.0 / 5.0 * scale_order_input
+    cycles_m: float = 12.0 / 5.0 * scale_order_input
     lin_fft_decimate: float = 2.0
 
     # Compute the nearest higher power of two number of points for the fft
@@ -104,7 +106,7 @@ def tfr_stx_fft(
     omega_fft = 2 * np.pi * frequency_fft / frequency_sample_rate  # scaled angular frequency
 
     window_longest_time = n_fft_pow2 / frequency_sample_rate
-    frequency_min_nth = cycles_M / window_longest_time
+    frequency_min_nth = cycles_m / window_longest_time
 
     # Initialize stx frequencies
     if frequency_min is None:
@@ -167,6 +169,7 @@ def tfr_stx_fft(
     for isx, fsx in enumerate(frequency_stx):
         stx_index = np.abs(frequency_fft - fsx).argmin()
         frequency_stx_fft[isx] = frequency_fft[stx_index]
+        # todo: remove?
         # omega_sx = 2*np.pi*frequency_stx_hz/sample_rate    # non-dimensional angular stx frequency
         omega_sx = (
             2 * np.pi * frequency_stx_fft[isx] / frequency_sample_rate
@@ -177,12 +180,12 @@ def tfr_stx_fft(
             # Sigma is the standard deviation of the Gaussian
             # Additional flexibility is added in gamma_sigma_scaling
             sigma_scaling = (1 + factor_q * (omega_sx ** power_p)) * (omega_sx ** (1 - power_r))
-            sigma = cycles_M / omega_sx
+            sigma = cycles_m / omega_sx
             sigma *= sigma_scaling
             windows_fft[isx] = np.exp(-0.5 * (sigma ** 2.0) * (omega_fft ** 2.0))
 
         # This is the main event
-        tfr_stx_pow2 = ifft(sig_fft_cat[stx_index : stx_index + n_fft_pow2] * windows_fft[isx])
+        tfr_stx_pow2 = ifft(sig_fft_cat[stx_index: stx_index + n_fft_pow2] * windows_fft[isx])
         if zero_pad > 0:
             tfr_stx[isx, :] = tfr_stx_pow2[:-zero_pad:1]
         else:
@@ -332,7 +335,6 @@ def tfr_stx_fft(
 #     return tfr_stx, psd_stx, frequency_stx, frequency_stx_fft, windows_fft
 
 
-# todo: don't return a value you just pass in
 # TODO: AS IN CWT, build log STX frequency. See above for fancier version
 def stx_complex_any_scale_pow2(
     band_order_nth: float, sig_wf: np.ndarray, frequency_sample_rate_hz: float
@@ -344,7 +346,6 @@ def stx_complex_any_scale_pow2(
     :param sig_wf: input signal with 2^M points
     :param frequency_sample_rate_hz: sample rate in Hz
     :return: frequency_stx_hz, time_stx_s, tfr_stx
-
     """
     n_fft_pow2 = len(sig_wf)
     frequency_stx_hz = scales.log_frequency_hz_from_fft_points(
@@ -375,6 +376,6 @@ def stx_complex_any_scale_pow2(
     for isx, fsx in enumerate(frequency_stx_hz):
         # This is the main event
         stx_index = np.abs(frequency_fft - fsx).argmin()
-        tfr_stx[isx, :] = ifft(sig_fft_cat[stx_index : stx_index + n_fft_pow2] * windows_fft_2d[isx, :])
+        tfr_stx[isx, :] = ifft(sig_fft_cat[stx_index: stx_index + n_fft_pow2] * windows_fft_2d[isx, :])
 
     return frequency_stx_hz, np.arange(n_fft_pow2) / frequency_sample_rate_hz, tfr_stx
