@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from quantum_inferno import styx_fft, styx_cwt, scales_dyadic
 import quantum_inferno.plot_templates.plot_cyberspectral as pltq
-from quantum_inferno.utilities.calculations import get_num_points, RoundingType, OutputType
+from quantum_inferno.utilities.calculations import get_num_points
 
 print(__doc__)
 
@@ -75,8 +75,8 @@ if __name__ == "__main__":
     ave_points_ceil_log2 = get_num_points(
         sample_rate_hz=frequency_sample_rate_hz,
         duration_s=duration_fft_s,
-        round_type=RoundingType.CEIL,
-        unit=OutputType.BITS,
+        rounding_type="ceil",
+        output_unit="points",
     )
     # dyadic number of points
     time_fft_nd = 2 ** ave_points_ceil_log2
