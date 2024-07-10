@@ -96,9 +96,9 @@ if __name__ == "__main__":
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
     ax2.semilogx(frequency_fft_pos_hz, fft_abs_power)
-    ax2.set_title('FFT Power, f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
-    ax2.set_xlabel('Frequency, hz')
-    ax2.set_ylabel('2*|RFFT/N|**2')
+    ax2.set_title(f"FFT Power, f = {frequency_center_fft_hz:.3f} Hz")
+    ax2.set_xlabel('Frequency, Hz')
+    ax2.set_ylabel("$2\cdot\mid\\frac{RFFT}{N}\mid ^2$")
     ax2.grid(True)
 
     plt.show()

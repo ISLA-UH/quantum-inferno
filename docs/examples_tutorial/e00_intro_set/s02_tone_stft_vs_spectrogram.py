@@ -26,13 +26,13 @@ if __name__ == "__main__":
     """
 
     # Construct a tone of fixed frequency with a constant sample rate
-    # In this example, added noise, taper, and antialiasing filter.
+    # In this example, noise, taper, and antialiasing filter are all added.
     # In the first example (FFT), the nominal signal duration was 1s.
     # In this example the nominal signal duration is 16s, with averaging (fft) window duration of 1s.
     # Compare to synthetic tone with 2^n points and max FFT amplitude at exact and NOT exact fft frequency
     # If NOT exact fft frequency does not return unit amplitude (but it's close)
     frequency_tone_hz = 60
-    EVENT_NAME = str(frequency_tone_hz) + " Hz Tone Test"
+    EVENT_NAME = f"{frequency_tone_hz} Hz Tone Test,"
     [
         mic_sig,
         time_s,
@@ -49,8 +49,8 @@ if __name__ == "__main__":
         add_noise_taper_aa=True,
     )
 
-    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window
-    # inside the cosine tapered region.
+    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window inside the
+    #        cosine tapered region.
     # If zero, the Tukey window is equivalent to a rectangular window.
     # If one, the Tukey window is equivalent to a Hann window.
     alpha = 0.25  # 25% Tukey (Cosine) window
@@ -75,6 +75,7 @@ if __name__ == "__main__":
         average="mean",
     )
     # TODO: Why is spectrogram truncating the edge windows?
+    # TODO: check if switch to ShortTimeFFT fixes truncating issue
     # Zero pad the mic_sig to get the full time for signal.spectrogram as it truncates by 1/2 window size
     mic_sig_zero_padded_by_half_window = np.pad(mic_sig, (time_fft_nd // 2, time_fft_nd // 2), "constant")
 
@@ -125,10 +126,10 @@ if __name__ == "__main__":
     # Express in log2(power) with epsilon
     mic_spect_bits = to_log2_with_epsilon(psd_spec_power)
     mic_stft_bits = to_log2_with_epsilon(stft_power)
-    print("Max spect:", np.max(psd_spec_power))
-    print("Max stft:", np.max(psd_spec_power))
-    print("Max spect bits:", np.max(mic_spect_bits))
-    print("Max stft bits:", np.max(mic_stft_bits))
+    print(f"Max spect: {np.max(psd_spec_power)}")
+    print(f"Max stft: {np.max(stft_power)}")
+    print(f"Max spect bits: {np.max(mic_spect_bits)}")
+    print(f"Max stft bits: {np.max(mic_stft_bits)}")
 
     # Compute the inverse stft (istft)
     sig_time_istft, sig_wf_istft = signal.istft(
@@ -156,14 +157,14 @@ if __name__ == "__main__":
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(11, 6))
     ax1.plot(time_s, mic_sig)
-    ax1.set_title("Synthetic CW, with taper")
+    ax1.set_title("Synthetic CW with taper")
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("Norm")
     ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
-    ax2.semilogx(frequency_spect_hz, spect_over_var, "-.", label="Spect")
-    ax2.semilogx(frequency_stft_hz, stft_over_var, ".-", label="STFT")
-    ax2.set_title("Welch, Spect, and STFT Power, f = " + str(round(frequency_center_fft_hz * 100) / 100) + " Hz")
-    ax2.set_xlabel("Frequency, hz")
+    ax2.semilogx(frequency_spect_hz, spect_over_var, label="Spect", lw=2)
+    ax2.semilogx(frequency_stft_hz, stft_over_var, "--", label="STFT", lw=1)
+    ax2.set_title(f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz")
+    ax2.set_xlabel("Frequency, Hz")
     ax2.set_ylabel("Power/VAR(signal)")
     ax2.grid(True)
     ax2.legend()
@@ -176,7 +177,7 @@ if __name__ == "__main__":
     ax1.set_ylabel("Norm")
     ax1.set_xlim([-0.25, 10.5])
     ax2.plot(sig_time_istft, (mic_sig - sig_wf_istft) ** 2)
-    ax2.set_title("(original-inverse ISTFT)**2")
+    ax2.set_title("(original-inverse ISTFT)$^2$")
     ax2.set_xlabel("Time, s")
     ax2.set_ylabel("Norm")
 
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     fmin = 2 * frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
     pltq.plot_wf_mesh_vert(
-        station_id=", Log2(1/2)=-1",
+        station_id="log$_2\\frac{1}{2}=-1$",
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_spect_s,
@@ -192,15 +193,15 @@ if __name__ == "__main__":
         mesh_panel_b_tfr=mic_spect_bits,
         mesh_panel_b_colormap_scaling="range",
         wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="Log2(Power)",
+        mesh_panel_b_cbar_units="log$_2$(Power)",
         start_time_epoch=0,
-        figure_title="Spectrogram for " + EVENT_NAME,
+        figure_title=f"Spectrogram for {EVENT_NAME}",
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
 
     pltq.plot_wf_mesh_vert(
-        station_id=", Log2(1/2)=-1",
+        station_id="log$_2\\frac{1}{2}=-1$",
         wf_panel_a_sig=mic_sig,
         wf_panel_a_time=time_s,
         mesh_time=time_stft_s,
@@ -208,9 +209,9 @@ if __name__ == "__main__":
         mesh_panel_b_tfr=mic_stft_bits,
         mesh_panel_b_colormap_scaling="range",
         wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="Log2(Power)",
+        mesh_panel_b_cbar_units="log$_2$(Power)",
         start_time_epoch=0,
-        figure_title="STFT for " + EVENT_NAME,
+        figure_title=f"STFT for {EVENT_NAME}",
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )

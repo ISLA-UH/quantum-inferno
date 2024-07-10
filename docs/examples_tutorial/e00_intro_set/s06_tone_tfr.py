@@ -18,8 +18,8 @@ if __name__ == "__main__":
     # Set tone parameters. Play with order number to learn things about the methods
     frequency_tone_hz = 60
     order_number_input = 12
-    EVENT_NAME = str(frequency_tone_hz) + " Hz Tone Test"
-    ORDER_NUM = ", Dyadic Order " + str(order_number_input)
+    EVENT_NAME = f"{frequency_tone_hz} Hz Tone Test"
+    ORDER_NUM = f"Dyadic Order {order_number_input}"
 
     # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the tapered region.
     # If zero, the Tukey window is equivalent to a rectangular window.
@@ -115,14 +115,14 @@ if __name__ == "__main__":
     mic_cwt_bits = to_log2_with_epsilon(cwt_power)
     mic_stx_bits = to_log2_with_epsilon(stx_power)
 
-    print("Max stft bits:", np.max(mic_stft_bits))
-    print("Max cwt bits:", np.max(mic_cwt_bits))
-    print("Max stx bits:", np.max(mic_stx_bits))
+    print(f"Max stft bits: {np.max(mic_stft_bits)}")
+    print(f"Max cwt bits: {np.max(mic_cwt_bits)}")
+    print(f"Max stx bits: {np.max(mic_stx_bits)}")
 
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
-    ax1.set_title("Synthetic CW, with taper")
+    ax1.set_title("Synthetic CW with taper")
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("Norm")
     ax2.semilogx(frequency_welch_hz, fft_var_norm_welch, label="Welch")
@@ -130,9 +130,9 @@ if __name__ == "__main__":
     ax2.semilogx(frequency_cwt_hz, fft_var_norm_cwt, "-.", label="CWT")
     ax2.semilogx(frequency_stx_hz, fft_var_norm_stx, "--", label="STX")
 
-    ax2.set_title("Welch and Spect FFT (RMS), f = " + str(round(frequency_center_fft_hz * 100) / 100) + " Hz")
+    ax2.set_title(f"Welch and Spect FFT (RMS), f = {frequency_center_fft_hz:.3f} Hz")
     ax2.set_xlabel("Frequency, hz")
-    ax2.set_ylabel("VAR|FFT| / VAR(SIG)")
+    ax2.set_ylabel("VAR(|FFT|) / VAR(SIG)")
     ax2.grid(True)
     ax2.legend()
 
@@ -151,9 +151,9 @@ if __name__ == "__main__":
         mesh_panel_b_tfr=mic_stft_bits,
         mesh_panel_b_colormap_scaling="range",
         wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="Log2(Power)",
+        mesh_panel_b_cbar_units="log$_2$(Power)",
         start_time_epoch=0,
-        figure_title="STFT for " + EVENT_NAME,
+        figure_title=f"STFT for {EVENT_NAME}",
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
@@ -168,9 +168,9 @@ if __name__ == "__main__":
         mesh_panel_b_tfr=mic_cwt_bits,
         mesh_panel_b_colormap_scaling="range",
         wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="Log2(Power)",
+        mesh_panel_b_cbar_units="log$_2$(Power)",
         start_time_epoch=0,
-        figure_title="CWT for " + EVENT_NAME + ORDER_NUM,
+        figure_title=f"CWT for {EVENT_NAME}, {ORDER_NUM}",
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )
@@ -185,9 +185,9 @@ if __name__ == "__main__":
         mesh_panel_b_tfr=mic_stx_bits,
         mesh_panel_b_colormap_scaling="range",
         wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="Log2(Power)",
+        mesh_panel_b_cbar_units="log$_2$(Power)",
         start_time_epoch=0,
-        figure_title="STX for " + EVENT_NAME + ORDER_NUM,
+        figure_title=f"STX for {EVENT_NAME}, {ORDER_NUM}",
         frequency_hz_ymin=fmin,
         frequency_hz_ymax=fmax,
     )

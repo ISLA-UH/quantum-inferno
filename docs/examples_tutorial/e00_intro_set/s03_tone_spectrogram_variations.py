@@ -194,7 +194,7 @@ if __name__ == "__main__":
     )
     plt.title("Spectrum scaling returns near-unity at peak: preferred forms")
     plt.xlim(frequency_center_fft_hz - 10, frequency_center_fft_hz + 10)
-    plt.xlabel("Frequency, hz")
+    plt.xlabel("Frequency, Hz")
     plt.ylabel("Power/VAR(signal)")
     plt.grid(True)
     plt.legend()
@@ -221,10 +221,10 @@ if __name__ == "__main__":
         "--",
         label="density, complex",
     )
-    plt.title("Density Scaling has stronger % taper dependence")
+    plt.title("Density scaling has stronger % taper dependence")
     plt.xlim(frequency_center_fft_hz - 10, frequency_center_fft_hz + 10)
-    plt.xlabel("Frequency, hz")
-    plt.ylabel("df * Power/VAR(signal)")
+    plt.xlabel("Frequency, Hz")
+    plt.ylabel("df $\\cdot$ Power/VAR(signal)")
     plt.grid(True)
     plt.legend()
 
