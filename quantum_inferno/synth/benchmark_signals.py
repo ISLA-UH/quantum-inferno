@@ -53,11 +53,7 @@ def oversample_time(time_duration: float, time_sample_interval: float, oversampl
 
 
 def quantum_chirp(
-        omega: float,
-        order: float = 12.,
-        gamma: float = 0.,
-        gauss: bool = True,
-        oversample_scale: int = 2
+    omega: float, order: float = 12.0, gamma: float = 0.0, gauss: bool = True, oversample_scale: int = 2
 ) -> Tuple[np.ndarray, int]:
     """
     Constructs a tone or a sweep with a gaussian window option and a duration of 2^n points
@@ -74,7 +70,7 @@ def quantum_chirp(
         omega = np.pi * 2 ** (-1 / order)
 
     # Gabor atom specifications
-    scale_multiplier = 3. / 4. * np.pi * order
+    scale_multiplier = 3.0 / 4.0 * np.pi * order
 
     # Atom scale
     scale = scale_multiplier / omega
@@ -84,7 +80,7 @@ def quantum_chirp(
     chirp_scale = scale * mu
 
     # scale multiplier Mc
-    window_support_points = 2. * np.pi * chirp_scale
+    window_support_points = 2.0 * np.pi * chirp_scale
     # scale up
     window_support_pow2 = 2 ** int((np.ceil(np.log2(window_support_points))))
 
@@ -109,13 +105,13 @@ def quantum_chirp(
 
 
 def synth_00(
-    frequency_0: float = 100.,
-    frequency_1: float = 200.,
-    frequency_2: float = 400.,
+    frequency_0: float = 100.0,
+    frequency_1: float = 200.0,
+    frequency_2: float = 400.0,
     time_start_2: float = 0.25,
     time_stop_2: float = 0.4,
     time_sample_interval: float = DEFAULT_TIME_SAMPLE_INTERVAL,
-    time_duration: float = 1.,
+    time_duration: float = 1.0,
     oversample_scale: int = 2,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -138,16 +134,16 @@ def synth_00(
     time_all = np.arange(number_points) * oversample_interval
 
     # Construct sine waves with unit amplitude [rms * sqrt(2)]
-    sin_0 = np.sin(2. * np.pi * frequency_0 * time_all)
+    sin_0 = np.sin(2.0 * np.pi * frequency_0 * time_all)
     signal_gate(wf=sin_0, t=time_all, tmin=0, tmax=0.5)
-    sin_1 = np.sin(2. * np.pi * frequency_1 * time_all)
-    signal_gate(wf=sin_1, t=time_all, tmin=0.5, tmax=1.)
-    sin_2 = np.sin(2. * np.pi * frequency_2 * time_all)
+    sin_1 = np.sin(2.0 * np.pi * frequency_1 * time_all)
+    signal_gate(wf=sin_1, t=time_all, tmin=0.5, tmax=1.0)
+    sin_2 = np.sin(2.0 * np.pi * frequency_2 * time_all)
     signal_gate(wf=sin_2, t=time_all, tmin=time_start_2, tmax=time_stop_2)
 
     # Superpose gated sinusoids
     superpose = sin_0 + sin_1 + sin_2
-    signal_gate(wf=superpose, t=time_all, tmin=0., tmax=1., fraction_cosine=0.05)
+    signal_gate(wf=superpose, t=time_all, tmin=0.0, tmax=1.0, fraction_cosine=0.05)
 
     # Decimate by same oversample scale, essentially an AA filter
     synth_wf = signal.decimate(x=superpose, q=oversample_scale)
@@ -157,11 +153,11 @@ def synth_00(
 
 
 def synth_01(
-    a: float = 100.,
-    b: float = 20.,
-    f: float = 5.,
+    a: float = 100.0,
+    b: float = 20.0,
+    f: float = 5.0,
     time_sample_interval: float = DEFAULT_TIME_SAMPLE_INTERVAL,
-    time_duration: float = 1.,
+    time_duration: float = 1.0,
     oversample_scale: int = 2,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -178,10 +174,10 @@ def synth_01(
     # Oversample, then decimate, essentially an AA filter
     time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
     superpose = np.cos(a * np.pi * time_all - b * np.pi * time_all * time_all) + np.cos(
-        4. * np.pi * np.sin(np.pi * f * time_all) + np.pi * 80. * time_all
+        4.0 * np.pi * np.sin(np.pi * f * time_all) + np.pi * 80.0 * time_all
     )
     # Taper
-    signal_gate(wf=superpose, t=time_all, tmin=0., tmax=1., fraction_cosine=0.05)
+    signal_gate(wf=superpose, t=time_all, tmin=0.0, tmax=1.0, fraction_cosine=0.05)
     # Decimate by same oversample scale
     synth_wf = signal.decimate(x=superpose, q=oversample_scale)
     synth_time = np.arange(len(synth_wf)) * time_sample_interval
@@ -193,11 +189,11 @@ def synth_02(
     t1: float = 0.3,
     t2: float = 0.7,
     t3: float = 0.5,
-    f1: float = 45.,
-    f2: float = 75.,
-    f3: float = 15.,
+    f1: float = 45.0,
+    f2: float = 75.0,
+    f3: float = 15.0,
     time_sample_interval: float = DEFAULT_TIME_SAMPLE_INTERVAL,
-    time_duration: float = 1.,
+    time_duration: float = 1.0,
     oversample_scale: int = 2,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -216,10 +212,10 @@ def synth_02(
     """
     t = oversample_time(time_duration, time_sample_interval, oversample_scale)
 
-    pulse1 = np.exp(-35. * np.pi * (t - t1) ** 2) * np.cos(np.pi * f1 * t)
-    pulse2 = np.exp(-35. * np.pi * (t - t2) ** 2) * np.cos(np.pi * f1 * t)
-    pulse3 = np.exp(-55. * np.pi * (t - t3) ** 2) * np.cos(np.pi * f2 * t)
-    pulse4 = np.exp(-45. * np.pi * (t - t3) ** 2) * np.cos(np.pi * f3 * t)
+    pulse1 = np.exp(-35.0 * np.pi * (t - t1) ** 2) * np.cos(np.pi * f1 * t)
+    pulse2 = np.exp(-35.0 * np.pi * (t - t2) ** 2) * np.cos(np.pi * f1 * t)
+    pulse3 = np.exp(-55.0 * np.pi * (t - t3) ** 2) * np.cos(np.pi * f2 * t)
+    pulse4 = np.exp(-45.0 * np.pi * (t - t3) ** 2) * np.cos(np.pi * f3 * t)
 
     superpose = pulse1 + pulse2 + pulse3 + pulse4
 
@@ -231,11 +227,11 @@ def synth_02(
 
 
 def synth_03(
-    a: float = 30.,
-    b: float = 40.,
-    c: float = 150.,
+    a: float = 30.0,
+    b: float = 40.0,
+    c: float = 150.0,
     time_sample_interval: float = DEFAULT_TIME_SAMPLE_INTERVAL,
-    time_duration: float = 1.,
+    time_duration: float = 1.0,
     oversample_scale: int = 2,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -251,10 +247,10 @@ def synth_03(
     """
     # Oversample, then decimate
     time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
-    superpose = np.cos(20. * np.pi * np.log(a * time_all + 1.)) + np.cos(
+    superpose = np.cos(20.0 * np.pi * np.log(a * time_all + 1.0)) + np.cos(
         b * np.pi * time_all + c * np.pi * (time_all ** 2)
     )
-    signal_gate(wf=superpose, t=time_all, tmin=0., tmax=1., fraction_cosine=0.05)
+    signal_gate(wf=superpose, t=time_all, tmin=0.0, tmax=1.0, fraction_cosine=0.05)
 
     # Decimate by same oversample scale, essentially an AA filter
     synth_wf = signal.decimate(x=superpose, q=oversample_scale)
@@ -269,8 +265,8 @@ def synth_03(
 def well_tempered_tone(
     frequency_sample_rate_hz: float = 800.0,
     frequency_center_hz: float = 60.0,
-    time_duration_s: float = 16.,
-    time_fft_s: float = 1.0,
+    time_duration_s: float = 10.24,
+    time_fft_s: float = 0.64,
     use_fft_frequency: bool = True,
     add_noise_taper_aa: bool = False,
     output_desc: bool = False,
@@ -288,13 +284,25 @@ def well_tempered_tone(
     :return: waveform, timestamps, fft duration, sample rate, center frequency, frequency resolution
     """
     # The segments determine the spectral resolution
-    frequency_resolution_hz = 1. / time_fft_s
+    frequency_resolution_hz = 1.0 / time_fft_s
 
     # The FFT efficiency is based on powers of 2; it is always possible to pad with zeros.
     # Set the record duration, make a power of 2. Note that int rounds down
     time_duration_nd = 2 ** (int(np.log2(time_duration_s * frequency_sample_rate_hz)))
     # Set the fft duration, make a power of 2
     time_fft_nd = 2 ** (int(np.log2(time_fft_s * frequency_sample_rate_hz)))
+
+    # Add a warning if the time duration or fft duration is not a power of 2 and show the new values
+    if time_duration_nd != time_duration_s * frequency_sample_rate_hz:
+        print(
+            f"Warning: The time duration {time_duration_s} s with given sample rate doesn't produce data points "
+            f"that are power of two, adjusting time duration to {time_duration_nd / frequency_sample_rate_hz} s"
+        )
+    if time_fft_nd != time_fft_s * frequency_sample_rate_hz:
+        print(
+            f"Warning: fft duration {time_fft_s} s with given sample rate doesn't produce data points "
+            f"that are power of two, adjusting fft duration to {time_fft_nd / frequency_sample_rate_hz} s"
+        )
 
     # The fft frequencies are set by the duration of the fft
     # In this example we only need the positive frequencies
@@ -312,13 +320,13 @@ def well_tempered_tone(
     if use_fft_frequency:
         frequency_center_fft = frequency_center_fft_hz / frequency_sample_rate_hz
         # Construct synthetic tone with 2^n points and max FFT amplitude at exact fft frequency
-        mic_sig = np.cos(2. * np.pi * frequency_center_fft * time_nd)
+        mic_sig = np.cos(2.0 * np.pi * frequency_center_fft * time_nd)
     else:
         # Dimensionless center frequency
         frequency_center = frequency_center_hz / frequency_sample_rate_hz
         # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
         # It does NOT return unit amplitude (but it's close)
-        mic_sig = np.cos(2. * np.pi * frequency_center * time_nd)
+        mic_sig = np.cos(2.0 * np.pi * frequency_center * time_nd)
 
     if add_noise_taper_aa:
         # Add noise
