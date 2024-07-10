@@ -67,6 +67,8 @@ def get_fill_from_filling_method(array_1d: np.ndarray, fill_type: str) -> float:
     """
     Returns the fill value based on the fill type
 
+    Refer to FILL_TYPES for available options
+
     :param array_1d: 1D array with data to be filled
     :param fill_type: The fill type
     :return: The fill value
@@ -98,6 +100,8 @@ def append_fill(array_1d: np.ndarray, fill_value: float, fill_loc: str) -> np.nd
     """
     Append fill value to the array based on the fill location
 
+    Refer to FILL_LOCATIONS for available options
+
     :param array_1d: 1D array with data
     :param fill_value: fill value
     :param fill_loc: fill location
@@ -115,13 +119,16 @@ def derivative_with_difference_timestamps_s(
     timestamps_s: np.ndarray, timeseries: np.ndarray, fill_type: str = "zero", fill_loc: str = "end"
 ) -> np.ndarray:
     """
-    Derivative using numpy.diff with fill options to return the same length as the input
-    Default fill type is zero and fill location is end
+    Derivative using numpy.diff with fill options to return the same length as the input.
+
+    Refer to FILL_TYPES for available options
+
+    Refer to FILL_LOCATIONS for available options
 
     :param timestamps_s: timestamps in seconds
     :param timeseries: sensor waveform
-    :param fill_type: fill type
-    :param fill_loc: fill location
+    :param fill_type: fill type.  Default "zero"
+    :param fill_loc: fill location.  Default "end"
     :return: derivative waveform with the same length as the input
     """
     derivative = np.diff(timeseries) / np.diff(timestamps_s)
@@ -134,12 +141,15 @@ def derivative_with_difference_sample_rate_hz(
 ) -> np.ndarray:
     """
     Derivative using numpy.diff with fill options to return the same length as the input
-    Default fill type is zero and fill location is end
+
+    Refer to FILL_TYPES for available options
+
+    Refer to FILL_LOCATIONS for available options
 
     :param sample_rate_hz: sample rate in Hz
     :param timeseries: sensor waveform
-    :param fill_type: fill type
-    :param fill_loc: fill location
+    :param fill_type: fill type.  Default "zero"
+    :param fill_loc: fill location.  Default "end"
     :return: derivative waveform with the same length as the input
     """
     derivative = np.diff(timeseries) * sample_rate_hz
@@ -147,15 +157,15 @@ def derivative_with_difference_sample_rate_hz(
     return append_fill(derivative, fill_value, fill_loc)
 
 
-# return round based on the rounding method
 def round_value(value: float, rounding_type: str = "round") -> int:
     """
-    Round value based on the rounding method for positive or negative floats
-    For rounding type ROUND, if the decimals is halfway between two integers, it will round to the nearest even integer
-    Default rounding type is round
+    Round value based on the rounding method for positive or negative floats.
+    For rounding type "round", if the decimal is halfway between two integers, it will round to the nearest even integer
+
+    Refer to ROUNDING_TYPES for available options
 
     :param value: value to be rounded
-    :param rounding_type: rounding type
+    :param rounding_type: method of rounding.  Default "round"
     :return: rounded value
     """
     if rounding_type not in ROUNDING_TYPES:
@@ -174,12 +184,13 @@ def round_value(value: float, rounding_type: str = "round") -> int:
         raise ValueError("Invalid rounding type")
 
 
-# get number of points in a waveform based on the sample rate and duration and round based on the rounding method
 def get_num_points(sample_rate_hz: float, duration_s: float, rounding_type: str, output_unit: str) -> int:
     """
     TODO: Make defaults for RoundingType, OutputType, add POW2 option/function. BITS is maybe not the best descriptor?
-    Get number of points in a waveform based on the sample rate and duration and round based on the rounding method
-    For rounding type ROUND, if the decimals is halfway between two integers, it will round to the nearest even integer
+    Get number of points in a waveform based on the sample rate and duration and round based on the rounding method.
+    For rounding type "round", if the decimal is halfway between two integers, it will round to the nearest even integer
+
+    Refer to OUTPUT_TYPES for available options
 
     :param sample_rate_hz: sample rate in Hz
     :param duration_s: duration in seconds
@@ -187,7 +198,6 @@ def get_num_points(sample_rate_hz: float, duration_s: float, rounding_type: str,
     :param output_unit: output unit (points, log2, or pow2)
     :return: number of points
     """
-
     if output_unit not in OUTPUT_TYPES:
         raise ValueError(f"Invalid output unit {output_unit}, must be one of {OUTPUT_TYPES}")
     elif output_unit == "points":
