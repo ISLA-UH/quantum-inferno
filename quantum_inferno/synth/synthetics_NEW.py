@@ -51,12 +51,12 @@ def gabor_grain_frequencies(
     return frequency_center, frequency_start, frequency_end
 
 
-def chirp_rdvxm_noise_16bit(
+def chirp_noise_16bit(
     duration_points: int = 2 ** 12,
     sample_rate_hz: float = 80.0,
     noise_std_loss_bits: float = 4.0,
     frequency_center_hz: Optional[float] = None,
-):
+) -> np.ndarray:
     """
     Construct chirp with linear frequency sweep, white noise added, anti-aliased filter applied
 
@@ -78,12 +78,11 @@ def chirp_rdvxm_noise_16bit(
     chirp_wf *= taper_tukey(chirp_wf, 0.25)
     chirp_white = chirp_wf + white_noise_fbits(sig=chirp_wf, std_bit_loss=noise_std_loss_bits)
     chirp_white_aa = antialias_half_nyquist(chirp_white)
-    chirp_white_aa.astype(np.float16)
 
-    return chirp_white_aa
+    return chirp_white_aa.astype(np.float16)
 
 
-def sawtooth_rdvxm_noise_16bit(
+def sawtooth_noise_16bit(
     duration_points: int = 2 ** 12,
     sample_rate_hz: float = 80.0,
     noise_std_loss_bits: float = 4.0,
@@ -105,9 +104,8 @@ def sawtooth_rdvxm_noise_16bit(
     saw_wf *= taper_tukey(saw_wf, 0.25)
     saw_white = saw_wf + white_noise_fbits(sig=saw_wf, std_bit_loss=noise_std_loss_bits)
     saw_white_aa = antialias_half_nyquist(saw_white)
-    saw_white_aa.astype(np.float16)
 
-    return saw_white_aa
+    return saw_white_aa.astype(np.float16)
 
 
 def sawtooth_doppler_noise_16bit(phase_radians: np.ndarray, noise_std_loss_bits: float = 4.0) -> np.ndarray:
@@ -188,8 +186,8 @@ def antialias_half_nyquist(synth: np.ndarray, filter_order: int = 4) -> np.ndarr
     """
     Antialiasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
 
-    :param filter_order: filter order sets decay rate
     :param synth: array with signal data
+    :param filter_order: sets decay rate
     :return: numpy array with anti-aliased signal
     """
     # Antialiasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist

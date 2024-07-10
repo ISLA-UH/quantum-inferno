@@ -11,6 +11,8 @@ from quantum_inferno.utilities.window import get_tukey
 from quantum_inferno.synth import synthetics_NEW
 
 DEFAULT_TIME_SAMPLE_INTERVAL = 1e-3
+DEFAULT_TIME_DURATION = 1.0
+DEFAULT_OVERSAMPLE_SCALE = 2
 
 
 """ Signal conditioning  """
@@ -53,7 +55,11 @@ def oversample_time(time_duration: float, time_sample_interval: float, oversampl
 
 
 def quantum_chirp(
-    omega: float, order: float = 12.0, gamma: float = 0.0, gauss: bool = True, oversample_scale: int = 2
+    omega: float,
+    order: float = 12.0,
+    gamma: float = 0.0,
+    gauss: bool = True,
+    oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE
 ) -> Tuple[np.ndarray, int]:
     """
     Constructs a tone or a sweep with a gaussian window option and a duration of 2^n points
@@ -111,8 +117,8 @@ def synth_00(
     time_start_2: float = 0.25,
     time_stop_2: float = 0.4,
     time_sample_interval: float = DEFAULT_TIME_SAMPLE_INTERVAL,
-    time_duration: float = 1.0,
-    oversample_scale: int = 2,
+    time_duration: float = DEFAULT_TIME_DURATION,
+    oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate three sine waves, oversample and decimate to AA
@@ -157,8 +163,8 @@ def synth_01(
     b: float = 20.0,
     f: float = 5.0,
     time_sample_interval: float = DEFAULT_TIME_SAMPLE_INTERVAL,
-    time_duration: float = 1.0,
-    oversample_scale: int = 2,
+    time_duration: float = DEFAULT_TIME_DURATION,
+    oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Example Synthetic 1 todo: be more descriptive
@@ -193,8 +199,8 @@ def synth_02(
     f2: float = 75.0,
     f3: float = 15.0,
     time_sample_interval: float = DEFAULT_TIME_SAMPLE_INTERVAL,
-    time_duration: float = 1.0,
-    oversample_scale: int = 2,
+    time_duration: float = DEFAULT_TIME_DURATION,
+    oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Example Synthetic 2 todo: be more descriptive
@@ -231,8 +237,8 @@ def synth_03(
     b: float = 40.0,
     c: float = 150.0,
     time_sample_interval: float = DEFAULT_TIME_SAMPLE_INTERVAL,
-    time_duration: float = 1.0,
-    oversample_scale: int = 2,
+    time_duration: float = DEFAULT_TIME_DURATION,
+    oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Example Synthetic 3 todo: be more descriptive
@@ -292,7 +298,7 @@ def well_tempered_tone(
     # Set the fft duration, make a power of 2
     time_fft_nd = 2 ** (int(np.log2(time_fft_s * frequency_sample_rate_hz)))
 
-    # Add a warning if the time duration or fft duration is not a power of 2 and show the new values
+    # Warn user if the time duration or fft duration is not a power of 2 and show the new values
     if time_duration_nd != time_duration_s * frequency_sample_rate_hz:
         print(
             f"Warning: The time duration {time_duration_s} s with given sample rate doesn't produce data points "
@@ -303,6 +309,7 @@ def well_tempered_tone(
             f"Warning: fft duration {time_fft_s} s with given sample rate doesn't produce data points "
             f"that are power of two, adjusting fft duration to {time_fft_nd / frequency_sample_rate_hz} s"
         )
+    # todo: are the values supposed to get reset?
 
     # The fft frequencies are set by the duration of the fft
     # In this example we only need the positive frequencies
