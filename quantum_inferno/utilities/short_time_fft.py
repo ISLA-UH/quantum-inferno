@@ -80,7 +80,7 @@ def istft_tukey(
     tukey_alpha: float,
     segment_length: int,
     overlap_length: int,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class
 
@@ -89,8 +89,15 @@ def istft_tukey(
     :param tukey_alpha: shape parameter of the Tukey window
     :param segment_length: length of the segment
     :param overlap_length: length of the overlap
-    :return: iSTFT of the signal
+    :return: timestamps and iSTFT of the signal
     """
     # create the ShortTimeFFT object
     stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length)
-    return stft_obj.istft(stft_magnitude)
+
+    # The index of the last window where only half of the window contains the signal
+    last_window_index = int((np.shape(stft_magnitude)[1] - 1) * stft_obj.hop)
+
+    # return timestamps for the iSTFT that includes the full signal
+    timestamps = np.arange(start=0, stop=last_window_index / sample_rate_hz, step=1 / sample_rate_hz)
+
+    return timestamps, stft_obj.istft(stft_magnitude, k1=last_window_index)
