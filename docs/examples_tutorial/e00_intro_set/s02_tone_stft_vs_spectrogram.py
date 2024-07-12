@@ -155,19 +155,33 @@ if __name__ == "__main__":
     )
 
     # Show the waveform and the averaged FFT over the whole record:
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(11, 6))
-    ax1.plot(time_s, mic_sig)
-    ax1.set_title("Synthetic CW with taper")
-    ax1.set_xlabel("Time, s")
-    ax1.set_ylabel("Norm")
-    ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
-    ax2.semilogx(frequency_spect_hz, spect_over_var, label="Spect", lw=2)
-    ax2.semilogx(frequency_stft_hz, stft_over_var, "--", label="STFT", lw=1)
-    ax2.set_title(f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz")
-    ax2.set_xlabel("Frequency, Hz")
-    ax2.set_ylabel("Power/VAR(signal)")
-    ax2.grid(True)
-    ax2.legend()
+    # fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(11, 6))
+    # ax1.plot(time_s, mic_sig)
+    # ax1.set_title("Synthetic CW with taper")
+    # ax1.set_xlabel("Time, s")
+    # ax1.set_ylabel("Norm")
+    # ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
+    # ax2.semilogx(frequency_spect_hz, spect_over_var, label="Spect", lw=2)
+    # ax2.semilogx(frequency_stft_hz, stft_over_var, "--", label="STFT", lw=1)
+    # ax2.set_title(f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz")
+    # ax2.set_xlabel("Frequency, Hz")
+    # ax2.set_ylabel("Power/VAR(signal)")
+    # ax2.grid(True)
+    # ax2.legend()
+
+    pltq.plot_cw_and_power(cw_panel_sig=mic_sig,
+                           cw_panel_time=time_s,
+                           power_panel_freqs=[frequency_welch_hz, frequency_spect_hz, frequency_stft_hz],
+                           power_panel_ls=["-", "-", "--"],
+                           power_panel_lw=[1, 2, 1],
+                           power_panel_sigs=[welch_over_var, spect_over_var, stft_over_var],
+                           power_panel_sig_labels=["Welch", "Spect", "STFT"],
+                           cw_panel_units="Norm",
+                           power_panel_x_units="Hz",
+                           power_panel_y_units="Power/VAR(signal)",
+                           units_time="s",
+                           cw_panel_title=f"Synthetic CW with {alpha*100:.2f}% taper",
+                           power_panel_title=f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz")
 
     # Plot the inverse stft (full recovery)
     fig2, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, constrained_layout=True, figsize=(11, 6), sharex="all")
