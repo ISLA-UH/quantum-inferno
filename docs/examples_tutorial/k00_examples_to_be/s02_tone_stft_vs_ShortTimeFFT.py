@@ -167,15 +167,21 @@ if __name__ == "__main__":
     fmin = 2 * signal_frequency_resolution_fft_hz
     fmax = signal_sample_rate_hz / 2  # Nyquist
 
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 6))
     plt.title(f"Power / Variance Comparison, f = {signal_frequency_center_fft_hz:.3f} Hz")
-    plt.plot(frequency_welch_hz, welch_over_variance, label="Welch PSD / Variance", alpha=0.8)
-    plt.plot(stft_frequencies, stft_over_variance, ".-", label="STFT PSD / Variance", alpha=0.8)
-    plt.plot(ShortTimeFFT_frequencies, ShortTimeFFT_over_variance, "--", label="ShortTimeFFT PSD / Variance", alpha=0.8)
+    plt.plot(frequency_welch_hz, welch_over_variance, ".-", label="Welch Power from PSD / Variance", alpha=0.7, lw=2)
+    plt.plot(stft_frequencies, stft_over_variance, ".--", label="STFT Power from PSD / Variance", alpha=0.7, lw=2)
+    plt.plot(
+        ShortTimeFFT_frequencies,
+        ShortTimeFFT_over_variance,
+        ".-.",
+        label="ShortTimeFFT Power from PSD / Variance",
+        alpha=0.7,
+        lw=2,
+    )
     plt.xlabel("Frequency (Hz)")
     plt.ylabel("PSD / Variance")
-    plt.xscale("log")
-    plt.xlim([0.8, signal_sample_rate_hz / 2])
+    plt.xlim([signal_frequency_center_fft_hz - 20, signal_frequency_center_fft_hz + 20])
     plt.grid()
     plt.legend()
 
