@@ -9,10 +9,11 @@ from typing import Tuple
 
 from quantum_inferno.utilities.calculations import round_value
 
+SCALING_OPTIONS = ["magnitude", "psd", None]
 
 # return the Short-Time Fourier Transform (STFT) object with default parameters
 def get_stft_object_tukey(
-    sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int
+    sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = "magnitude"
 ) -> signal.ShortTimeFFT:
     """
     Return the Short-Time Fourier Transform (STFT) object with a Tukey window using ShortTimeFFT class
@@ -22,6 +23,7 @@ def get_stft_object_tukey(
     :param tukey_alpha: shape parameter of the Tukey window
     :param segment_length: length of the segment
     :param overlap_length: length of the overlap
+    :param scaling: scaling of the STFT (default is magnitude, other options are 'psd' and None)
     :return: ShortTimeFFT object
     """
     # checks
@@ -32,6 +34,14 @@ def get_stft_object_tukey(
         )
         overlap_length = segment_length // 2
 
+    if tukey_alpha < 0 or tukey_alpha > 1:
+        print(f"Warning: Tukey alpha {tukey_alpha} must be between 0 and 1, using 0.25 as the default value")
+        tukey_alpha = 0.25
+
+    if scaling not in SCALING_OPTIONS:
+        print(f"Warning: scaling {scaling} must be one of {SCALING_OPTIONS}, using 'magnitude' as the default value")
+        scaling = "magnitude"
+
     # calculate the values to be used in the ShortTimeFFT object
     tukey_window = signal.windows.tukey(segment_length, alpha=tukey_alpha)
     fft_points = round_value(segment_length, "ceil_power_of_two")
@@ -39,14 +49,19 @@ def get_stft_object_tukey(
 
     # create the ShortTimeFFT object
     stft_obj = signal.ShortTimeFFT(
-        win=tukey_window, hop=hop_length, fs=sample_rate_hz, mfft=fft_points, fft_mode="onesided", scale_to="magnitude"
+        win=tukey_window, hop=hop_length, fs=sample_rate_hz, mfft=fft_points, fft_mode="onesided", scale_to=scaling
     )
 
     return stft_obj
 
 
 def stft_tukey(
-    timeseries: np.ndarray, sample_rate_hz: float or int, tukey_alpha: float, segment_length: int, overlap_length: int
+    timeseries: np.ndarray,
+    sample_rate_hz: float or int,
+    tukey_alpha: float,
+    segment_length: int,
+    overlap_length: int,
+    scaling: str = "magnitude",
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
@@ -57,11 +72,12 @@ def stft_tukey(
     :param tukey_alpha: shape parameter of the Tukey window
     :param segment_length: length of the segment
     :param overlap_length: length of the overlap
+    :param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
     :return: time, frequency, and magnitude of the STFT
     """
 
     # create the ShortTimeFFT object
-    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length)
+    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling)
 
     # calculate the STFT with detrending
     stft_magnitude = stft_obj.stft_detrend(x=timeseries, detr="constant")
@@ -75,22 +91,31 @@ def stft_tukey(
 
 # get inverse Short-Time Fourier Transform (iSTFT) with default parameters
 def istft_tukey(
-    stft_magnitude: np.ndarray,
+    stft_to_invert: np.ndarray,
     sample_rate_hz: float or int,
     tukey_alpha: float,
     segment_length: int,
     overlap_length: int,
-) -> np.ndarray:
+    scaling: str = "magnitude",
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class
 
-    :param stft_magnitude: magnitude of the STFT
+    :param stft_to_invert: The STFT to be inverted
     :param sample_rate_hz: sample rate of the signal
     :param tukey_alpha: shape parameter of the Tukey window
     :param segment_length: length of the segment
     :param overlap_length: length of the overlap
-    :return: iSTFT of the signal
+    :param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
+    :return: timestamps and iSTFT of the signal
     """
     # create the ShortTimeFFT object
-    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length)
-    return stft_obj.istft(stft_magnitude)
+    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling)
+
+    # The index of the last window where only half of the window contains the signal
+    last_window_index = int((np.shape(stft_to_invert)[1] - 1) * stft_obj.hop)
+
+    # return timestamps for the iSTFT that includes the full signal
+    timestamps = np.arange(start=0, stop=last_window_index / sample_rate_hz, step=1 / sample_rate_hz)
+
+    return timestamps, stft_obj.istft(stft_to_invert, k1=last_window_index)
