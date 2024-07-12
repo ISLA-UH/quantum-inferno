@@ -885,3 +885,86 @@ def plot_wf_mesh_vert(
     fig.subplots_adjust(bottom=0.1, hspace=0.13)
 
     return fig
+
+
+def plot_cw_and_power(
+        cw_panel_sig: np.ndarray,
+        power_panel_sigs: List[np.ndarray],
+        cw_panel_time: np.ndarray,
+        power_panel_freqs: List[np.ndarray],
+        power_panel_ls: List[str] = None,
+        power_panel_lw: List[int] = None,
+        power_panel_sig_labels: List[str] = None,
+        cw_panel_units: str = "Norm",
+        power_panel_y_units: str = "Power/Var(signal)",
+        power_panel_x_units: str = "Frequency, Hz",
+        params_tfr=AudioParams(),
+        units_time: str = "s",
+        cw_panel_title: str = "CW",
+        power_panel_title: str = "Power",
+        figure_title_show: bool = True,
+) -> None:
+    """
+    Template for CW and power plots
+    :param cw_panel_sig:
+    :param power_panel_sigs:
+    :param cw_panel_time:
+    :param power_panel_freqs:
+    :param power_panel_ls:
+    :param power_panel_lw:
+    :param cw_panel_units:
+    :param power_panel_y_units:
+    :param power_panel_x_units:
+    :param params_tfr:
+    :param units_time:
+    :param cw_panel_title:
+    :param power_panel_title:
+    :param figure_title_show:
+    :return:
+    """
+
+    # Catch cases where there may not be any data
+    time_xmin = cw_panel_time[0]
+    time_xmax = cw_panel_time[-1]
+    if time_xmin == time_xmax:
+        print("No data to plot.")
+        return
+
+    # Figure starts here
+    fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
+        1,
+        2,
+        figsize=(params_tfr.figure_parameters.figure_size_x, params_tfr.figure_parameters.figure_size_y),
+    )
+    fig: plt.Figure = fig_ax_tuple[0]
+    axes: List[plt.Axes] = fig_ax_tuple[1]
+    cw_panel: plt.Axes = axes[0]
+    power_panel: plt.Axes = axes[1]
+
+    if figure_title_show:
+        cw_panel.set_title(cw_panel_title, size=params_tfr.figure_parameters.text_size)
+        power_panel.set_title(power_panel_title, size=params_tfr.figure_parameters.text_size)
+
+    cw_panel.plot(cw_panel_time, cw_panel_sig)
+    cw_panel.set_ylabel(cw_panel_units, size=params_tfr.figure_parameters.text_size)
+    cw_panel.set_xlabel(f"Time ({units_time})", size=params_tfr.figure_parameters.text_size)
+    cw_panel.tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
+    cw_panel.tick_params(axis="y", which="both", left=True, labelleft=True, labelsize="large")
+    cw_panel.grid(True)
+
+    for i in range(len(power_panel_sigs)):
+        power_panel.semilogx(power_panel_freqs[i], power_panel_sigs[i],
+                             ls=power_panel_ls[i],
+                             lw=power_panel_lw[i],
+                             label=power_panel_sig_labels[i])
+
+    power_panel.set_ylabel(power_panel_y_units, size=params_tfr.figure_parameters.text_size)
+    power_panel.set_xlabel(f"Frequency ({power_panel_x_units})", size=params_tfr.figure_parameters.text_size)
+    power_panel.tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
+    power_panel.tick_params(axis="y", which="both", left=True, labelleft=True, labelsize="large")
+    power_panel.grid(True)
+    power_panel.legend()
+
+    fig.tight_layout()
+    fig.subplots_adjust()
+    return fig
