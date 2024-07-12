@@ -51,10 +51,24 @@ if __name__ == "__main__":
 
     signal_variance = np.var(signal_timeseries)
     signal_variance_nominal = 1 / 2.0
-
-    # Compute the STFT of the signal using the scipy.signal.stft function
     tukey_alpha = 0.25  # 25% Tukey (Cosine) window [if zero, rectangular window; if one, Hann window]
 
+    # Compute the welch PSD of the signal using the scipy.signal.welch function for comparison
+    frequency_welch_hz, psd_welch_power = signal.welch(
+        x=signal_timeseries,
+        fs=signal_sample_rate_hz,
+        window=("tukey", tukey_alpha),
+        nperseg=signal_number_of_fft_points,
+        noverlap=signal_number_of_fft_points // 2,
+        nfft=signal_number_of_fft_points,
+        detrend="constant",
+        return_onesided=True,
+        axis=-1,
+        scaling="spectrum",
+        average="mean",
+    )
+
+    # Compute the STFT of the signal using the scipy.signal.stft function
     stft_frequencies, stft_times, stft_magnitudes = signal.stft(
         x=signal_timeseries,
         fs=signal_sample_rate_hz,
@@ -83,8 +97,9 @@ if __name__ == "__main__":
     ShortTimeFFT_power = 2 * np.abs(ShortTimeFFT_magnitudes) ** 2
 
     # Compute the ratio of the PSD to the variance by averaging over the columns for the STFT
-    stft_over_var = np.average(stft_power, axis=1) / signal_variance
-    ShortTimeFFT_over_var = np.average(ShortTimeFFT_power, axis=1) / signal_variance
+    welch_over_variance = psd_welch_power / signal_variance
+    stft_over_variance = np.average(stft_power, axis=1) / signal_variance
+    ShortTimeFFT_over_variance = np.average(ShortTimeFFT_power, axis=1) / signal_variance
 
     # Conver to bits [log2(power)] with epsilon to avoid log(0)
     stft_bits = to_log2_with_epsilon(stft_power)
@@ -97,10 +112,12 @@ if __name__ == "__main__":
     print(f"The computed maximum power with scipy.signal.stft is {np.max(stft_power)}")
     print(f"The computed maximum power with scipy.signal.ShortTimeFFT is {np.max(ShortTimeFFT_power)}")
     print(
-        f"The STFTs are the same within taper: {np.allclose(stft_magnitudes[3:-3], ShortTimeFFT_magnitudes[3:-3], atol=1e-4)}"
+        f"The STFTs (Power) are the same within taper (tolerance: 1e-3): "
+        f"{np.allclose(stft_power[3:-3], ShortTimeFFT_power[3:-3], atol=1e-3)}"
     )
     print(
-        f"The average difference between the two STFT powers within taper: {np.mean(np.abs(stft_power[3:-3] - ShortTimeFFT_power[3:-3]))}"
+        f"The average difference between the two STFT powers within taper: "
+        f"{np.mean(np.abs(stft_power[3:-3] - ShortTimeFFT_power[3:-3]))}"
     )
 
     # Convert the stft and ShortTimeFFT back to a time series
@@ -145,17 +162,20 @@ if __name__ == "__main__":
 
     # Plot
     event_name = str(tone_frequency_hz) + " Hz Tone Test"
-
-    print(
-        len(signal_timeseries) / signal_sample_rate_hz,
-        len(istft_stft_timeseries) / signal_sample_rate_hz,
-        len(istft_ShortTimeFFT_timeseries) / signal_sample_rate_hz,
-    )
-    print(np.shape(stft_power), np.shape(ShortTimeFFT_power))
-
-    # Select plot frequencies
     fmin = 2 * signal_frequency_resolution_fft_hz
     fmax = signal_sample_rate_hz / 2  # Nyquist
+
+    plt.figure(figsize=(8, 6))
+    plt.title(f"Power / Variance Comparison, f = {signal_frequency_center_fft_hz:.3f} Hz")
+    plt.plot(frequency_welch_hz, welch_over_variance, label="Welch PSD / Variance", alpha=0.8)
+    plt.plot(stft_frequencies, stft_over_variance, ".-", label="STFT PSD / Variance", alpha=0.8)
+    plt.plot(ShortTimeFFT_frequencies, ShortTimeFFT_over_variance, "--", label="ShortTimeFFT PSD / Variance", alpha=0.8)
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("PSD / Variance")
+    plt.xscale("log")
+    plt.xlim([0.8, signal_sample_rate_hz / 2])
+    plt.grid()
+    plt.legend()
 
     pltq.plot_wf_mesh_vert(
         station_id=", Log2(1/2)=-1",
