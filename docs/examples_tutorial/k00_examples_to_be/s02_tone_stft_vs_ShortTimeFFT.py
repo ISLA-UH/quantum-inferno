@@ -90,6 +90,7 @@ if __name__ == "__main__":
         tukey_alpha=tukey_alpha,
         segment_length=signal_number_of_fft_points,
         overlap_length=signal_number_of_fft_points // 2,  # 50% overlap
+        scaling="magnitude",
     )
 
     # Since one-sided, multiply by 2 to get the full power
@@ -135,11 +136,12 @@ if __name__ == "__main__":
     )
 
     istft_ShortTimeFFT_time_s, istft_ShortTimeFFT_timeseries = istft_tukey(
-        stft_magnitude=ShortTimeFFT_magnitudes,
+        stft_to_invert=ShortTimeFFT_magnitudes,
         sample_rate_hz=signal_sample_rate_hz,
         tukey_alpha=tukey_alpha,
         segment_length=signal_number_of_fft_points,
         overlap_length=signal_number_of_fft_points // 2,
+        scaling="magnitude",
     )
 
     # check if same thing happens when getting the object
