@@ -5,7 +5,7 @@ Try to match all the defaults...
 
 import numpy as np
 from scipy import signal
-from typing import Tuple, Literal
+from typing import Tuple
 
 from quantum_inferno.utilities.calculations import round_value
 
