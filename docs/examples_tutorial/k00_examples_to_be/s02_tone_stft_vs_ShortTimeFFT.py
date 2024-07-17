@@ -81,6 +81,7 @@ if __name__ == "__main__":
         axis=-1,
         boundary="zeros",
         padded=True,
+        scaling="spectrum",
     )
 
     # Compute the STFT of the signal using the short_time_fft.stft_tukey function which uses scipy.signal.ShortTimeFFT
@@ -91,6 +92,7 @@ if __name__ == "__main__":
         segment_length=signal_number_of_fft_points,
         overlap_length=signal_number_of_fft_points // 2,  # 50% overlap
         scaling="magnitude",
+        padding="zeros",
     )
 
     # Since one-sided, multiply by 2 to get the full power
@@ -152,7 +154,7 @@ if __name__ == "__main__":
         segment_length=signal_number_of_fft_points,
         overlap_length=signal_number_of_fft_points // 2,
     )
-    check_stft = short_time_fft_object.stft_detrend(signal_timeseries, "constant")
+    check_stft = short_time_fft_object.stft_detrend(signal_timeseries, detr="constant", padding="zeros")
     check_istft = short_time_fft_object.istft(check_stft)
 
     print(f"Signal length: {len(signal_timeseries)}, duration: {len(signal_timeseries) / signal_sample_rate_hz}")
@@ -167,15 +169,23 @@ if __name__ == "__main__":
     fmin = 2 * signal_frequency_resolution_fft_hz
     fmax = signal_sample_rate_hz / 2  # Nyquist
 
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 6))
     plt.title(f"Power / Variance Comparison, f = {signal_frequency_center_fft_hz:.3f} Hz")
-    plt.plot(frequency_welch_hz, welch_over_variance, label="Welch PSD / Variance", alpha=0.8)
-    plt.plot(stft_frequencies, stft_over_variance, ".-", label="STFT PSD / Variance", alpha=0.8)
-    plt.plot(ShortTimeFFT_frequencies, ShortTimeFFT_over_variance, "--", label="ShortTimeFFT PSD / Variance", alpha=0.8)
+    plt.plot(
+        frequency_welch_hz, welch_over_variance, ".-", label="Welch Power from Spectrum / Variance", alpha=0.7, lw=2
+    )
+    plt.plot(stft_frequencies, stft_over_variance, ".--", label="STFT Power from Spectrum / Variance", alpha=0.7, lw=2)
+    plt.plot(
+        ShortTimeFFT_frequencies,
+        ShortTimeFFT_over_variance,
+        ".-.",
+        label="ShortTimeFFT Power from Spectrum / Variance",
+        alpha=0.7,
+        lw=2,
+    )
     plt.xlabel("Frequency (Hz)")
-    plt.ylabel("PSD / Variance")
-    plt.xscale("log")
-    plt.xlim([0.8, signal_sample_rate_hz / 2])
+    plt.ylabel("Power / Variance")
+    plt.xlim([signal_frequency_center_fft_hz - 20, signal_frequency_center_fft_hz + 20])
     plt.grid()
     plt.legend()
 

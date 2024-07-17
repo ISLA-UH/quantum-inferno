@@ -14,13 +14,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from quantum_inferno.synth import benchmark_signals
-import quantum_inferno.plot_templates.plot_cyberspectral as pltq
-from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
-from quantum_inferno.utilities.short_time_fft import stft_tukey, istft_tukey, get_stft_object_tukey
+from quantum_inferno.utilities.short_time_fft import stft_tukey, spectrogram_tukey
 
 print(__doc__)
-# TODO: ADD SPECTROGRAM COMPARISON
 
 
 if __name__ == "__main__":
@@ -90,23 +87,46 @@ if __name__ == "__main__":
     )
 
     # Compute the STFT magnitudes of the signal using the ShortTimeFFT class
-    ShortTimeFFT_frequencies, ShortTimeFFT_times, ShortTimeFFT_magnitudes = stft_tukey(
+    ShortTimeFFT_frequencies, ShortTimeFFT_times, ShortTimeFFT_stft_magnitudes = stft_tukey(
         timeseries=signal_timeseries,
         sample_rate_hz=signal_sample_rate_hz,
         tukey_alpha=tukey_alpha,
         segment_length=signal_number_of_fft_points,
         overlap_length=signal_number_of_fft_points // 2,  # 50% overlap
         scaling="magnitude",
+        padding="zeros",
+    )
+    # Compute the spectrogram magnitudes of the signal using the ShortTimeFFT class
+    _, _, ShortTimeFFT_spectrogram_magnitudes = spectrogram_tukey(
+        timeseries=signal_timeseries,
+        sample_rate_hz=signal_sample_rate_hz,
+        tukey_alpha=tukey_alpha,
+        segment_length=signal_number_of_fft_points,
+        overlap_length=signal_number_of_fft_points // 2,  # 50% overlap
+        scaling="magnitude",
+        padding="zeros",
     )
 
     # Compute the STFT power spectral density of the signal using the ShortTimeFFT class
-    _, _, ShortTimeFFT_psd = stft_tukey(
+    _, _, ShortTimeFFT_stft_psd = stft_tukey(
         timeseries=signal_timeseries,
         sample_rate_hz=signal_sample_rate_hz,
         tukey_alpha=tukey_alpha,
         segment_length=signal_number_of_fft_points,
         overlap_length=signal_number_of_fft_points // 2,  # 50% overlap
         scaling="psd",
+        padding="zeros",
+    )
+
+    # Compute the STFT power spectral density of the signal using the ShortTimeFFT class
+    _, _, ShortTimeFFT_spectrogram_psd = spectrogram_tukey(
+        timeseries=signal_timeseries,
+        sample_rate_hz=signal_sample_rate_hz,
+        tukey_alpha=tukey_alpha,
+        segment_length=signal_number_of_fft_points,
+        overlap_length=signal_number_of_fft_points // 2,  # 50% overlap
+        scaling="psd",
+        padding="zeros",
     )
 
     # Plot the Welch PSD and the ShortTimeFFT PSD
@@ -120,9 +140,16 @@ if __name__ == "__main__":
     )
     plt.plot(
         ShortTimeFFT_frequencies,
-        signal_frequency_resolution_fft_hz * 2 * np.mean(np.abs(ShortTimeFFT_psd) ** 2, axis=1) / signal_variance,
+        signal_frequency_resolution_fft_hz * 2 * np.mean(np.abs(ShortTimeFFT_stft_psd) ** 2, axis=1) / signal_variance,
         ".-",
-        label="ShortTimeFFT, PSD",
+        label="ShortTimeFFT, STFT PSD",
+        alpha=0.75,
+    )
+    plt.plot(
+        ShortTimeFFT_frequencies,
+        signal_frequency_resolution_fft_hz * np.mean(2 * ShortTimeFFT_spectrogram_psd, axis=1) / signal_variance,
+        "-.",
+        label="ShortTimeFFT, Spectrogram PSD",
         alpha=0.75,
     )
     plt.xlim([signal_frequency_center_fft_hz - 10, signal_frequency_center_fft_hz + 10])
@@ -137,9 +164,16 @@ if __name__ == "__main__":
     plt.plot(welch_frequency_hz, welch_spectrum / signal_variance, ".-", label="Welch, Spectrum", alpha=0.75)
     plt.plot(
         ShortTimeFFT_frequencies,
-        np.mean(2 * np.abs(ShortTimeFFT_magnitudes) ** 2, axis=1) / signal_variance,
+        np.mean(2 * np.abs(ShortTimeFFT_stft_magnitudes) ** 2, axis=1) / signal_variance,
         ".--",
-        label="ShortTimeFFT, Magnitudes",
+        label="ShortTimeFFT, STFT Magnitudes",
+        alpha=0.75,
+    )
+    plt.plot(
+        ShortTimeFFT_frequencies,
+        np.mean(2 * ShortTimeFFT_spectrogram_magnitudes, axis=1) / signal_variance,
+        "-.",
+        label="ShortTimeFFT, Spectrogram Magnitudes",
         alpha=0.75,
     )
     plt.xlim([signal_frequency_center_fft_hz - 10, signal_frequency_center_fft_hz + 10])
