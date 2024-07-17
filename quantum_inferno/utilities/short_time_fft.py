@@ -9,19 +9,13 @@ from typing import Tuple, Literal
 
 from quantum_inferno.utilities.calculations import round_value
 
-scaling_type = Literal["magnitude", "psd", None]
-padding_type = Literal["zeros", "edge", "even", "odd"]
-
-# TODO: ADD THE SPECTROGRAM FUNCTIONALITY
-
+# Create dictionaries for the types to avoid having to use Literal when running the functions
+scaling_type = ["magnitude", "psd", None]
+padding_type = ["zeros", "edge", "even", "odd"]
 
 # return the Short-Time Fourier Transform (STFT) object with default parameters
 def get_stft_object_tukey(
-    sample_rate_hz: float,
-    tukey_alpha: float,
-    segment_length: int,
-    overlap_length: int,
-    scaling: scaling_type = "magnitude",
+    sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = "magnitude"
 ) -> signal.ShortTimeFFT:
     """
     Return the Short-Time Fourier Transform (STFT) object with a Tukey window using ShortTimeFFT class
@@ -69,8 +63,8 @@ def stft_tukey(
     tukey_alpha: float,
     segment_length: int,
     overlap_length: int,
-    scaling: scaling_type = "magnitude",
-    padding: padding_type = "zeros",
+    scaling: str = "magnitude",
+    padding: str = "zeros",
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
@@ -110,7 +104,7 @@ def istft_tukey(
     tukey_alpha: float,
     segment_length: int,
     overlap_length: int,
-    scaling: scaling_type = "magnitude",
+    scaling: str = "magnitude",
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class
@@ -142,8 +136,8 @@ def spectrogram_tukey(
     tukey_alpha: float,
     segment_length: int,
     overlap_length: int,
-    scaling: scaling_type = "magnitude",
-    padding: padding_type = "zeros",
+    scaling: str = "magnitude",
+    padding: str = "zeros",
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate the Spectrogram of a signal with a Tukey window using ShortTimeFFT class
