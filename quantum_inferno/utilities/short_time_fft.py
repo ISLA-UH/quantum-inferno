@@ -13,6 +13,7 @@ from quantum_inferno.utilities.calculations import round_value
 scaling_type = ["magnitude", "psd", None]
 padding_type = ["zeros", "edge", "even", "odd"]
 
+
 # return the Short-Time Fourier Transform (STFT) object with default parameters
 def get_stft_object_tukey(
     sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = "magnitude"

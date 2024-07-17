@@ -9,7 +9,7 @@ from quantum_inferno.utilities import picker
 class TestPicker(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.signal, cls.timestamps, cls.time, cls.sample_rate, cls.freq_center, cls.resolution = well_tempered_tone()
+        cls.signal, cls.timestamps, _, cls.sample_rate, cls.freq_center, cls.resolution = well_tempered_tone()
         cls.two_peak_signal = np.array([0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -4, -3, -2, -1])
 
     def test_find_sample_rate_hz_from_timestamps(self):
