@@ -31,7 +31,6 @@ class TestPicker(unittest.TestCase):
         self.assertEqual(stft_obj.hop, self.fft_nd // 2)  # check hop length
         self.assertEqual(stft_obj.delta_f, self.resolution)
 
-
     def test_stft_tukey(self):
         frequencies, times, stfts = short_time_fft.stft_tukey(
             timeseries=self.signal,
@@ -78,3 +77,4 @@ class TestPicker(unittest.TestCase):
         self.assertEqual(times.shape[0], len(self.timestamps) // (self.fft_nd // 2) + 1)
         self.assertEqual(frequencies.shape, (self.fft_nd // 2 + 1,))
         self.assertEqual(spectrogram.shape, (self.fft_nd // 2 + 1, len(self.timestamps) // (self.fft_nd // 2) + 1))
+        print(frequencies)
