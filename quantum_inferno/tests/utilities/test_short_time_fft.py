@@ -77,4 +77,3 @@ class TestPicker(unittest.TestCase):
         self.assertEqual(times.shape[0], len(self.timestamps) // (self.fft_nd // 2) + 1)
         self.assertEqual(frequencies.shape, (self.fft_nd // 2 + 1,))
         self.assertEqual(spectrogram.shape, (self.fft_nd // 2 + 1, len(self.timestamps) // (self.fft_nd // 2) + 1))
-        # print(frequencies)
