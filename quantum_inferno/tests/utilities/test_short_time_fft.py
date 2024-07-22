@@ -1,10 +1,10 @@
 import unittest
 
 import numpy as np
+from scipy.signal import ShortTimeFFT
 
 from quantum_inferno.synth.benchmark_signals import well_tempered_tone
 from quantum_inferno.utilities import short_time_fft
-from scipy.signal import ShortTimeFFT
 
 
 class TestPicker(unittest.TestCase):
@@ -77,4 +77,4 @@ class TestPicker(unittest.TestCase):
         self.assertEqual(times.shape[0], len(self.timestamps) // (self.fft_nd // 2) + 1)
         self.assertEqual(frequencies.shape, (self.fft_nd // 2 + 1,))
         self.assertEqual(spectrogram.shape, (self.fft_nd // 2 + 1, len(self.timestamps) // (self.fft_nd // 2) + 1))
-        print(frequencies)
+        # print(frequencies)

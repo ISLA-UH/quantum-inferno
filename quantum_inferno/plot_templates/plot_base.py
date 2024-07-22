@@ -2,7 +2,7 @@
 Base classes, constants, and functions used to create plots
 """
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import cast, Literal, Optional, Tuple
 
 import numpy as np
 
@@ -75,6 +75,12 @@ class MeshBase:
             self.frequency_scaling = "log"
         if self.shading not in MESH_SHADING_VALS:
             self.shading = "auto"
+
+    def get_shading_as_literal(self) -> Literal["auto", "gouraud", "flat", "nearest"]:
+        """
+        :return: Literal value of the shading
+        """
+        return cast(Literal, self.shading)
 
 
 def mesh_colormap_limits(

@@ -82,8 +82,7 @@ def quantum_chirp(
     scale = scale_multiplier / omega
 
     # Chirp index gamma, blueshift
-    mu = np.sqrt(1 + gamma ** 2)
-    chirp_scale = scale * mu
+    chirp_scale = scale * np.sqrt(1 + gamma ** 2)
 
     # scale multiplier Mc
     window_support_points = 2.0 * np.pi * chirp_scale
@@ -123,6 +122,7 @@ def synth_00(
     """
     Generate three sine waves, oversample and decimate to AA
     Always work with non-dimensionalized units (number of points, Nyquist, etc.)
+    todo: finish comments
 
     :param frequency_0:
     :param frequency_1:
@@ -279,6 +279,7 @@ def well_tempered_tone(
 ) -> Tuple[np.ndarray, np.ndarray, int, float, float, float]:
     """
     Return a tone of unit amplitude and fixed frequency with a constant sample rate
+    todo: finish comments
 
     :param frequency_sample_rate_hz:
     :param frequency_center_hz:
@@ -325,15 +326,15 @@ def well_tempered_tone(
     # Convert to dimensionless time and frequency, which is typically used in mathematical formulas.
     # Scale by the sample rate.
     if use_fft_frequency:
-        frequency_center_fft = frequency_center_fft_hz / frequency_sample_rate_hz
+        f_c = frequency_center_fft_hz / frequency_sample_rate_hz
         # Construct synthetic tone with 2^n points and max FFT amplitude at exact fft frequency
-        mic_sig = np.cos(2.0 * np.pi * frequency_center_fft * time_nd)
+        # mic_sig = np.cos(2.0 * np.pi * frequency_center_fft * time_nd)
     else:
         # Dimensionless center frequency
-        frequency_center = frequency_center_hz / frequency_sample_rate_hz
+        f_c = frequency_center_hz / frequency_sample_rate_hz
         # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
         # It does NOT return unit amplitude (but it's close)
-        mic_sig = np.cos(2.0 * np.pi * frequency_center * time_nd)
+    mic_sig = np.cos(2.0 * np.pi * f_c * time_nd)
 
     if add_noise_taper_aa:
         # Add noise

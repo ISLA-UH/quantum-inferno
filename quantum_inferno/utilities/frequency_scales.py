@@ -1,13 +1,14 @@
 """
 Utilities for calculating frequencies for both linear and logarithmic scales.
 """
+from typing import Optional
 
 import numpy as np
 import scipy.signal as signal
 
 
 def get_linear_frequency_bins_range(
-    sample_rate_hz: float, segment_length: int, start_hz: float = None, end_hz: float = None
+    sample_rate_hz: float, segment_length: int, start_hz: Optional[float] = None, end_hz: Optional[float] = None
 ) -> np.ndarray:
     """
     Get the frequency bins with given sample rate and segment length that matches output from scipy.signal.spectrogram.
@@ -15,8 +16,8 @@ def get_linear_frequency_bins_range(
 
     :param sample_rate_hz: sample rate of the signal
     :param segment_length: length of the segment
-    :param start_hz: start frequency in Hz
-    :param end_hz: end frequency in Hz
+    :param start_hz: Optional start frequency in Hz.  If None, value is set to 0.  Default None
+    :param end_hz: Optional end frequency in Hz.  If None, value is set to sample_rate_hz / 2.  Default None
     :return: frequency bins
     """
     # Default values
@@ -27,17 +28,17 @@ def get_linear_frequency_bins_range(
 
     # Check values
     if start_hz < 0:
-        print(f"Waring: start_hz ({start_hz}) is less than 0, setting to 0")
+        print(f"Warning: start_hz ({start_hz}) is less than 0, setting to 0")
         start_hz = 0
     if end_hz > sample_rate_hz / 2:
-        print(f"Waring: end_hz ({end_hz}) is greater than Nyquist frequency, setting to Nyquist frequency")
+        print(f"Warning: end_hz ({end_hz}) is greater than Nyquist frequency, setting to Nyquist frequency")
         end_hz = sample_rate_hz / 2
     if start_hz > end_hz:
-        print(f"Waring: start_hz ({start_hz}) is greater than end_hz ({end_hz}), setting to 0 and Nyquist frequency")
+        print(f"Warning: start_hz ({start_hz}) is greater than end_hz ({end_hz}), setting to 0 and Nyquist frequency")
         start_hz = 0
         end_hz = sample_rate_hz / 2
     if segment_length < 0:
-        ValueError(f"sample_rate_hz ({sample_rate_hz}) is less than 0")
+        raise ValueError(f"segment_length ({segment_length}) is less than 0")
     if sample_rate_hz < 0:
         raise ValueError(f"sample_rate_hz ({sample_rate_hz}) is less than 0")
     if segment_length > sample_rate_hz:
@@ -69,6 +70,7 @@ def get_log_central_frequency_bins_range(
     """
     Get the central frequency bins with given sample rate, band order, start and end frequency.
     Default starts at 0 Hz and ends at Nyquist frequency.
+
     :param sample_rate_hz: sample rate of the signal
     :param band_order: band order
     :param start_hz: start frequency in Hz
@@ -83,13 +85,13 @@ def get_log_central_frequency_bins_range(
 
     # Check values
     if start_hz < 0:
-        print(f"Waring: start_hz ({start_hz}) is less than 0, setting to 0")
+        print(f"Warning: start_hz ({start_hz}) is less than 0, setting to 0")
         start_hz = 0
     if end_hz > sample_rate_hz / 2:
-        print(f"Waring: end_hz ({end_hz}) is greater than Nyquist frequency, setting to Nyquist frequency")
+        print(f"Warning: end_hz ({end_hz}) is greater than Nyquist frequency, setting to Nyquist frequency")
         end_hz = sample_rate_hz / 2
     if start_hz > end_hz:
-        print(f"Waring: start_hz ({start_hz}) is greater than end_hz ({end_hz}), setting to 0 and Nyquist frequency")
+        print(f"Warning: start_hz ({start_hz}) is greater than end_hz ({end_hz}), setting to 0 and Nyquist frequency")
         start_hz = 0
         end_hz = sample_rate_hz / 2
     if sample_rate_hz < 0:

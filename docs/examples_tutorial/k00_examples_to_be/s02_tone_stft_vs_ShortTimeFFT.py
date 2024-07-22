@@ -12,7 +12,7 @@ The number of time bins for the STFT is 33 (8192 / 256 + 1), where the additiona
 It may be beneficial to remove the last time bin, as it is not a full window.
 Additionally, for scipy.signal.istft, the function assumes the last window is a not full window.
 However, the ShortTimeFFT class assumes the last window is a full window and will return a longer time series.
-The method used in this examples, istft_tukey, will return a time series of the same length as the input signal.
+The method used in this example, istft_tukey, will return a time series of the same length as the input signal.
 
 """
 import numpy as np
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     stft_over_variance = np.average(stft_power, axis=1) / signal_variance
     ShortTimeFFT_over_variance = np.average(ShortTimeFFT_power, axis=1) / signal_variance
 
-    # Conver to bits [log2(power)] with epsilon to avoid log(0)
+    # Convert to bits [log2(power)] with epsilon to avoid log(0)
     stft_bits = to_log2_with_epsilon(stft_power)
     ShortTimeFFT_bits = to_log2_with_epsilon(ShortTimeFFT_power)
 

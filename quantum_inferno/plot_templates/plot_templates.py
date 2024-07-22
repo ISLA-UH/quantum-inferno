@@ -5,7 +5,7 @@ Base templates for plots:
 * 1 waveform, 1 mesh
 """
 import math
-from typing import cast, List, Literal, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from matplotlib.collections import QuadMesh
 from matplotlib.colorbar import Colorbar
@@ -247,7 +247,7 @@ def plot_wf_mesh_2_vert(
     if mesh_base.shading in ["auto", "gouraud"]:
         mesh_x = mesh_base.time
         mesh_y = mesh_base.frequency
-        shading = cast(Literal, mesh_base.shading)
+        shading = mesh_base.shading
     else:
         mesh_x = t_edge
         mesh_y = f_edge
@@ -369,7 +369,7 @@ def plot_wf_mesh_vt(
     if mesh_base.shading in ["auto", "gouraud"]:
         mesh_x = mesh_base.time
         mesh_y = mesh_base.frequency
-        shading = cast(Literal, mesh_base.shading)
+        shading = mesh_base.get_shading_as_literal()
     else:
         mesh_x = t_edge
         mesh_y = f_edge

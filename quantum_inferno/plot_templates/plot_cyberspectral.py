@@ -903,7 +903,7 @@ def plot_cw_and_power(
         cw_panel_title: str = "CW",
         power_panel_title: str = "Power",
         figure_title_show: bool = True,
-) -> None:
+) -> plt.Figure:
     """
     Template for CW and power plots
     :param cw_panel_sig:
@@ -912,6 +912,7 @@ def plot_cw_and_power(
     :param power_panel_freqs:
     :param power_panel_ls:
     :param power_panel_lw:
+    :param power_panel_sig_labels:
     :param cw_panel_units:
     :param power_panel_y_units:
     :param power_panel_x_units:
@@ -922,13 +923,12 @@ def plot_cw_and_power(
     :param figure_title_show:
     :return:
     """
-
     # Catch cases where there may not be any data
     time_xmin = cw_panel_time[0]
     time_xmax = cw_panel_time[-1]
     if time_xmin == time_xmax:
         print("No data to plot.")
-        return
+        return plt.Figure()
 
     # Figure starts here
     fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
@@ -937,9 +937,8 @@ def plot_cw_and_power(
         figsize=(params_tfr.figure_parameters.figure_size_x, params_tfr.figure_parameters.figure_size_y),
     )
     fig: plt.Figure = fig_ax_tuple[0]
-    axes: List[plt.Axes] = fig_ax_tuple[1]
-    cw_panel: plt.Axes = axes[0]
-    power_panel: plt.Axes = axes[1]
+    cw_panel: plt.Axes = fig_ax_tuple[1][0]
+    power_panel: plt.Axes = fig_ax_tuple[1][1]
 
     if figure_title_show:
         cw_panel.set_title(cw_panel_title, size=params_tfr.figure_parameters.text_size)
