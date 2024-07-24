@@ -14,7 +14,7 @@ from quantum_inferno.plot_templates import plot_templates as plt_tpl
 from quantum_inferno.plot_templates.plot_cyberspectral import mesh_time_frequency_edges
 
 
-def adjust_figure_height(figure_size_y: int, n_rows: int, n_rows_standard: int = 3) -> int:
+def adjust_figure_height(figure_size_y: int, n_rows: int, n_rows_standard: int = 2) -> int:
     """
     Adjust the figure height based on the number of rows to preserve standard panel aspect ratios
 
@@ -29,29 +29,27 @@ def adjust_figure_height(figure_size_y: int, n_rows: int, n_rows_standard: int =
 
 
 def plot_nwf_nmesh_vert(panels_dict: dict,
+                        plot_base: plt_base.PlotBase,
                         mesh_base: plt_base.MeshBase,
                         wf_base: plt_base.WaveformBase,
-                        start_time_epoch: float = 0,
-                        sanitize_times: bool = True,
-                        units_time: str = "s",
-                        fig_params=fa.FigureParameters(fa.AspectRatioType(3))):
+                        sanitize_times: bool = True,):
     """
     Plot n vertical panels - mesh (top panels) and time series waveforms (bottom panels)
     :param panels_dict: dictionary containing panel order (key), panel type ("panel_type" value), and the panel object
                         ("panel" value, either a MeshPanel or a WaveformPanel)
-    :param start_time_epoch: start time in epoch UTC. Default is 0.0
-    :param sanitize_times: if True (default), sanitize timestamps
-    :param units_time: units of time. Default is "s"
-    :param fig_params: figure parameter object. Default is FigureParameters(AspectRatioType(3))
+    :param plot_base: base params for plotting figure
     :param mesh_base: base params for plotting mesh panel(s)
     :param wf_base: base params for plotting wf panel(s)
+    :param sanitize_times: if True (default), sanitize timestamps
     :return: figure to plot
     """
     n: int = len(panels_dict)
-    time_label: str = plt_tpl.get_time_label(start_time_epoch, units_time)
-    epoch_start = panels_dict[n - 1]["panel"].time[0] if start_time_epoch == 0 and sanitize_times else start_time_epoch
-
-    # TODO: add checks for missing/mismatched data
+    time_label: str = plt_tpl.get_time_label(plot_base.start_time_epoch, plot_base.units_time)
+    if plot_base.start_time_epoch == 0 and sanitize_times:
+        epoch_start = panels_dict[n - 1]["panel"].time[0]
+    else:
+        epoch_start = plot_base.start_time_epoch
+    fig_params = plot_base.params_tfr
 
     # Time is in the center of the window, frequency is in the fft coefficient center.
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
@@ -83,6 +81,8 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
     )
     fig: plt.Figure = fig_ax_tuple[0]
     axes: List[plt.Axes] = fig_ax_tuple[1]
+
+    # format colorbar ticks
     all_cbar_ticks_lens: List[int] = []
     for i in range(len(panels_dict)):
         if panels_dict[i]["panel_type"] == "mesh":
@@ -91,24 +91,28 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
                 max(len(str(math.ceil(mesh_panel.color_min))), len(str(math.floor(mesh_panel.color_max)))))
     max_cbar_tick_len: int = sorted(all_cbar_ticks_lens)[-1]
     cbar_tick_fmt: str = f"%-{max_cbar_tick_len}s"
+
+    # main plotting loop
     for i in range(len(panels_dict)):
         if panels_dict[i]["panel_type"] == "mesh":
             mesh_panel = panels_dict[i]["panel"]
+            print(mesh_panel.color_min, mesh_panel.color_max)
+            mesh_panel.set_color_min_max()
+            print(mesh_panel.color_min, mesh_panel.color_max)
             if not mesh_panel.is_auto_color_min_max():
                 print(f"Mesh panel {i} color scaling with user inputs")
-            _ = axes[i].pcolormesh(mesh_x,
-                                   mesh_y,
-                                   mesh_panel.tfr,
-                                   vmin=mesh_panel.color_min,
-                                   vmax=mesh_panel.color_max,
-                                   cmap=mesh_base.colormap,
-                                   shading=shading,
-                                   snap=True)
+            pcolormesh_i = axes[i].pcolormesh(mesh_x,
+                                              mesh_y,
+                                              mesh_panel.tfr,
+                                              vmin=mesh_panel.color_min,
+                                              vmax=mesh_panel.color_max,
+                                              cmap=mesh_base.colormap,
+                                              shading=shading,
+                                              snap=True)
             mesh_panel_div: AxesDivider = make_axes_locatable(axes[i])
             mesh_panel_cax: plt.Axes = mesh_panel_div.append_axes("right", size="1%", pad="0.5%")
             mesh_panel_cbar: Colorbar = fig.colorbar(
-                axes[i].pcolormesh(t_edge, f_edge, mesh_panel.tfr, cmap=mesh_base.colormap,
-                                   shading=mesh_base.get_shading_as_literal()),
+                pcolormesh_i,
                 cax=mesh_panel_cax,
                 ticks=[math.ceil(mesh_panel.color_min), math.floor(mesh_panel.color_max)],
                 format=cbar_tick_fmt)
@@ -128,6 +132,15 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
             axes[i].tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
             axes[i].grid(True)
             axes[i].tick_params(axis="y", labelsize="large")
+            if wf_panel.yscaling == "auto":
+                axes[i].set_ylim(np.min(wf_panel.sig), np.max(wf_panel.sig))
+                axes[i].ticklabel_format(style="plain", scilimits=(0, 0), axis="y")
+            elif wf_panel.yscaling == "symmetric":
+                axes[i].set_ylim(-np.max(np.abs(wf_panel.sig)), np.max(np.abs(wf_panel.sig)))
+            elif wf_panel.yscaling == "positive":
+                axes[i].set_ylim(0, np.max(np.abs(wf_panel.sig)))
+            else:
+                axes[i].set_ylim(-10, 10)
             axes[i].ticklabel_format(style="plain", scilimits=(0, 0), axis="y")
             axes[i].yaxis.get_offset_text().set_x(-0.034)
             wf_panel_a_div: AxesDivider = make_axes_locatable(axes[i])
@@ -136,8 +149,9 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
         if i != 0 and i != n - 1:
             axes[i].margins(x=0)
 
-    fig.text(.5, .01, time_label, ha='center', size=wf_base.params_tfr.text_size)
-
+    if plot_base.figure_title_show:
+        axes[0].set_title(plot_base.figure_title)
+    fig.text(.5, .01, time_label, ha='center', size=fig_params.text_size)
     fig.align_ylabels(axes)
     fig.tight_layout()
     fig.subplots_adjust(bottom=.1, hspace=0.13)
@@ -209,12 +223,19 @@ def plot_wf_mesh_vert_example(
     :param figure_title_show: show title if True. Default is True
     :return: plot
     """
+    plot_base = plt_base.PlotBase(station_id=station_id,
+                                  figure_title=figure_title,
+                                  figure_title_show=figure_title_show,
+                                  start_time_epoch=start_time_epoch,
+                                  params_tfr=params_tfr,
+                                  units_time=units_time
+                                  )
     wf_base = plt_base.WaveformBase(station_id=station_id,
                                     label_panel_show=False,
                                     labels_fontweight=None,
                                     waveform_color=waveform_color,
                                     figure_title=figure_title,
-                                    figure_title_show=figure_title_show)
+                                    figure_title_show=figure_title_show,)
     mesh_base = plt_base.MeshBase(time=mesh_time, frequency=mesh_frequency,
                                   frequency_scaling=frequency_scaling, shading=mesh_shading,
                                   frequency_hz_ymin=frequency_hz_ymin,
@@ -231,10 +252,8 @@ def plot_wf_mesh_vert_example(
                                     cbar_units=mesh_panel_b_cbar_units, ytick_style=mesh_panel_b_ytick_style)
     fig = plot_nwf_nmesh_vert(
         {0: {"panel_type": "mesh", "panel": mesh_panel}, 1: {"panel_type": "wf", "panel": wf_panel}},
-        start_time_epoch=start_time_epoch,
+        plot_base=plot_base,
         sanitize_times=True,
-        units_time=units_time,
-        fig_params=params_tfr,
         mesh_base=mesh_base,
         wf_base=wf_base)
 
