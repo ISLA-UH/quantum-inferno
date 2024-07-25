@@ -14,25 +14,38 @@ from quantum_inferno.plot_templates import plot_templates as plt_tpl
 from quantum_inferno.plot_templates.plot_cyberspectral import mesh_time_frequency_edges
 
 
-def adjust_figure_height(figure_size_y: int, n_rows: int, n_rows_standard: int = 2) -> int:
+def adjust_figure_height(figure_size_y: int,
+                         n_rows: int,
+                         n_rows_standard: int = 2,
+                         hspace: float = 0.13
+                         ) -> List[float]:
     """
     Adjust the figure height based on the number of rows to preserve standard panel aspect ratios
-
     :param figure_size_y: figure size y
-    :param n_rows: number of rows
-    :param n_rows_standard: default 3 todo: what is this
-    :return: adjusted figure size y
+    :param n_rows: number of rows in figure
+    :param n_rows_standard: default 2, number of rows in the figure for which height is not adjusted
+    :param hspace: default 0.13, height space between panels, fraction of average panel height
+    :return: adjusted figure height, space param for title, space param for x label, space param for hspace
     """
-    # TODO: currently very rough estimate; factor in label sizes and whitespace
-    # todo: return type ambiguous, forcing int as default
-    return int(figure_size_y * n_rows / n_rows_standard)
+    # space needed for the time label = 10% of the base figure height
+    n_px_x_label: float = figure_size_y * 0.1
+    # space needed for the title = 6% of the base figure height
+    n_px_title: float = figure_size_y * 0.06
+    n_px_panel: float = (figure_size_y - n_px_x_label - n_px_title) / ((1. + hspace) * n_rows_standard - hspace)
+    n_px_hspace = hspace * n_px_panel
+    adjusted_figure_size_y: float = n_px_panel * n_rows + n_px_hspace * (n_rows - 1) + n_px_x_label + n_px_title
+    frac_title = 1 - n_px_title / adjusted_figure_size_y
+    frac_x_label = n_px_x_label / adjusted_figure_size_y
+    frac_hspace = n_px_hspace / adjusted_figure_size_y
+    print(frac_hspace, frac_hspace * adjusted_figure_size_y, n_px_hspace)
+    return [adjusted_figure_size_y, frac_title, frac_x_label, hspace]
 
 
 def plot_nwf_nmesh_vert(panels_dict: dict,
                         plot_base: plt_base.PlotBase,
                         mesh_base: plt_base.MeshBase,
                         wf_base: plt_base.WaveformBase,
-                        sanitize_times: bool = True,):
+                        sanitize_times: bool = True, ):
     """
     Plot n vertical panels - mesh (top panels) and time series waveforms (bottom panels)
     :param panels_dict: dictionary containing panel order (key), panel type ("panel_type" value), and the panel object
@@ -72,11 +85,12 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
         mesh_x = t_edge
         mesh_y = f_edge
         shading = None
+    [adj_fig_height, title_space, xlabel_space, hspace] = adjust_figure_height(fig_params.figure_size_y, n)
 
     fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
         n,
         1,
-        figsize=(fig_params.figure_size_x, adjust_figure_height(fig_params.figure_size_y, n)),
+        figsize=(fig_params.figure_size_x, adj_fig_height),
         sharex=True,
     )
     fig: plt.Figure = fig_ax_tuple[0]
@@ -96,9 +110,7 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
     for i in range(len(panels_dict)):
         if panels_dict[i]["panel_type"] == "mesh":
             mesh_panel = panels_dict[i]["panel"]
-            print(mesh_panel.color_min, mesh_panel.color_max)
             mesh_panel.set_color_min_max()
-            print(mesh_panel.color_min, mesh_panel.color_max)
             if not mesh_panel.is_auto_color_min_max():
                 print(f"Mesh panel {i} color scaling with user inputs")
             pcolormesh_i = axes[i].pcolormesh(mesh_x,
@@ -154,7 +166,7 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
     fig.text(.5, .01, time_label, ha='center', size=fig_params.text_size)
     fig.align_ylabels(axes)
     fig.tight_layout()
-    fig.subplots_adjust(bottom=.1, hspace=0.13)
+    fig.subplots_adjust(bottom=xlabel_space, top=title_space, hspace=hspace)
 
     return fig
 
@@ -235,7 +247,7 @@ def plot_wf_mesh_vert_example(
                                     labels_fontweight=None,
                                     waveform_color=waveform_color,
                                     figure_title=figure_title,
-                                    figure_title_show=figure_title_show,)
+                                    figure_title_show=figure_title_show, )
     mesh_base = plt_base.MeshBase(time=mesh_time, frequency=mesh_frequency,
                                   frequency_scaling=frequency_scaling, shading=mesh_shading,
                                   frequency_hz_ymin=frequency_hz_ymin,
@@ -252,6 +264,130 @@ def plot_wf_mesh_vert_example(
                                     cbar_units=mesh_panel_b_cbar_units, ytick_style=mesh_panel_b_ytick_style)
     fig = plot_nwf_nmesh_vert(
         {0: {"panel_type": "mesh", "panel": mesh_panel}, 1: {"panel_type": "wf", "panel": wf_panel}},
+        plot_base=plot_base,
+        sanitize_times=True,
+        mesh_base=mesh_base,
+        wf_base=wf_base)
+
+    return fig
+
+
+def plot_wf_mesh_mesh_vert_example(
+        station_id: str,
+        wf_panel_a_sig: np.ndarray,
+        wf_panel_a_time: np.ndarray,
+        mesh_time: np.ndarray,
+        mesh_frequency: np.ndarray,
+        mesh_panel_b_tfr: np.ndarray,
+        mesh_panel_c_tfr: np.ndarray,
+        params_tfr=plt_base.AudioParams(fa.AspectRatioType(3)),
+        wf_panel_a_yscaling: str = "auto",
+        wf_panel_a_ytick_style: str = "plain",
+        mesh_panel_b_ytick_style: str = "sci",
+        mesh_panel_c_ytick_style: str = "sci",
+        waveform_color: str = "midnightblue",
+        frequency_scaling: str = "log",
+        mesh_shading: str = "auto",
+        mesh_panel_b_colormap_scaling: str = "auto",
+        mesh_panel_b_color_max: float = 15,
+        mesh_panel_b_color_range: float = 15,
+        mesh_panel_b_color_min: float = 0,
+        mesh_panel_c_colormap_scaling: str = "auto",
+        mesh_panel_c_color_max: float = 15,
+        mesh_panel_c_color_range: float = 15,
+        mesh_panel_c_color_min: float = 0,
+        start_time_epoch: float = 0,
+        frequency_hz_ymin: float = None,
+        frequency_hz_ymax: float = None,
+        mesh_colormap: str = None,
+        units_time: str = "s",
+        units_frequency: str = "Hz",
+        wf_panel_a_units: str = "Norm",
+        mesh_panel_b_cbar_units: str = "bits",
+        mesh_panel_c_cbar_units: str = "bits",
+        figure_title: str = "Time-Frequency Representation",
+        figure_title_show: bool = True,
+):
+    """
+    Plot 3 vertical panels - mesh (top panel), mesh (middle panel) and signal waveform (bottom panel)
+
+    :param mesh_panel_b_ytick_style: y-tick style for the middle mesh panel
+    :param wf_panel_a_ytick_style: y-tick style for the waveform panel
+    :param wf_panel_a_yscaling: y-scaling for the waveform panel
+    :param mesh_panel_c_ytick_style: y-tick style for the top mesh panel
+    :param station_id: name of station
+    :param wf_panel_a_sig: array with signal waveform for bottom panel
+    :param wf_panel_a_time: array with signal timestamps for bottom panel
+    :param mesh_time: array with mesh time
+    :param mesh_frequency: array with mesh frequencies
+    :param mesh_panel_b_tfr: array with mesh tfr data for mesh plot (middle panel)
+    :param mesh_panel_c_tfr: array with mesh tfr data for mesh plot (top panel)
+    :param params_tfr: parameters for tfr. Check AudioParams().
+    :param frequency_scaling: "log" or "linear". Default is "log"
+    :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
+     :param mesh_panel_b_colormap_scaling: color scaling for mesh plot (middle panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_b_color_max, mesh_panel_b_color_range, mesh_panel_b_color_min). Default is "auto"
+    :param mesh_panel_b_color_max: maximum value for color scaling for mesh plot (middle panel). Default is 15.0
+    :param mesh_panel_b_color_range: range between maximum and minimum values in color scaling for mesh plot
+        (middle panel). Default is 15.0
+    :param mesh_panel_b_color_min: minimum value for color scaling for mesh plot (middle panel). Default is 0.0
+    :param mesh_panel_c_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_c_color_max, mesh_panel_c_color_range, mesh_panel_c_color_min). Default is "auto"
+    :param mesh_panel_c_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
+    :param mesh_panel_c_color_range:range between maximum and minimum values in color scaling for scatter plot
+        (top panel). Default is 15.0
+    :param mesh_panel_c_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
+    :param start_time_epoch: start time in epoch UTC. Default is 0.0
+    :param frequency_hz_ymin: minimum frequency for y-axis
+    :param frequency_hz_ymax: maximum frequency for y-axis
+    :param waveform_color: color of waveform for bottom panel. Default is "midnightblue"
+    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
+    :param units_time: units of time. Default is "s"
+    :param units_frequency: units of frequency. Default is "Hz"
+    :param wf_panel_a_units: units of waveform plot (bottom panel). Default is "Norm"
+    :param mesh_panel_b_cbar_units: units of colorbar for mesh plot (middle panel). Default is "bits"
+    :param mesh_panel_c_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
+    :param figure_title: title of figure. Default is "Time-Frequency Representation"
+    :param figure_title_show: show title if True. Default is True
+    :return: plot
+    """
+
+    plot_base = plt_base.PlotBase(station_id=station_id,
+                                  figure_title=figure_title,
+                                  figure_title_show=figure_title_show,
+                                  start_time_epoch=start_time_epoch,
+                                  params_tfr=params_tfr,
+                                  units_time=units_time
+                                  )
+    wf_base = plt_base.WaveformBase(station_id=station_id,
+                                    label_panel_show=False,
+                                    labels_fontweight=None,
+                                    waveform_color=waveform_color,
+                                    figure_title=figure_title,
+                                    figure_title_show=figure_title_show, )
+    mesh_base = plt_base.MeshBase(time=mesh_time, frequency=mesh_frequency,
+                                  frequency_scaling=frequency_scaling, shading=mesh_shading,
+                                  frequency_hz_ymin=frequency_hz_ymin,
+                                  frequency_hz_ymax=frequency_hz_ymax,
+                                  colormap=mesh_colormap,
+                                  units_frequency=units_frequency)
+    # build panels
+    wf_panel = plt_base.WaveformPanel(sig=wf_panel_a_sig, time=wf_panel_a_time, units=wf_panel_a_units, label="(wf)",
+                                      yscaling=wf_panel_a_yscaling, ytick_style=wf_panel_a_ytick_style)
+    mesh_panel_b = plt_base.MeshPanel(tfr=mesh_panel_b_tfr,
+                                      colormap_scaling=mesh_panel_b_colormap_scaling,
+                                      color_max=mesh_panel_b_color_max,
+                                      color_range=mesh_panel_b_color_range, color_min=mesh_panel_b_color_min,
+                                      cbar_units=mesh_panel_b_cbar_units, ytick_style=mesh_panel_b_ytick_style)
+    mesh_panel_c = plt_base.MeshPanel(tfr=mesh_panel_c_tfr,
+                                      colormap_scaling=mesh_panel_c_colormap_scaling,
+                                      color_max=mesh_panel_c_color_max,
+                                      color_range=mesh_panel_c_color_range, color_min=mesh_panel_c_color_min,
+                                      cbar_units=mesh_panel_c_cbar_units, ytick_style=mesh_panel_c_ytick_style)
+    fig = plot_nwf_nmesh_vert(
+        {0: {"panel_type": "mesh", "panel": mesh_panel_c},
+         1: {"panel_type": "mesh", "panel": mesh_panel_b},
+         2: {"panel_type": "wf", "panel": wf_panel}},
         plot_base=plot_base,
         sanitize_times=True,
         mesh_base=mesh_base,
