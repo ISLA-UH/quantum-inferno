@@ -4,6 +4,7 @@ Base classes, constants, and functions used to create plots
 from dataclasses import dataclass
 from typing import cast, Literal, Optional, Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from quantum_inferno.plot_templates.figure_attributes import AudioParams
@@ -196,3 +197,19 @@ class WaveformPanel:
             self.ytick_style = "plain"
         if self.yscaling not in WF_Y_SCALING_VALS:
             self.yscaling = "else"
+
+    def set_y_lims(self, axis: plt.Axes) -> plt.Axes:
+        """
+        :param axis: the axis to update y limits for
+        :return: updated axis with new y limits
+        """
+        if self.yscaling == "auto":
+            axis.set_ylim(np.min(self.sig), np.max(self.sig))
+            self.ytick_style = "plain"
+        elif self.yscaling == "symmetric":
+            axis.set_ylim(-np.max(np.abs(self.sig)), np.max(np.abs(self.sig)))
+        elif self.yscaling == "positive":
+            axis.set_ylim(0, np.max(np.abs(self.sig)))
+        else:
+            axis.set_ylim(-10, 10)
+        return axis

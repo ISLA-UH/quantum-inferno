@@ -5,7 +5,7 @@ Base templates for plots:
 * 1 waveform, 1 mesh
 """
 import math
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 from matplotlib.collections import QuadMesh
 from matplotlib.colorbar import Colorbar
@@ -15,6 +15,33 @@ import numpy as np
 
 import quantum_inferno.utilities.date_time as dt
 from quantum_inferno.plot_templates import plot_base as plt_base
+
+
+def adjust_figure_height(
+        figure_size_y: int,
+        n_rows: int,
+        n_rows_standard: int = 2,
+        hspace: float = 0.13
+) -> Tuple[float, float, float]:
+    """
+    Adjust the figure height based on the number of rows to preserve standard panel aspect ratios
+
+    :param figure_size_y: figure height
+    :param n_rows: number of rows in figure
+    :param n_rows_standard: number of rows in the figure for which height is not adjusted.  Default 2
+    :param hspace: height space between panels, fraction of average panel height.  Default 0.13
+    :return: adjusted figure height, space param for title, space param for x label
+    """
+    # space needed for the time label = 10% of the base figure height
+    n_px_x_label: float = figure_size_y * 0.1
+    # space needed for the title = 6% of the base figure height
+    n_px_title: float = figure_size_y * 0.06
+    n_px_panel: float = (figure_size_y - n_px_x_label - n_px_title) / ((1. + hspace) * n_rows_standard - hspace)
+    n_px_hspace = hspace * n_px_panel
+    adjusted_figure_size_y: float = n_px_panel * n_rows + n_px_hspace * (n_rows - 1) + n_px_x_label + n_px_title
+    frac_title = 1 - n_px_title / adjusted_figure_size_y
+    frac_x_label = n_px_x_label / adjusted_figure_size_y
+    return adjusted_figure_size_y, frac_title, frac_x_label
 
 
 def sanitize_timestamps(time_input: np.ndarray, start_epoch: Optional[float] = None) -> np.ndarray:
@@ -93,6 +120,129 @@ def mesh_time_frequency_edges(
         frequency_ymax = float(frequency_ymax)
 
     return t_edge, f_edge, frequency_ymin, frequency_ymax
+
+
+def plot_n_panels_vert(
+        wf_panel: plt_base.WaveformPanel,
+        panels: List[Union[plt_base.MeshPanel, plt_base.WaveformPanel]],
+        plot_base: plt_base.PlotBase,
+        mesh_base: plt_base.MeshBase,
+        sanitize_times: bool = True
+) -> plt.Figure:
+    """
+    Plot n vertical panels that are either mesh or time series waveforms in addition to the base waveform panel.
+    Mesh panels are placed above the waveforms.
+
+    :param wf_panel: WaveformPanel required for figure
+    :param panels: list of panels to display, in order of display
+    :param plot_base: base values for plotting
+    :param mesh_base: base values for mesh plots
+    :param sanitize_times: if True, sanitize timestamps.  Default True
+    :return: figure to display
+    """
+    panels.append(wf_panel)
+    num_panels: int = len(panels)
+    time_label: str = get_time_label(plot_base.start_time_epoch, plot_base.units_time)
+    # if we need to sanitize times and have a start epoch of 0, use the first timestamp, otherwise use plot base start
+    epoch_start = wf_panel.time[0] if plot_base.start_time_epoch == 0 and sanitize_times else plot_base.start_time_epoch
+    fig_params = plot_base.params_tfr
+
+    # Time is in the center of the window, frequency is in the fft coefficient center.
+    # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
+    # frequency and time must be increasing!
+    t_edge, f_edge, frequency_fix_ymin, frequency_fix_ymax = \
+        mesh_time_frequency_edges(frequency=mesh_base.frequency, time=mesh_base.time,
+                                  frequency_ymin=mesh_base.frequency_hz_ymin,
+                                  frequency_ymax=mesh_base.frequency_hz_ymax,
+                                  frequency_scaling=mesh_base.frequency_scaling)
+
+    wf_panel_n_time_zero = sanitize_timestamps(wf_panel.time, epoch_start)
+    time_xmin = wf_panel_n_time_zero[0]
+    time_xmax = t_edge[-1]
+
+    if mesh_base.shading in ["auto", "gouraud"]:
+        mesh_x = mesh_base.time
+        mesh_y = mesh_base.frequency
+        shading = mesh_base.get_shading_as_literal()
+    else:
+        mesh_x = t_edge
+        mesh_y = f_edge
+        shading = None
+    hspace = 0.13
+    adj_fig_height, title_space, xlabel_space = adjust_figure_height(fig_params.figure_size_y, num_panels)
+
+    fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
+        num_panels,
+        1,
+        figsize=(fig_params.figure_size_x, adj_fig_height),
+        sharex=True,
+    )
+    fig: plt.Figure = fig_ax_tuple[0]
+    axes: List[plt.Axes] = fig_ax_tuple[1]
+
+    # format colorbar ticks
+    all_cbar_ticks_lens: List[int] = []
+    for p in panels:
+        if isinstance(p, plt_base.MeshPanel):
+            all_cbar_ticks_lens.append(max(len(str(math.ceil(p.color_min))), len(str(math.floor(p.color_max)))))
+    max_cbar_tick_len: int = sorted(all_cbar_ticks_lens)[-1]
+    cbar_tick_fmt: str = f"%-{max_cbar_tick_len}s"
+
+    panel_index = 0
+    # main plotting loop
+    for p in panels:
+        if isinstance(p, plt_base.MeshPanel):
+            p.set_color_min_max()
+            if not p.is_auto_color_min_max():
+                print(f"Mesh panel {panel_index} color scaling with user inputs")
+            pcolormesh_i = axes[panel_index].pcolormesh(mesh_x,
+                                                        mesh_y,
+                                                        p.tfr,
+                                                        vmin=p.color_min,
+                                                        vmax=p.color_max,
+                                                        cmap=mesh_base.colormap,
+                                                        shading=shading,
+                                                        snap=True)
+            mesh_panel_div: AxesDivider = make_axes_locatable(axes[panel_index])
+            mesh_panel_cax: plt.Axes = mesh_panel_div.append_axes("right", size="1%", pad="0.5%")
+            mesh_panel_cbar: Colorbar = fig.colorbar(
+                pcolormesh_i,
+                cax=mesh_panel_cax,
+                ticks=[math.ceil(p.color_min), math.floor(p.color_max)],
+                format=cbar_tick_fmt)
+            mesh_panel_cbar.set_label(p.cbar_units, rotation=270, size=fig_params.text_size)
+            mesh_panel_cax.tick_params(labelsize="large")
+            axes[panel_index].set_ylabel(mesh_base.units_frequency, size=fig_params.text_size)
+            axes[panel_index].set_xlim(time_xmin, time_xmax)
+            axes[panel_index].set_ylim(frequency_fix_ymin, frequency_fix_ymax)
+            axes[panel_index].set_yscale(mesh_base.frequency_scaling)
+            axes[panel_index].tick_params(axis="x", which="both", bottom=False, labelbottom=False)
+            axes[panel_index].tick_params(axis="y", labelsize="large")
+        elif isinstance(p, plt_base.WaveformPanel):
+            axes[panel_index].plot(wf_panel_n_time_zero, p.sig)
+            axes[panel_index].set_ylabel(p.units, size=fig_params.text_size)
+            axes[panel_index].set_xlim(time_xmin, time_xmax)
+            axes[panel_index].tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
+            axes[panel_index].grid(True)
+            axes[panel_index].tick_params(axis="y", labelsize="large")
+            axes[panel_index] = p.set_y_lims(axes[panel_index])
+            axes[panel_index].ticklabel_format(style=p.ytick_style, scilimits=(0, 0), axis="y")
+            axes[panel_index].yaxis.get_offset_text().set_x(-0.034)
+            wf_panel_a_div: AxesDivider = make_axes_locatable(axes[panel_index])
+            wf_panel_a_cax: plt.Axes = wf_panel_a_div.append_axes("right", size="1%", pad="0.5%")
+            wf_panel_a_cax.axis("off")
+        if panel_index != 0 and panel_index != num_panels - 1:
+            axes[panel_index].margins(x=0)
+        panel_index += 1
+
+    if plot_base.figure_title_show:
+        axes[0].set_title(plot_base.figure_title)
+    fig.text(.5, .01, time_label, ha='center', size=fig_params.text_size)
+    fig.align_ylabels(axes)
+    fig.tight_layout()
+    fig.subplots_adjust(bottom=xlabel_space, top=title_space, hspace=hspace)
+
+    return fig
 
 
 def plot_wf_3_vert(
