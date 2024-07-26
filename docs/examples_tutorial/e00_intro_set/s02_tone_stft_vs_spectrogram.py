@@ -12,8 +12,10 @@ Welch power averaged over the signal duration is 1/2
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
+
+import quantum_inferno.plot_templates.plot_base as ptb
+from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert, plot_cw_and_power
 from quantum_inferno.synth import benchmark_signals
-import quantum_inferno.plot_templates.plot_cyberspectral as pltq
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 print(__doc__)
@@ -154,34 +156,14 @@ if __name__ == "__main__":
         "ACCEPT AND QUANTIFY COMPROMISE **"
     )
 
-    # Show the waveform and the averaged FFT over the whole record:
-    # fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(11, 6))
-    # ax1.plot(time_s, mic_sig)
-    # ax1.set_title("Synthetic CW with taper")
-    # ax1.set_xlabel("Time, s")
-    # ax1.set_ylabel("Norm")
-    # ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
-    # ax2.semilogx(frequency_spect_hz, spect_over_var, label="Spect", lw=2)
-    # ax2.semilogx(frequency_stft_hz, stft_over_var, "--", label="STFT", lw=1)
-    # ax2.set_title(f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz")
-    # ax2.set_xlabel("Frequency, Hz")
-    # ax2.set_ylabel("Power/VAR(signal)")
-    # ax2.grid(True)
-    # ax2.legend()
-
-    pltq.plot_cw_and_power(cw_panel_sig=mic_sig,
-                           cw_panel_time=time_s,
-                           power_panel_freqs=[frequency_welch_hz, frequency_spect_hz, frequency_stft_hz],
-                           power_panel_ls=["-", "-", "--"],
-                           power_panel_lw=[1, 2, 1],
-                           power_panel_sigs=[welch_over_var, spect_over_var, stft_over_var],
-                           power_panel_sig_labels=["Welch", "Spect", "STFT"],
-                           cw_panel_units="Norm",
-                           power_panel_x_units="Hz",
-                           power_panel_y_units="Power/VAR(signal)",
-                           units_time="s",
-                           cw_panel_title=f"Synthetic CW with {alpha*100:.2f}% taper",
-                           power_panel_title=f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz")
+    cw_panel = ptb.CwPanel(mic_sig, time_s, y_units="Norm", x_units="s",
+                           title=f"Synthetic CW with {alpha*100:.2f}% taper")
+    power_panel = ptb.PowerPanel([ptb.PowerPanelData(welch_over_var, frequency_welch_hz, "-", 1, "Welch"),
+                                  ptb.PowerPanelData(spect_over_var, frequency_spect_hz, "-", 2, "Spect"),
+                                  ptb.PowerPanelData(stft_over_var, frequency_stft_hz, "--", 1, "STFT")],
+                                 y_units="Power/VAR(signal)", x_units="Hz",
+                                 title=f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz")
+    fig = plot_cw_and_power(cw_panel, power_panel)
 
     # Plot the inverse stft (full recovery)
     fig2, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, constrained_layout=True, figsize=(11, 6), sharex="all")
@@ -198,36 +180,17 @@ if __name__ == "__main__":
     # Select plot frequencies
     fmin = 2 * frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
-    pltq.plot_wf_mesh_vert(
-        station_id="log$_2\\frac{1}{2}=-1$",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_spect_s,
-        mesh_frequency=frequency_spect_hz,
-        mesh_panel_b_tfr=mic_spect_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="log$_2$(Power)",
-        start_time_epoch=0,
-        figure_title=f"Spectrogram for {EVENT_NAME}",
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    wf_base = ptb.WaveformBase(station_id="log$_2\\frac{1}{2}=-1$",
+                               figure_title=f"Spectrogram for {EVENT_NAME}")
+    wf_panel = ptb.WaveformPanel(mic_sig, time_s)
+    mesh_base = ptb.MeshBase(time_spect_s, frequency_spect_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
+    mesh_panel = ptb.MeshPanel(mic_spect_bits, colormap_scaling="range", cbar_units="log$_2$(Power)")
+    spect = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
-    pltq.plot_wf_mesh_vert(
-        station_id="log$_2\\frac{1}{2}=-1$",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_stft_s,
-        mesh_frequency=frequency_stft_hz,
-        mesh_panel_b_tfr=mic_stft_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="log$_2$(Power)",
-        start_time_epoch=0,
-        figure_title=f"STFT for {EVENT_NAME}",
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    wf_base.figure_title = f"STFT for {EVENT_NAME}"
+    mesh_base.time = time_stft_s
+    mesh_base.frequency = frequency_stft_hz
+    mesh_panel.tfr = mic_stft_bits
+    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
     plt.show()

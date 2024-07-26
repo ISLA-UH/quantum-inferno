@@ -6,8 +6,10 @@ TODO: Select better scaling units to assess grain performance
 """
 import numpy as np
 import matplotlib.pyplot as plt
+
 from quantum_inferno import styx_stx, styx_cwt, styx_fft
-import quantum_inferno.plot_templates.plot_cyberspectral as pltq
+import quantum_inferno.plot_templates.plot_base as ptb
+from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 print(__doc__)
@@ -183,52 +185,25 @@ if __name__ == "__main__":
     fmin = 2 * frequency_resolution_stft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
 
-    pltq.plot_wf_mesh_vert(
-        station_id="",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_stft_s,
-        mesh_frequency=frequency_stft_hz,
-        mesh_panel_b_tfr=mic_stft_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title=f"STFT for {EVENT_NAME}, {ORDER_NUM}",
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    # Plot the STFT
+    wf_base = ptb.WaveformBase("", f"STFT for {EVENT_NAME}, {ORDER_NUM}")
+    wf_panel = ptb.WaveformPanel(mic_sig, time_s)
+    mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
+    mesh_panel = ptb.MeshPanel(mic_stft_bits, colormap_scaling="range", cbar_units="log$_2$(Power)")
+    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
-    pltq.plot_wf_mesh_vert(
-        station_id="",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_cwt_s,
-        mesh_frequency=frequency_cwt_hz,
-        mesh_panel_b_tfr=mic_cwt_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title=f"CWT for {EVENT_NAME}, {ORDER_NUM}",
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    # Plot the CWT
+    wf_base.figure_title = f"CWT for {EVENT_NAME}, {ORDER_NUM}"
+    mesh_base.time = time_cwt_s
+    mesh_base.frequency = frequency_cwt_hz
+    mesh_panel.tfr = mic_cwt_bits
+    cwt = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
-    pltq.plot_wf_mesh_vert(
-        station_id="",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_s,
-        mesh_frequency=frequency_stx_hz,
-        mesh_panel_b_tfr=mic_stx_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title=f"STX for {EVENT_NAME}, {ORDER_NUM}",
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    # Plot the STX
+    wf_base.figure_title = f"STX for {EVENT_NAME}, {ORDER_NUM}"
+    mesh_base.time = time_s
+    mesh_base.frequency = frequency_stx_hz
+    mesh_panel.tfr = mic_stx_bits
+    stx = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
     plt.show()

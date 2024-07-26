@@ -2,7 +2,7 @@
 Base classes, constants, and functions used to create plots
 """
 from dataclasses import dataclass
-from typing import cast, Literal, Optional, Tuple
+from typing import cast, List, Literal, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -213,3 +213,78 @@ class WaveformPanel:
         else:
             axis.set_ylim(-10, 10)
         return axis
+
+
+@dataclass
+class CwPanel:
+    """
+    Panel for Continuous Waveform plots
+
+    Attributes:
+        sig: np.ndarray, the signal to plot.  Required
+        time: np.ndarray, the timestamps of the data.  Required
+        y_units: str, units of the signal.  Default "Norm"
+        x_units: str, label for the time axis.  Default "s"
+        title: str, title for the panel.  Default "CW"
+    """
+    sig: np.ndarray
+    time: np.ndarray
+    y_units: str = "Norm"
+    x_units: str = "s"
+    title: str = "CW"
+
+    def is_no_data(self) -> bool:
+        """
+        :return: True if no data, False otherwise
+        """
+        return self.time[0] == self.time[-1]
+
+
+@dataclass
+class PowerPanelData:
+    """
+    Data to be plotted in a PowerPanel.  All values are required
+
+    Attributes:
+        sig: np.ndarray, the signal to plot.
+        freq: np.ndarray, the frequencies to plot.
+        linestyle: str, linestyle; all possible values:
+            [‘solid’ | ‘dashed’, ‘dashdot’, ‘dotted’ | '-' | '--' | '-.' | ':' | 'None' | ' ' | ''].
+        linewidth: float, linewidth.
+        sig_label: str, label for the signal.
+    """
+    sig: np.ndarray
+    freq: np.ndarray
+    linestyle: str
+    linewidth: float
+    sig_label: str
+
+
+@dataclass
+class PowerPanel:
+    """
+    Panel for Power plots
+
+    Attributes:
+        panel_data: List of PowerPanelData objects to plot.  Required
+        y_units: str, unit label for y-axis.  Default "Power/Var(signal)"
+        x_units: str, unit label for x-axis.  Default "Frequency, Hz"
+        title: str, title of the panel.  Default "Power"
+    """
+    panel_data: List[PowerPanelData]
+    y_units: str = "Power/Var(signal)"
+    x_units: str = "Frequency, Hz"
+    title: str = "Power"
+
+
+@dataclass
+class CwPowerPlotBase:
+    """
+    Base class for plotting CW and Power plots.
+
+    Attributes:
+        params_tfr: AudioParams, parameters for plotting data.  Default AudioParams()
+        figure_title_show: bool, if True, show the figure title.  Default True
+    """
+    params_tfr: AudioParams = AudioParams()
+    figure_title_show: bool = True

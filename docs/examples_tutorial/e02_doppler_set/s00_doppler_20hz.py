@@ -4,13 +4,16 @@ Doppler example: source and image from reflecting boundary
 
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.signal import spectrogram
+
 from quantum_inferno import scales_dyadic
-import quantum_inferno.synth.synthetics_NEW as synth
+from quantum_inferno.plot_templates import plot_base as ptb
+from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
 import quantum_inferno.synth.doppler as doppler
-import quantum_inferno.plot_templates.plot_cyberspectral as pltq
+import quantum_inferno.synth.synthetics_NEW as synth
+
 print(__doc__)
 
 
@@ -232,8 +235,8 @@ if __name__ == "__main__":
 
     # Shift relative to time of closest approach
     plot_inv_time_s = inv_time_receiver_s - inv_time_min_range_s
-    plot_inv_spect_time_s = t_center + inv_time_receiver_s[0] \
-                            - inv_time_min_range_s + 0.5 * nfft / inv_time_sample_rate_hz
+    plot_inv_spect_time_s = \
+        t_center + inv_time_receiver_s[0] - inv_time_min_range_s + 0.5 * nfft / inv_time_sample_rate_hz
 
     # Plot against Tca
     plt.figure(5, figsize=(8, 6))
@@ -266,21 +269,14 @@ if __name__ == "__main__":
     dB_colormin = dB_colormax - dB_range
 
     plt.style.use('dark_background')
-    fig = pltq.plot_wf_mesh_vert(station_id='synthetic',
-                                 wf_panel_a_sig=sig_wf,
-                                 wf_panel_a_time=time_wf_s,
-                                 mesh_time=t_center,
-                                 mesh_frequency=f_center,
-                                 mesh_panel_b_tfr=np.log2(synth_Sxx + scales_dyadic.EPSILON32),
-                                 mesh_panel_b_colormap_scaling="auto",
-                                 frequency_scaling=frequency_yscale,
-                                 wf_panel_a_units="Norm",
-                                 mesh_panel_b_cbar_units="bits",
-                                 start_time_epoch=0,
-                                 figure_title="STFT of Doppler Shift",
-                                 frequency_hz_ymin=frequency_hz_ymin,
-                                 frequency_hz_ymax=frequency_hz_ymax,
-                                 mesh_colormap='inferno',
-                                 waveform_color='yellow',
-                                 mesh_panel_b_ytick_style='plain')
+
+    wf_base = ptb.WaveformBase("synthetic", "STFT of Doppler Shift", waveform_color="yellow")
+    wf_panel = ptb.WaveformPanel(sig_wf, time_wf_s)
+    mesh_base = ptb.MeshBase(t_center, f_center, frequency_scaling=frequency_yscale,
+                             frequency_hz_ymin=frequency_hz_ymin, frequency_hz_ymax=frequency_hz_ymax,
+                             colormap="inferno")
+    mesh_panel = ptb.MeshPanel(np.log2(synth_Sxx + scales_dyadic.EPSILON32),
+                               colormap_scaling="auto", ytick_style="plain")
+    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+
     plt.show()

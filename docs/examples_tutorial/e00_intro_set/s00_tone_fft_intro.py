@@ -12,7 +12,7 @@ Nominal FFT power averaged over the signal duration is 1/2
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from quantum_inferno.utilities import calculations
+# from quantum_inferno.utilities import calculations
 print(__doc__)
 
 if __name__ == "__main__":
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     ax2.semilogx(frequency_fft_pos_hz, fft_abs_power)
     ax2.set_title(f"FFT Power, f = {frequency_center_fft_hz:.3f} Hz")
     ax2.set_xlabel('Frequency, Hz')
-    ax2.set_ylabel("$2\cdot\mid\\frac{RFFT}{N}\mid ^2$")
+    ax2.set_ylabel("$2\\cdot\\mid\\frac{RFFT}{N}\\mid ^2$")
     ax2.grid(True)
 
     plt.show()

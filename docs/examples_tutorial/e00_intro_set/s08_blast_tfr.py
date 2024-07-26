@@ -6,10 +6,12 @@ Use GT blast synthetic to compare time-frequency representations of explosion tr
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from quantum_inferno.synth import blast_pulse as kaboom
+
+import quantum_inferno.plot_templates.plot_base as ptb
+from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
 from quantum_inferno.styx_stx import tfr_stx_fft
-import quantum_inferno.plot_templates.plot_cyberspectral as pltq
+from quantum_inferno.synth import blast_pulse as kaboom
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 from quantum_inferno.utilities.window import get_tukey
 
@@ -20,8 +22,8 @@ if __name__ == "__main__":
     """
     Blast test
     """
-
-    # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
+    # alpha: Shape parameter of the Tukey window, representing the fraction of the window
+    # inside the cosine tapered region.
     # If zero, the Tukey window is equivalent to a rectangular window.
     # If one, the Tukey window is equivalent to a Hann window.
     alpha = 1
@@ -161,58 +163,29 @@ if __name__ == "__main__":
     ax2.grid(True)
     ax2.legend()
 
-    # plt.show()
-    # exit()
     # Select plot frequencies
     fmin = 2 * frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
 
-    pltq.plot_wf_mesh_vert(
-        station_id="00",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_stft_s,
-        mesh_frequency=frequency_stft_hz,
-        mesh_panel_b_tfr=mic_stft_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title="stft for " + EVENT_NAME,
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    # Plot the STFT
+    wf_base = ptb.WaveformBase("00", f"STFT for {EVENT_NAME}")
+    wf_panel = ptb.WaveformPanel(mic_sig, time_s)
+    mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
+    mesh_panel = ptb.MeshPanel(mic_stft_bits, colormap_scaling="range", cbar_units="log$_2$(Power)")
+    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
-    pltq.plot_wf_mesh_vert(
-        station_id="00",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_cwt_s,
-        mesh_frequency=frequency_cwt_hz,
-        mesh_panel_b_tfr=mic_cwt_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title="cwt for " + EVENT_NAME,
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    # Plot the CWT
+    wf_base.figure_title = f"CWT for {EVENT_NAME}"
+    mesh_base.time = time_cwt_s
+    mesh_base.frequency = frequency_cwt_hz
+    mesh_panel.tfr = mic_cwt_bits
+    cwt = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
-    pltq.plot_wf_mesh_vert(
-        station_id="00",
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_s,
-        mesh_frequency=frequency_stx_hz,
-        mesh_panel_b_tfr=mic_stx_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title="STX for " + EVENT_NAME,
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    # Plot the STX
+    wf_base.figure_title = f"STX for {EVENT_NAME}"
+    mesh_base.time = time_s
+    mesh_base.frequency = frequency_stx_hz
+    mesh_panel.tfr = mic_stx_bits
+    stx = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
     plt.show()

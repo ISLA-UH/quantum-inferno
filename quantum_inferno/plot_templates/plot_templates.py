@@ -459,7 +459,7 @@ def plot_wf_mesh_2_vert(
     return fig
 
 
-def plot_wf_mesh_vt(
+def plot_wf_mesh_vert(
         wf_base: plt_base.WaveformBase,
         wf_panel: plt_base.WaveformPanel,
         mesh_base: plt_base.MeshBase,
@@ -544,7 +544,10 @@ def plot_wf_mesh_vt(
                                 size=wf_base.params_tfr.text_size)
     mesh_panel_b_cax.tick_params(labelsize='large')
     if wf_base.figure_title_show:
-        fig_mesh_panel_b.set_title(f"{wf_base.figure_title} at Station {wf_base.station_id}")
+        title = f"{wf_base.figure_title}"
+        if wf_base.station_id:
+            title += f" at Station {wf_base.station_id}"
+        fig_mesh_panel_b.set_title(title)
     fig_mesh_panel_b.set_ylabel(mesh_base.units_frequency, size=wf_base.params_tfr.text_size)
     fig_mesh_panel_b.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
     fig_mesh_panel_b.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
@@ -584,4 +587,57 @@ def plot_wf_mesh_vt(
     fig.tight_layout()
     fig.subplots_adjust(bottom=.1, hspace=0.13)
 
+    return fig
+
+
+def plot_cw_and_power(
+        cw_panel: plt_base.CwPanel,
+        power_panel: plt_base.PowerPanel,
+        cw_plot_base: plt_base.CwPowerPlotBase = plt_base.CwPowerPlotBase()
+) -> plt.Figure:
+    """
+    Template for CW and power plots
+
+    :param cw_panel: CW panel to plot
+    :param power_panel: Power panel to plot
+    :param cw_plot_base: base parameters for plotting
+    :return: Figure to plot
+    """
+    # Catch cases where there may not be any data
+    if cw_panel.is_no_data():
+        print("No data to plot.")
+        return plt.Figure()
+
+    # Figure starts here
+    fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
+        2,
+        1,
+        figsize=(cw_plot_base.params_tfr.figure_size_x, cw_plot_base.params_tfr.figure_size_y),
+    )
+    fig: plt.Figure = fig_ax_tuple[0]
+    fig_cw_panel: plt.Axes = fig_ax_tuple[1][0]
+    fig_power_panel: plt.Axes = fig_ax_tuple[1][1]
+
+    if cw_plot_base.figure_title_show:
+        fig_cw_panel.set_title(cw_panel.title, size=cw_plot_base.params_tfr.text_size)
+        fig_power_panel.set_title(power_panel.title, size=cw_plot_base.params_tfr.text_size)
+
+    fig_cw_panel.plot(cw_panel.time, cw_panel.sig)
+    fig_cw_panel.set_ylabel(cw_panel.y_units, size=cw_plot_base.params_tfr.text_size)
+    fig_cw_panel.set_xlabel(f"Time ({cw_panel.x_units})", size=cw_plot_base.params_tfr.text_size)
+    fig_cw_panel.tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
+    fig_cw_panel.tick_params(axis="y", which="both", left=True, labelleft=True, labelsize="large")
+    fig_cw_panel.grid(True)
+
+    for i in power_panel.panel_data:
+        fig_power_panel.semilogx(i.freq, i.sig, ls=i.linestyle, lw=i.linewidth, label=i.sig_label)
+    fig_power_panel.set_ylabel(power_panel.y_units, size=cw_plot_base.params_tfr.text_size)
+    fig_power_panel.set_xlabel(f"Frequency ({power_panel.x_units})", size=cw_plot_base.params_tfr.text_size)
+    fig_power_panel.tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
+    fig_power_panel.tick_params(axis="y", which="both", left=True, labelleft=True, labelsize="large")
+    fig_power_panel.grid(True)
+    fig_power_panel.legend()
+
+    fig.tight_layout()
+    fig.subplots_adjust()
     return fig

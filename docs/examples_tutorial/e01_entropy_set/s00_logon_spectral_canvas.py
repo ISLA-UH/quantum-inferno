@@ -3,12 +3,15 @@ Inferno example s00_logon_spectral_canvas.
 Define the cyberspectral canvas from a knowledge of the signal center frequency and passband.
 Compute a periodogram and a spectrogram of a Gabor wavelet (logon, grain) over sliding windows.
 The Welch method is equivalent to averaging the spectrogram over the columns.
+todo: runs out of memory when running
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 from quantum_inferno import styx_fft, styx_cwt, scales_dyadic
-import quantum_inferno.plot_templates.plot_cyberspectral as pltq
+import quantum_inferno.plot_templates.plot_base as ptb
+from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
 from quantum_inferno.utilities.calculations import get_num_points
 
 print(__doc__)
@@ -79,7 +82,7 @@ if __name__ == "__main__":
         output_unit="points",
     )
     # dyadic number of points
-    time_fft_nd = 2 ** ave_points_ceil_log2
+    time_fft_nd: int = 2 ** ave_points_ceil_log2
     # Scale the total number of points to the averaging window
     time_nd = time_fft_nd * 2
 
@@ -154,8 +157,8 @@ if __name__ == "__main__":
     # The Tukey taper window can be adjusted for smoothness.
     tukey_alpha = 1
     # The overlap can make the results prettier at the expense of redundancy and computation cost
-    fractional_overlap = 0.95
-    overlap_pts = np.round(fractional_overlap * time_fft_nd)
+    fractional_overlap: float = 0.95
+    overlap_pts: int = int(np.round(fractional_overlap * time_fft_nd))
 
     # Compute the Welch PSD; averaged spectrum over sliding Tukey windows
     frequency_welch_hz, psd_welch_power = styx_fft.welch_power_pow2(
@@ -214,56 +217,23 @@ if __name__ == "__main__":
     ax2.grid(True)
     ax2.legend()
 
-    # plt.show()
-    # exit()
-    # plt.figure()
-    # plt.plot(cwt_information_bits_per_sample)
-
     # Select plot frequencies
     fmin = frequency_averaging_hz
     fmax = frequency_nyquist_hz
-    # +EPSILON16 reduces numerical noise artifacts
+
     plt.style.use("dark_background")
     # Tukey STFT
-    pltq.plot_wf_mesh_vert(
-        station_id=station_id_str,
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_stft_s,
-        mesh_frequency=frequency_stft_hz,
-        mesh_panel_b_tfr=np.log2(stft_power + scales_dyadic.EPSILON16),
-        mesh_panel_b_colormap_scaling="auto",
-        frequency_scaling="linear",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title="STFT Tukey Taper",
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-        mesh_colormap="inferno",
-        waveform_color="yellow",
-        mesh_panel_b_ytick_style="plain",
-    )
+    wf_base = ptb.WaveformBase(station_id_str, f"STFT Tukey Taper", waveform_color="yellow")
+    wf_panel = ptb.WaveformPanel(mic_sig, time_s)
+    mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_scaling="linear",
+                             frequency_hz_ymin=fmin, frequency_hz_ymax=fmax, colormap="inferno")
+    mesh_panel = ptb.MeshPanel(np.log2(stft_power + scales_dyadic.EPSILON16),
+                               colormap_scaling="auto", ytick_style="plain")
+    tukey = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
     # Gauss STFT
-    pltq.plot_wf_mesh_vert(
-        station_id=station_id_str,
-        wf_panel_a_sig=mic_sig,
-        wf_panel_a_time=time_s,
-        mesh_time=time_stft_s,
-        mesh_frequency=frequency_stft_hz,
-        mesh_panel_b_tfr=np.log2(stft_power_gauss + scales_dyadic.EPSILON16),
-        mesh_panel_b_colormap_scaling="auto",
-        frequency_scaling="linear",
-        wf_panel_a_units="Norm",
-        mesh_panel_b_cbar_units="bits",
-        start_time_epoch=0,
-        figure_title="STFT Gaussian Taper",
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-        mesh_colormap="inferno",
-        waveform_color="yellow",
-        mesh_panel_b_ytick_style="plain",
-    )
+    wf_base.figure_title = f"STFT Gaussian Taper"
+    mesh_panel.tfr = np.log2(stft_power_gauss + scales_dyadic.EPSILON16)
+    gauss = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
     plt.show()

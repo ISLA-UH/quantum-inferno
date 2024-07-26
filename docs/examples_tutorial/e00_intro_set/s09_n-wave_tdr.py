@@ -1,12 +1,13 @@
 """
-libquantum example: nwave_tdr_highpass
+Quantum inferno example: nwave_tdr_highpass
 Constructs and processes N wave
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.signal as signal
+
 from quantum_inferno import styx_fft
 from quantum_inferno.synth import synthetics_NEW
-import scipy.signal as signal
 
 
 print(__doc__)

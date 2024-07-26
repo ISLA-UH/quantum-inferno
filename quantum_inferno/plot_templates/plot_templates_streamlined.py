@@ -1,5 +1,10 @@
 """
 This module contains updated and streamlined versions of the quantum inferno plot templates.
+These functions are intended to run with the full set of parameters for each chart, without the
+user knowing the underlying classes that group the values.
+todo: Pretty sure if there's a better way to present this to users, considering the enormous amount of params
+    required to create one plot
+Some of these functions have been co-opted into plot_templates
 """
 from typing import List, Tuple, Union
 import math
@@ -11,21 +16,22 @@ from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable, AxesDivide
 from quantum_inferno.plot_templates import plot_base as plt_base
 from quantum_inferno.plot_templates import figure_attributes as fa
 from quantum_inferno.plot_templates import plot_templates as plt_tpl
-from quantum_inferno.plot_templates.plot_cyberspectral import mesh_time_frequency_edges
 
 
-def adjust_figure_height(figure_size_y: int,
-                         n_rows: int,
-                         n_rows_standard: int = 2,
-                         hspace: float = 0.13
-                         ) -> List[float]:
+def adjust_figure_height(
+        figure_size_y: int,
+        n_rows: int,
+        n_rows_standard: int = 2,
+        hspace: float = 0.13
+) -> List[float]:
     """
     Adjust the figure height based on the number of rows to preserve standard panel aspect ratios
-    :param figure_size_y: figure size y
+
+    :param figure_size_y: figure height
     :param n_rows: number of rows in figure
-    :param n_rows_standard: default 2, number of rows in the figure for which height is not adjusted
-    :param hspace: default 0.13, height space between panels, fraction of average panel height
-    :return: adjusted figure height, space param for title, space param for x label, space param for hspace
+    :param n_rows_standard: number of rows in the figure for which height is not adjusted.  Default 2
+    :param hspace: height space between panels, fraction of average panel height.  Default 0.13
+    :return: adjusted figure height, space param for title, space param for x label
     """
     # space needed for the time label = 10% of the base figure height
     n_px_x_label: float = figure_size_y * 0.1
@@ -36,15 +42,14 @@ def adjust_figure_height(figure_size_y: int,
     adjusted_figure_size_y: float = n_px_panel * n_rows + n_px_hspace * (n_rows - 1) + n_px_x_label + n_px_title
     frac_title = 1 - n_px_title / adjusted_figure_size_y
     frac_x_label = n_px_x_label / adjusted_figure_size_y
-    frac_hspace = n_px_hspace / adjusted_figure_size_y
-    print(frac_hspace, frac_hspace * adjusted_figure_size_y, n_px_hspace)
-    return [adjusted_figure_size_y, frac_title, frac_x_label, hspace]
+    # frac_hspace = n_px_hspace / adjusted_figure_size_y
+    # print(frac_hspace, frac_hspace * adjusted_figure_size_y, n_px_hspace)
+    return [adjusted_figure_size_y, frac_title, frac_x_label]
 
 
 def plot_nwf_nmesh_vert(panels_dict: dict,
                         plot_base: plt_base.PlotBase,
                         mesh_base: plt_base.MeshBase,
-                        wf_base: plt_base.WaveformBase,
                         sanitize_times: bool = True, ):
     """
     Plot n vertical panels - mesh (top panels) and time series waveforms (bottom panels)
@@ -52,7 +57,6 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
                         ("panel" value, either a MeshPanel or a WaveformPanel)
     :param plot_base: base params for plotting figure
     :param mesh_base: base params for plotting mesh panel(s)
-    :param wf_base: base params for plotting wf panel(s)
     :param sanitize_times: if True (default), sanitize timestamps
     :return: figure to plot
     """
@@ -68,10 +72,10 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
     # frequency and time must be increasing!
     t_edge, f_edge, frequency_fix_ymin, frequency_fix_ymax = \
-        mesh_time_frequency_edges(frequency=mesh_base.frequency, time=mesh_base.time,
-                                  frequency_ymin=mesh_base.frequency_hz_ymin,
-                                  frequency_ymax=mesh_base.frequency_hz_ymax,
-                                  frequency_scaling=mesh_base.frequency_scaling)
+        plt_tpl.mesh_time_frequency_edges(frequency=mesh_base.frequency, time=mesh_base.time,
+                                          frequency_ymin=mesh_base.frequency_hz_ymin,
+                                          frequency_ymax=mesh_base.frequency_hz_ymax,
+                                          frequency_scaling=mesh_base.frequency_scaling)
 
     wf_panel_n_time_zero = plt_tpl.sanitize_timestamps(panels_dict[n - 1]["panel"].time, epoch_start)
     time_xmin = wf_panel_n_time_zero[0]
@@ -85,7 +89,8 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
         mesh_x = t_edge
         mesh_y = f_edge
         shading = None
-    [adj_fig_height, title_space, xlabel_space, hspace] = adjust_figure_height(fig_params.figure_size_y, n)
+    hspace = 0.13
+    [adj_fig_height, title_space, xlabel_space] = adjust_figure_height(fig_params.figure_size_y, n)
 
     fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
         n,
@@ -192,7 +197,6 @@ def plot_wf_mesh_vert_example(
         frequency_hz_ymin: float = None,
         frequency_hz_ymax: float = None,
         mesh_colormap: str = None,
-        waveform_color: str = None,
         units_time: str = "s",
         units_frequency: str = "Hz",
         wf_panel_a_units: str = "Norm",
@@ -223,7 +227,6 @@ def plot_wf_mesh_vert_example(
     :param start_time_epoch: start time in epoch UTC. Default is 0.0
     :param frequency_hz_ymin: minimum frequency for y-axis
     :param frequency_hz_ymax: maximum frequency for y-axis
-    :param waveform_color: color of waveform for bottom panel. Default is "midnightblue"
     :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. If None, inherits style sheet spec
     :param units_time: units of time. Default is "s"
     :param units_frequency: units of frequency. Default is "Hz"
@@ -242,12 +245,6 @@ def plot_wf_mesh_vert_example(
                                   params_tfr=params_tfr,
                                   units_time=units_time
                                   )
-    wf_base = plt_base.WaveformBase(station_id=station_id,
-                                    label_panel_show=False,
-                                    labels_fontweight=None,
-                                    waveform_color=waveform_color,
-                                    figure_title=figure_title,
-                                    figure_title_show=figure_title_show, )
     mesh_base = plt_base.MeshBase(time=mesh_time, frequency=mesh_frequency,
                                   frequency_scaling=frequency_scaling, shading=mesh_shading,
                                   frequency_hz_ymin=frequency_hz_ymin,
@@ -266,8 +263,7 @@ def plot_wf_mesh_vert_example(
         {0: {"panel_type": "mesh", "panel": mesh_panel}, 1: {"panel_type": "wf", "panel": wf_panel}},
         plot_base=plot_base,
         sanitize_times=True,
-        mesh_base=mesh_base,
-        wf_base=wf_base)
+        mesh_base=mesh_base)
 
     return fig
 
@@ -285,7 +281,6 @@ def plot_wf_mesh_mesh_vert_example(
         wf_panel_a_ytick_style: str = "plain",
         mesh_panel_b_ytick_style: str = "sci",
         mesh_panel_c_ytick_style: str = "sci",
-        waveform_color: str = "midnightblue",
         frequency_scaling: str = "log",
         mesh_shading: str = "auto",
         mesh_panel_b_colormap_scaling: str = "auto",
@@ -326,13 +321,15 @@ def plot_wf_mesh_mesh_vert_example(
     :param frequency_scaling: "log" or "linear". Default is "log"
     :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
      :param mesh_panel_b_colormap_scaling: color scaling for mesh plot (middle panel). One of: "auto", "range" or "else"
-        (use inputs given in mesh_panel_b_color_max, mesh_panel_b_color_range, mesh_panel_b_color_min). Default is "auto"
+        (use inputs given in mesh_panel_b_color_max, mesh_panel_b_color_range, mesh_panel_b_color_min).
+        Default is "auto"
     :param mesh_panel_b_color_max: maximum value for color scaling for mesh plot (middle panel). Default is 15.0
     :param mesh_panel_b_color_range: range between maximum and minimum values in color scaling for mesh plot
         (middle panel). Default is 15.0
     :param mesh_panel_b_color_min: minimum value for color scaling for mesh plot (middle panel). Default is 0.0
     :param mesh_panel_c_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
-        (use inputs given in mesh_panel_c_color_max, mesh_panel_c_color_range, mesh_panel_c_color_min). Default is "auto"
+        (use inputs given in mesh_panel_c_color_max, mesh_panel_c_color_range, mesh_panel_c_color_min).
+        Default is "auto"
     :param mesh_panel_c_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
     :param mesh_panel_c_color_range:range between maximum and minimum values in color scaling for scatter plot
         (top panel). Default is 15.0
@@ -340,7 +337,6 @@ def plot_wf_mesh_mesh_vert_example(
     :param start_time_epoch: start time in epoch UTC. Default is 0.0
     :param frequency_hz_ymin: minimum frequency for y-axis
     :param frequency_hz_ymax: maximum frequency for y-axis
-    :param waveform_color: color of waveform for bottom panel. Default is "midnightblue"
     :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
     :param units_time: units of time. Default is "s"
     :param units_frequency: units of frequency. Default is "Hz"
@@ -351,7 +347,6 @@ def plot_wf_mesh_mesh_vert_example(
     :param figure_title_show: show title if True. Default is True
     :return: plot
     """
-
     plot_base = plt_base.PlotBase(station_id=station_id,
                                   figure_title=figure_title,
                                   figure_title_show=figure_title_show,
@@ -359,12 +354,6 @@ def plot_wf_mesh_mesh_vert_example(
                                   params_tfr=params_tfr,
                                   units_time=units_time
                                   )
-    wf_base = plt_base.WaveformBase(station_id=station_id,
-                                    label_panel_show=False,
-                                    labels_fontweight=None,
-                                    waveform_color=waveform_color,
-                                    figure_title=figure_title,
-                                    figure_title_show=figure_title_show, )
     mesh_base = plt_base.MeshBase(time=mesh_time, frequency=mesh_frequency,
                                   frequency_scaling=frequency_scaling, shading=mesh_shading,
                                   frequency_hz_ymin=frequency_hz_ymin,
@@ -390,8 +379,7 @@ def plot_wf_mesh_mesh_vert_example(
          2: {"panel_type": "wf", "panel": wf_panel}},
         plot_base=plot_base,
         sanitize_times=True,
-        mesh_base=mesh_base,
-        wf_base=wf_base)
+        mesh_base=mesh_base)
 
     return fig
 
@@ -415,6 +403,7 @@ def plot_cw_and_power(
 ) -> Union[plt.Figure, None]:
     """
     Template for CW and power plots from intro set examples
+
     :param cw_panel_sig: CW signal waveform
     :param power_panel_sigs: list of power signal arrays
     :param cw_panel_time: CW time series

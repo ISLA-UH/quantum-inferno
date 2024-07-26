@@ -18,10 +18,11 @@ The method used in this example, istft_tukey, will return a time series of the s
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from quantum_inferno.synth import benchmark_signals
-import quantum_inferno.plot_templates.plot_cyberspectral as pltq
-from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
+import quantum_inferno.plot_templates.plot_base as ptb
+from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
+from quantum_inferno.synth import benchmark_signals
+from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 from quantum_inferno.utilities.short_time_fft import stft_tukey, istft_tukey, get_stft_object_tukey
 
 print(__doc__)
@@ -189,56 +190,32 @@ if __name__ == "__main__":
     plt.grid()
     plt.legend()
 
-    pltq.plot_wf_mesh_vert(
-        station_id=", Log2(1/2)=-1",
-        wf_panel_a_sig=signal_timeseries - istft_stft_timeseries,
-        wf_panel_a_time=signal_times_s,
-        mesh_time=stft_times,
-        mesh_frequency=stft_frequencies,
-        mesh_panel_b_tfr=stft_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="istft difference to original",
-        mesh_panel_b_cbar_units="Log2(Power)",
-        start_time_epoch=0,
-        figure_title="scipy.signal.stft for " + event_name,
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    wf_base = ptb.WaveformBase(station_id="Log2(1/2)=-1",
+                               figure_title=f"scipy.signal.stft for {event_name}")
+    wf_panel = ptb.WaveformPanel(signal_timeseries - istft_stft_timeseries, signal_times_s,
+                                 units="istft difference to original")
+    mesh_base = ptb.MeshBase(stft_times, stft_frequencies, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
+    mesh_panel = ptb.MeshPanel(stft_bits, colormap_scaling="range", cbar_units="Log2(Power)")
+    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
-    pltq.plot_wf_mesh_vert(
-        station_id=", Log2(1/2)=-1",
-        wf_panel_a_sig=signal_timeseries - istft_ShortTimeFFT_timeseries,
-        wf_panel_a_time=istft_ShortTimeFFT_time_s,
-        mesh_time=ShortTimeFFT_times,
-        mesh_frequency=ShortTimeFFT_frequencies,
-        mesh_panel_b_tfr=ShortTimeFFT_bits,
-        mesh_panel_b_colormap_scaling="range",
-        wf_panel_a_units="istft difference to original",
-        mesh_panel_b_cbar_units="Log2(Power)",
-        start_time_epoch=0,
-        figure_title="scipy.signal.ShortTimeFFT for " + event_name,
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    wf_base.figure_title = f"scipy.signal.ShortTimeFFT for {event_name}"
+    wf_panel.sig = signal_timeseries - istft_ShortTimeFFT_timeseries
+    wf_panel.time = istft_ShortTimeFFT_time_s
+    mesh_base.time = ShortTimeFFT_times
+    mesh_base.frequency = ShortTimeFFT_frequencies
+    mesh_panel.tfr = ShortTimeFFT_bits
+    stfft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
-    pltq.plot_wf_mesh_vert(
-        station_id="-9 dB = 0.126, 9 dB = 7.94",
-        wf_panel_a_sig=istft_stft_timeseries - istft_ShortTimeFFT_timeseries,
-        wf_panel_a_time=istft_stft_time_s,
-        mesh_time=stft_times,
-        mesh_frequency=stft_frequencies,
-        mesh_panel_b_tfr=(10 * np.log10(ShortTimeFFT_power / stft_power)),
-        mesh_panel_b_colormap_scaling="else",
-        mesh_colormap="seismic",
-        wf_panel_a_units="istft difference",
-        mesh_panel_b_cbar_units="dB",
-        mesh_panel_b_color_min=-9,
-        mesh_panel_b_color_max=9,
-        mesh_panel_b_color_range=18,
-        start_time_epoch=0,
-        figure_title="(10*LOG10(signal.ShortTimeFFT / signal.stft)) for " + event_name,
-        frequency_hz_ymin=fmin,
-        frequency_hz_ymax=fmax,
-    )
+    wf_base.station_id = "-9 dB = 0.126, 9 dB = 7.94"
+    wf_base.figure_title = f"(10*LOG10(signal.ShortTimeFFT / signal.stft)) for {event_name}"
+    wf_panel.sig = istft_stft_timeseries - istft_ShortTimeFFT_timeseries
+    wf_panel.time = istft_stft_time_s
+    wf_panel.units = "istft difference"
+    mesh_base.time = stft_times
+    mesh_base.frequency = stft_frequencies
+    mesh_base.colormap = "seismic"
+    mesh_panel = ptb.MeshPanel((10 * np.log10(ShortTimeFFT_power / stft_power)), colormap_scaling="else",
+                               color_max=9, color_min=-9, color_range=18, cbar_units="dB")
+    log10_stfft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
 
     plt.show()
