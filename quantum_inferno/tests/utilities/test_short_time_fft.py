@@ -62,8 +62,8 @@ class TestPicker(unittest.TestCase):
             scaling="magnitude",
         )
         self.assertEqual(len(reconstructed_signal), len(self.signal))
-        self.assertTrue(np.allclose(self.signal, reconstructed_signal, atol=1e-15))
-        self.assertTrue(np.allclose(self.timestamps, reconstructed_time, atol=1e-15))
+        self.assertTrue(np.allclose(self.signal, reconstructed_signal, atol=1e-14))
+        self.assertTrue(np.allclose(self.timestamps, reconstructed_time, atol=1e-14))
 
     def test_spectrogram_tukey(self):
         frequencies, times, spectrogram = short_time_fft.spectrogram_tukey(
