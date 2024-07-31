@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 from quantum_inferno import styx_fft
-from quantum_inferno.synth import synthetics_NEW
+from quantum_inferno.synth import synthetic_signals
 
 
 print(__doc__)
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         outro_s=mult * pseudo_period_main_s,
         sample_rate_hz=frequency_sample_rate_hz,
     )
-    sig_wf_aa = synthetics_NEW.antialias_half_nyquist(synth=np.copy(sig_wf_raw))
+    sig_wf_aa = synthetic_signals.antialias_half_nyquist(synth=np.copy(sig_wf_raw))
     sig_wf_dec = signal.decimate(np.copy(sig_wf_aa), decimate)
     sig_time_s = sig_time_s_raw[::10]
 

@@ -11,7 +11,7 @@ import quantum_inferno.plot_templates.plot_base as ptb
 from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
 from quantum_inferno.styx_stx import tfr_stx_fft
-from quantum_inferno.synth import blast_pulse as kaboom
+from quantum_inferno.synth import blast_gt_pulse as kaboom
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 from quantum_inferno.utilities.window import get_tukey
 
