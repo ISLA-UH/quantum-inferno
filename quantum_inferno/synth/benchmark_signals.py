@@ -8,7 +8,7 @@ import numpy as np
 import scipy.signal as signal
 
 from quantum_inferno.utilities.window import get_tukey
-from quantum_inferno.synth import synthetics_NEW
+from quantum_inferno.synth import synthetic_signals
 
 DEFAULT_TIME_SAMPLE_INTERVAL = 1e-3
 DEFAULT_TIME_DURATION = 1.0
@@ -338,11 +338,11 @@ def well_tempered_tone(
 
     if add_noise_taper_aa:
         # Add noise
-        mic_sig += synthetics_NEW.white_noise_fbits(sig=mic_sig, std_bit_loss=8.0)
+        mic_sig += synthetic_signals.white_noise_fbits(sig=mic_sig, std_bit_loss=8.0)
         # Taper before AA
         mic_sig *= get_tukey(array=mic_sig, alpha=0.1)
         # Antialias (AA)
-        synthetics_NEW.antialias_half_nyquist(mic_sig)
+        synthetic_signals.antialias_half_nyquist(mic_sig)
 
     if output_desc:
         print("WELL TEMPERED TONE SYNTHETIC")

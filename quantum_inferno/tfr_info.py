@@ -2,15 +2,13 @@
 This module returns information and entropy from a TFR Power array
 """
 from typing import List, Tuple
+
 import numpy as np
 from scipy import signal
-import quantum_inferno.scales_dyadic as scales
-
-# from quantum_inferno import util_matrix as um
-from quantum_inferno.utilities.matrix import d1tile_x_d0d1, d0tile_x_d0d1, just_tile_d1
 import scipy.fft as sfft
 
-# TODO: verify that utilities.matrix are correctly used in this module
+import quantum_inferno.scales_dyadic as scales
+from quantum_inferno.utilities.matrix import d1tile_x_d0d1, d0tile_x_d0d1, just_tile_d1
 
 
 # TODO: Use 'em or lose 'em
@@ -35,7 +33,7 @@ def log2_round(x: float, epsilon: float = scales.EPSILON64) -> float:
     :param epsilon: override zero, negative, and imaginary values
     :return: rounded to nearest integer value of log2
     """
-    return np.round(np.log2(np.abs(x) + epsilon))
+    return float(np.round(np.log2(np.abs(x) + epsilon)))
 
 
 def log2_floor(x: float, epsilon: float = scales.EPSILON64) -> float:

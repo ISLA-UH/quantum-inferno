@@ -112,7 +112,7 @@ class SetTimestampToUtcTest(unittest.TestCase):
 class GetDatetimeFromTimestampToUtcTest(unittest.TestCase):
     def test_get_datetime_from_timestamp_to_utc(self):
         datetime_obj = dat.get_datetime_from_timestamp_to_utc(1609459200.0, -1.0, "s")
-        print(datetime_obj)
+        # print(datetime_obj)
         self.assertEqual(datetime_obj, dat.datetime(2021, 1, 1, 1, 0, 0, tzinfo=datetime.timezone.utc))
 
     def test_fail_get_datetime(self):

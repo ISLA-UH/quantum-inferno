@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-import quantum_inferno.synth.synthetics_NEW as synth
+import quantum_inferno.synth.synthetic_signals as synth
 
 
 class TestSynthetics(unittest.TestCase):
