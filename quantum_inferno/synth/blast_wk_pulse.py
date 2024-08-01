@@ -11,9 +11,8 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
-from quantum_inferno.synth.synthetics_NEW import white_noise_fbits, antialias_half_nyquist
+from quantum_inferno.synth.synthetic_signals import white_noise_fbits, antialias_half_nyquist
 from quantum_inferno.scales_dyadic import get_epsilon
-
 
 def wk_blast_period_center(time_center_s: np.ndarray, pseudo_period_s: float) -> np.ndarray:
     """
