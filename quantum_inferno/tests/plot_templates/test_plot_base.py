@@ -83,7 +83,7 @@ class MeshPanelTest(unittest.TestCase):
 
 class WaveformBaseTest(unittest.TestCase):
     def test_waveform_base(self):
-        test_wf_base = pb.WaveformBase(station_id="test", figure_title="test")
+        test_wf_base = pb.WaveformPlotBase(station_id="test", figure_title="test")
         self.assertFalse(test_wf_base.label_panel_show)
         self.assertIsNone(test_wf_base.labels_fontweight)
         self.assertIsNone(test_wf_base.waveform_color)

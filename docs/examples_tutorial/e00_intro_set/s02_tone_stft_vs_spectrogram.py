@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 import quantum_inferno.plot_templates.plot_base as ptb
-from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert, plot_cw_and_power
+from quantum_inferno.plot_templates.plot_templates import plot_cw_and_power, plot_mesh_wf_vert
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
@@ -180,17 +180,17 @@ if __name__ == "__main__":
     # Select plot frequencies
     fmin = 2 * frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
-    wf_base = ptb.WaveformBase(station_id="log$_2\\frac{1}{2}=-1$",
-                               figure_title=f"Spectrogram for {EVENT_NAME}")
+    wf_base = ptb.WaveformPlotBase(station_id="log$_2\\frac{1}{2}=-1$",
+                                   figure_title=f"Spectrogram for {EVENT_NAME}")
     wf_panel = ptb.WaveformPanel(mic_sig, time_s)
     mesh_base = ptb.MeshBase(time_spect_s, frequency_spect_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
     mesh_panel = ptb.MeshPanel(mic_spect_bits, colormap_scaling="range", cbar_units="log$_2$(Power)")
-    spect = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    spect = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     wf_base.figure_title = f"STFT for {EVENT_NAME}"
     mesh_base.time = time_stft_s
     mesh_base.frequency = frequency_stft_hz
     mesh_panel.tfr = mic_stft_bits
-    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     plt.show()

@@ -2,7 +2,6 @@
 Standardized Stockwell transform (stx) with optimization parameters
 After Moukadem et al., 2022, A new optimized Stockwell transform applied on synthetic and real non-stationary signals
 Rederivation in preparation, Garces et al. 2022; last updated 9 May 2022
-
 """
 import numpy as np
 from scipy.fft import fft, ifft, fftfreq

@@ -10,9 +10,9 @@ from scipy.signal import spectrogram
 
 from quantum_inferno import scales_dyadic
 from quantum_inferno.plot_templates import plot_base as ptb
-from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
+from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 import quantum_inferno.synth.doppler as doppler
-import quantum_inferno.synth.synthetics_NEW as synth
+import quantum_inferno.synth.synthetic_signals as synth
 
 print(__doc__)
 
@@ -270,13 +270,13 @@ if __name__ == "__main__":
 
     plt.style.use('dark_background')
 
-    wf_base = ptb.WaveformBase("synthetic", "STFT of Doppler Shift", waveform_color="yellow")
+    wf_base = ptb.WaveformPlotBase("synthetic", "STFT of Doppler Shift", waveform_color="yellow")
     wf_panel = ptb.WaveformPanel(sig_wf, time_wf_s)
     mesh_base = ptb.MeshBase(t_center, f_center, frequency_scaling=frequency_yscale,
                              frequency_hz_ymin=frequency_hz_ymin, frequency_hz_ymax=frequency_hz_ymax,
                              colormap="inferno")
     mesh_panel = ptb.MeshPanel(np.log2(synth_Sxx + scales_dyadic.EPSILON32),
                                colormap_scaling="auto", ytick_style="plain")
-    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     plt.show()

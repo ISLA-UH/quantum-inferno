@@ -232,7 +232,7 @@ def welch_power_pow2(
 
 
 # todo: lots of return values, consider an object
-# confirm this is different from info.py functions
+# todo: confirm this is different from tfr_info.py functions
 def power_and_information_shannon_stft(stft_complex):
     """
     Computes power and information metrics
@@ -265,7 +265,7 @@ def power_and_information_shannon_stft(stft_complex):
 
 
 # todo: lots of return values, consider an object
-# confirm this is different from info.py functions
+# todo: confirm this is different from tfr_info.py functions
 def power_and_information_shannon_welch(welch_power):
     """
     Computes power and information metrics

@@ -32,7 +32,7 @@ class PlotBase:
         figure_title_show: bool, if True, show the figure title.  Default True
         start_time_epoch: float, the epoch start time of the data.  Default 0.
         params_tfr: AudioParams, parameters for plotting audio data.  Default AudioParams()
-        units_time: str, label of units for time component
+        units_time: str, label of units for time component.  Default "s"
     """
     station_id: str
     figure_title: str
@@ -45,7 +45,7 @@ class PlotBase:
 @dataclass
 class MeshBase:
     """
-    Base class for Mesh plots
+    Base class for Mesh plots.  Independent of PlotBase.
 
     Attributes:
         time: np.ndarray of the timestamps.  Required
@@ -83,6 +83,14 @@ class MeshBase:
         """
         return cast(Literal, self.shading)
 
+    def get_colormesh_params(self) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional[str]]:
+        """
+        :return: time, frequency, and shading for colormesh.  All three could be None
+        """
+        if self.shading in ["auto", "gouraud"]:
+            return self.time, self.frequency, self.get_shading_as_literal()
+        return None, None, None
+
 
 def mesh_colormap_limits(
         mesh_array: np.ndarray,
@@ -106,7 +114,6 @@ def mesh_colormap_limits(
         color_max = np.max(mesh_array)
         color_min = color_max - color_range
     else:
-        # print("User specified mesh color limits will be applied.")
         color_max = np.max(np.abs(mesh_array))
         color_min = np.min(np.abs(mesh_array))
 
@@ -133,7 +140,7 @@ class MeshPanel:
     color_range: float = 15.
     color_min: float = 0.
     cbar_units: str = "bits"
-    ytick_style: str = 'sci'
+    ytick_style: str = "sci"
 
     def __post_init__(self):
         if self.colormap_scaling not in COLORMAP_SCALING_VALS:
@@ -158,9 +165,9 @@ class MeshPanel:
 
 
 @dataclass
-class WaveformBase(PlotBase):
+class WaveformPlotBase(PlotBase):
     """
-    Base class for Waveform plots
+    Base class for Waveform plots.  Extends PlotBase; refer to PlotBase for additional attributes
 
     Attributes:
         label_panel_show: bool, if True, show the label.  Default False
@@ -182,7 +189,7 @@ class WaveformPanel:
         time: np.ndarray, the timestamps of the data.  Required
         units: str, units of the signal.  Default "Norm"
         label: str, label for the data.  Default "(wf)"
-        yscaling: str, scaling for y-axis.  options: "auto", "symmetric", "positive", "else".  Default "auto"
+        yscaling: str, scaling for y-axis.  options: "auto", "symmetric", "positive", "else".  Default "auto"mesh_
         ytick_style: str, style for yticks.  options: "sci", "scientific", "plain".  Default "plain"
     """
     sig: np.ndarray
@@ -198,7 +205,7 @@ class WaveformPanel:
         if self.yscaling not in WF_Y_SCALING_VALS:
             self.yscaling = "else"
 
-    def set_y_lims(self, axis: plt.Axes) -> plt.Axes:
+    def set_y_lims(self, axis: plt.Axes):
         """
         :param axis: the axis to update y limits for
         :return: updated axis with new y limits
@@ -212,7 +219,6 @@ class WaveformPanel:
             axis.set_ylim(0, np.max(np.abs(self.sig)))
         else:
             axis.set_ylim(-10, 10)
-        return axis
 
 
 @dataclass

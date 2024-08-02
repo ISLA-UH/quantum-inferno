@@ -1,5 +1,5 @@
 """
-This module contains updated and streamlined versions of the quantum inferno plot templates.
+This module contains functionalized versions of the quantum inferno plot templates used by examples.
 These functions are intended to run with the full set of parameters for each chart, without the
 user knowing the underlying classes that group the values.
 todo: Pretty sure if there's a better way to present this to users, considering the enormous amount of params
@@ -16,35 +16,6 @@ from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable, AxesDivide
 from quantum_inferno.plot_templates import plot_base as plt_base
 from quantum_inferno.plot_templates import figure_attributes as fa
 from quantum_inferno.plot_templates import plot_templates as plt_tpl
-
-
-def adjust_figure_height(
-        figure_size_y: int,
-        n_rows: int,
-        n_rows_standard: int = 2,
-        hspace: float = 0.13
-) -> List[float]:
-    """
-    Adjust the figure height based on the number of rows to preserve standard panel aspect ratios
-
-    :param figure_size_y: figure height
-    :param n_rows: number of rows in figure
-    :param n_rows_standard: number of rows in the figure for which height is not adjusted.  Default 2
-    :param hspace: height space between panels, fraction of average panel height.  Default 0.13
-    :return: adjusted figure height, space param for title, space param for x label
-    """
-    # space needed for the time label = 10% of the base figure height
-    n_px_x_label: float = figure_size_y * 0.1
-    # space needed for the title = 6% of the base figure height
-    n_px_title: float = figure_size_y * 0.06
-    n_px_panel: float = (figure_size_y - n_px_x_label - n_px_title) / ((1. + hspace) * n_rows_standard - hspace)
-    n_px_hspace = hspace * n_px_panel
-    adjusted_figure_size_y: float = n_px_panel * n_rows + n_px_hspace * (n_rows - 1) + n_px_x_label + n_px_title
-    frac_title = 1 - n_px_title / adjusted_figure_size_y
-    frac_x_label = n_px_x_label / adjusted_figure_size_y
-    # frac_hspace = n_px_hspace / adjusted_figure_size_y
-    # print(frac_hspace, frac_hspace * adjusted_figure_size_y, n_px_hspace)
-    return [adjusted_figure_size_y, frac_title, frac_x_label]
 
 
 def plot_nwf_nmesh_vert(panels_dict: dict,
@@ -90,7 +61,7 @@ def plot_nwf_nmesh_vert(panels_dict: dict,
         mesh_y = f_edge
         shading = None
     hspace = 0.13
-    [adj_fig_height, title_space, xlabel_space] = adjust_figure_height(fig_params.figure_size_y, n)
+    [adj_fig_height, title_space, xlabel_space] = plt_tpl.adjust_figure_height(fig_params.figure_size_y, n)
 
     fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
         n,
@@ -183,7 +154,7 @@ def plot_wf_mesh_vert_example(
         mesh_time: np.ndarray,
         mesh_frequency: np.ndarray,
         mesh_panel_b_tfr: np.ndarray,
-        params_tfr=plt_base.AudioParams(fa.AspectRatioType(3)),
+        params_tfr=plt_base.AudioParams(),
         frequency_scaling: str = "log",
         mesh_shading: str = "auto",
         wf_panel_a_yscaling: str = "auto",
@@ -214,7 +185,7 @@ def plot_wf_mesh_vert_example(
     :param mesh_time: array with mesh time
     :param mesh_frequency: array with mesh frequencies
     :param mesh_panel_b_tfr: array with mesh tfr data for mesh plot (top panel)
-    :param params_tfr: parameters for tfr. Check AudioParams().
+    :param params_tfr: Display parameters for tfr. Check AudioParams().
     :param frequency_scaling: "log" or "linear". Default is "log"
     :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
     :param mesh_panel_b_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
@@ -238,13 +209,13 @@ def plot_wf_mesh_vert_example(
     :param figure_title_show: show title if True. Default is True
     :return: plot
     """
-    plot_base = plt_base.PlotBase(station_id=station_id,
-                                  figure_title=figure_title,
-                                  figure_title_show=figure_title_show,
-                                  start_time_epoch=start_time_epoch,
-                                  params_tfr=params_tfr,
-                                  units_time=units_time
-                                  )
+    wf_base = plt_base.WaveformPlotBase(station_id=station_id,
+                                        figure_title=figure_title,
+                                        figure_title_show=figure_title_show,
+                                        start_time_epoch=start_time_epoch,
+                                        params_tfr=params_tfr,
+                                        units_time=units_time
+                                        )
     mesh_base = plt_base.MeshBase(time=mesh_time, frequency=mesh_frequency,
                                   frequency_scaling=frequency_scaling, shading=mesh_shading,
                                   frequency_hz_ymin=frequency_hz_ymin,
@@ -259,11 +230,12 @@ def plot_wf_mesh_vert_example(
                                     color_max=mesh_panel_b_color_max,
                                     color_range=mesh_panel_b_color_range, color_min=mesh_panel_b_color_min,
                                     cbar_units=mesh_panel_b_cbar_units, ytick_style=mesh_panel_b_ytick_style)
-    fig = plot_nwf_nmesh_vert(
-        {0: {"panel_type": "mesh", "panel": mesh_panel}, 1: {"panel_type": "wf", "panel": wf_panel}},
-        plot_base=plot_base,
-        sanitize_times=True,
-        mesh_base=mesh_base)
+    fig = plt_tpl.plot_mesh_wf_vert(
+        mesh_base=mesh_base,
+        mesh_panel=mesh_panel,
+        wf_base=wf_base,
+        wf_panel=wf_panel,
+        sanitize_times=True)
 
     return fig
 
@@ -384,6 +356,21 @@ def plot_wf_mesh_mesh_vert_example(
     return fig
 
 
+def set_panel_label_ticks(ax_pnl: plt.Axes, ylabel: str, xlabel: str, text_size: int):
+    """
+    Set the x and y labels and set tick params for the given ax_pnl
+    :param ax_pnl: the Axes object to update
+    :param ylabel: label for y-axis
+    :param xlabel: label for x-axis
+    :param text_size: size of text
+    """
+    ax_pnl.set_ylabel(ylabel, size=text_size)
+    ax_pnl.set_xlabel(f"Frequency ({xlabel})", size=text_size)
+    ax_pnl.tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
+    ax_pnl.tick_params(axis="y", which="both", left=True, labelleft=True, labelsize="large")
+    ax_pnl.grid(True)
+
+
 def plot_cw_and_power(
         cw_panel_sig: np.ndarray,
         power_panel_sigs: List[np.ndarray],
@@ -444,11 +431,7 @@ def plot_cw_and_power(
         power_panel.set_title(power_panel_title, size=params_tfr.text_size)
 
     cw_panel.plot(cw_panel_time, cw_panel_sig)
-    cw_panel.set_ylabel(cw_panel_units, size=params_tfr.text_size)
-    cw_panel.set_xlabel(f"Time ({units_time})", size=params_tfr.text_size)
-    cw_panel.tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
-    cw_panel.tick_params(axis="y", which="both", left=True, labelleft=True, labelsize="large")
-    cw_panel.grid(True)
+    set_panel_label_ticks(cw_panel, cw_panel_units, units_time, params_tfr.text_size)
 
     for i in range(len(power_panel_sigs)):
         power_panel.semilogx(power_panel_freqs[i], power_panel_sigs[i],
@@ -456,11 +439,7 @@ def plot_cw_and_power(
                              lw=power_panel_lw[i],
                              label=power_panel_sig_labels[i])
 
-    power_panel.set_ylabel(power_panel_y_units, size=params_tfr.text_size)
-    power_panel.set_xlabel(f"Frequency ({power_panel_x_units})", size=params_tfr.text_size)
-    power_panel.tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
-    power_panel.tick_params(axis="y", which="both", left=True, labelleft=True, labelsize="large")
-    power_panel.grid(True)
+    set_panel_label_ticks(power_panel, power_panel_y_units, power_panel_x_units, params_tfr.text_size)
     power_panel.legend()
 
     fig.tight_layout()

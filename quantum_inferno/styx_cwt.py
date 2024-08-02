@@ -244,10 +244,10 @@ def cwt_complex_any_scale_pow2_TO_REPLACE(
     time_cwt_s = np.arange(wavelet_points) / frequency_sample_rate_hz
     cycles_m = scales.cycles_from_order(scale_order=band_order_nth)
 
-    frequencies_cwt_hz = scales.log_frequency_hz_from_fft_points(
-        frequency_sample_hz=frequency_sample_rate_hz,
-        fft_points=len(sig_wf),
-        scale_order=band_order_nth)
+    # frequencies_cwt_hz = scales.log_frequency_hz_from_fft_points(
+    #     frequency_sample_hz=frequency_sample_rate_hz,
+    #     fft_points=len(sig_wf),
+    #     scale_order=band_order_nth)
 
     cw_complex, _, _, _, amp = \
         wavelet_centered_4cwt(band_order_nth=band_order_nth,

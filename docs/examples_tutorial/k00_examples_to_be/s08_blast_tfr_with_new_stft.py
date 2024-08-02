@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 import quantum_inferno.plot_templates.plot_base as ptb
-from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
+from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
 from quantum_inferno.styx_stx import tfr_stx_fft
-from quantum_inferno.synth import blast_pulse as kaboom
+from quantum_inferno.synth import blast_gt_pulse as kaboom
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 from quantum_inferno.utilities.short_time_fft import stft_tukey
 from quantum_inferno.utilities.window import get_tukey
@@ -168,24 +168,24 @@ if __name__ == "__main__":
     fmax = frequency_sample_rate_hz / 2  # Nyquist
 
     # Plot the STFT
-    wf_base = ptb.WaveformBase(station_id="00", figure_title=f"STFT for {EVENT_NAME}")
+    wf_base = ptb.WaveformPlotBase(station_id="00", figure_title=f"STFT for {EVENT_NAME}")
     wf_panel = ptb.WaveformPanel(mic_sig, time_s)
     mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
     mesh_panel = ptb.MeshPanel(mic_stft_bits, colormap_scaling="range", cbar_units="bits")
-    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     # Plot the CWT
     wf_base.figure_title = f"CWT for {EVENT_NAME}"
     mesh_base.time = time_cwt_s
     mesh_base.frequency = frequency_cwt_hz
     mesh_panel.tfr = mic_cwt_bits
-    cwt = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    cwt = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     # Plot the STX
     wf_base.figure_title = f"STX for {EVENT_NAME}"
     mesh_base.time = time_s
     mesh_base.frequency = frequency_stx_hz
     mesh_panel.tfr = mic_stx_bits
-    stx = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    stx = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     plt.show()

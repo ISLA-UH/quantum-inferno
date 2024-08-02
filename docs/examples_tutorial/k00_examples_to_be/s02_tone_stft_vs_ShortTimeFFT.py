@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 import quantum_inferno.plot_templates.plot_base as ptb
-from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
+from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 from quantum_inferno.utilities.short_time_fft import stft_tukey, istft_tukey, get_stft_object_tukey
@@ -190,13 +190,13 @@ if __name__ == "__main__":
     plt.grid()
     plt.legend()
 
-    wf_base = ptb.WaveformBase(station_id="Log2(1/2)=-1",
-                               figure_title=f"scipy.signal.stft for {event_name}")
+    wf_base = ptb.WaveformPlotBase(station_id="Log2(1/2)=-1",
+                                   figure_title=f"scipy.signal.stft for {event_name}")
     wf_panel = ptb.WaveformPanel(signal_timeseries - istft_stft_timeseries, signal_times_s,
                                  units="istft difference to original")
     mesh_base = ptb.MeshBase(stft_times, stft_frequencies, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
     mesh_panel = ptb.MeshPanel(stft_bits, colormap_scaling="range", cbar_units="Log2(Power)")
-    stft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     wf_base.figure_title = f"scipy.signal.ShortTimeFFT for {event_name}"
     wf_panel.sig = signal_timeseries - istft_ShortTimeFFT_timeseries
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     mesh_base.time = ShortTimeFFT_times
     mesh_base.frequency = ShortTimeFFT_frequencies
     mesh_panel.tfr = ShortTimeFFT_bits
-    stfft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    stfft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     wf_base.station_id = "-9 dB = 0.126, 9 dB = 7.94"
     wf_base.figure_title = f"(10*LOG10(signal.ShortTimeFFT / signal.stft)) for {event_name}"
@@ -216,6 +216,6 @@ if __name__ == "__main__":
     mesh_base.colormap = "seismic"
     mesh_panel = ptb.MeshPanel((10 * np.log10(ShortTimeFFT_power / stft_power)), colormap_scaling="else",
                                color_max=9, color_min=-9, color_range=18, cbar_units="dB")
-    log10_stfft = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    log10_stfft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     plt.show()

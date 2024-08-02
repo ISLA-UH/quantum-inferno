@@ -3,7 +3,6 @@ Inferno example s01_tone_spectral_canvas.
 Define the cyberspectral canvas from a knowledge of the signal center frequency and passband.
 Compute a periodogram and a spectrogram of a tone over sliding windows.
 The Welch method is equivalent to averaging the spectrogram over the columns.
-todo: runs out of memory when running
 """
 
 import numpy as np
@@ -11,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from quantum_inferno import styx_fft, scales_dyadic
 import quantum_inferno.plot_templates.plot_base as ptb
-from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
+from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.utilities.calculations import get_num_points
 
 
@@ -74,7 +73,7 @@ if __name__ == "__main__":
         sample_rate_hz=frequency_sample_rate_hz,
         duration_s=duration_fft_s,
         rounding_type="ceil",
-        output_unit="points",
+        output_unit="log2",
     )
 
     time_fft_nd = 2 ** ave_points_ceil_log2
@@ -82,9 +81,9 @@ if __name__ == "__main__":
     time_nd = time_fft_nd * 4
 
     # The CWX and STX will be evaluated from the number of points in FFT of the signal
-    frequency_cwt_pos_hz = np.fft.rfftfreq(time_nd, d=1 / frequency_sample_rate_hz)
+    frequency_cwt_pos_hz = np.fft.rfftfreq(time_nd, d=1/frequency_sample_rate_hz)
     # Want to evaluate the CWX and STX at the NFFT frequencies of the sliding-window Welch/STFT spectra
-    frequency_stft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
+    frequency_stft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
 
     # CWT
     cwt_fft_index = np.argmin(np.abs(frequency_cwt_pos_hz - frequency_center_hz))
@@ -208,12 +207,12 @@ if __name__ == "__main__":
 
     plt.style.use("dark_background")
 
-    wf_base = ptb.WaveformBase(station_id_str, "STFT", waveform_color="yellow")
+    wf_base = ptb.WaveformPlotBase(station_id_str, "STFT", waveform_color="yellow")
     wf_panel = ptb.WaveformPanel(mic_sig, time_s)
     mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_scaling="linear",
                              frequency_hz_ymin=fmin, frequency_hz_ymax=fmax, colormap="inferno")
     mesh_panel = ptb.MeshPanel(np.log2(stft_power + scales_dyadic.EPSILON16),
                                colormap_scaling="auto", ytick_style="plain")
-    tukey = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    tukey = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     plt.show()

@@ -3,7 +3,6 @@ Inferno example s00_logon_spectral_canvas.
 Define the cyberspectral canvas from a knowledge of the signal center frequency and passband.
 Compute a periodogram and a spectrogram of a Gabor wavelet (logon, grain) over sliding windows.
 The Welch method is equivalent to averaging the spectrogram over the columns.
-todo: runs out of memory when running
 """
 
 import numpy as np
@@ -11,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from quantum_inferno import styx_fft, styx_cwt, scales_dyadic
 import quantum_inferno.plot_templates.plot_base as ptb
-from quantum_inferno.plot_templates.plot_templates import plot_wf_mesh_vert
+from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.utilities.calculations import get_num_points
 
 print(__doc__)
@@ -72,14 +71,11 @@ if __name__ == "__main__":
     )
 
     # Spectral cyberspace is defined is sample points and scaled frequencies
-    # ave_points_ceil_log2, ave_points_ceil_pow2, ave_time_ceil_pow2_s = utils.duration_ceil(
-    #     sample_rate_hz=frequency_sample_rate_hz, time_s=duration_fft_s
-    # ) # This is the same as the following
     ave_points_ceil_log2 = get_num_points(
         sample_rate_hz=frequency_sample_rate_hz,
         duration_s=duration_fft_s,
         rounding_type="ceil",
-        output_unit="points",
+        output_unit="log2",
     )
     # dyadic number of points
     time_fft_nd: int = 2 ** ave_points_ceil_log2
@@ -87,9 +83,9 @@ if __name__ == "__main__":
     time_nd = time_fft_nd * 2
 
     # The CWX and STX will be evaluated from the number of points in FFT of the signal
-    frequency_cwt_pos_hz = np.fft.rfftfreq(time_nd, d=1 / frequency_sample_rate_hz)
+    frequency_cwt_pos_hz = np.fft.rfftfreq(time_nd, d=1/frequency_sample_rate_hz)
     # Want to evaluate the CWX and STX at the NFFT frequencies of the sliding-window Welch/STFT spectra
-    frequency_stft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
+    frequency_stft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
 
     # CWT
     cwt_fft_index = np.argmin(np.abs(frequency_cwt_pos_hz - frequency_center_hz))
@@ -223,17 +219,17 @@ if __name__ == "__main__":
 
     plt.style.use("dark_background")
     # Tukey STFT
-    wf_base = ptb.WaveformBase(station_id_str, f"STFT Tukey Taper", waveform_color="yellow")
+    wf_base = ptb.WaveformPlotBase(station_id_str, f"STFT Tukey Taper", waveform_color="yellow")
     wf_panel = ptb.WaveformPanel(mic_sig, time_s)
     mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_scaling="linear",
                              frequency_hz_ymin=fmin, frequency_hz_ymax=fmax, colormap="inferno")
     mesh_panel = ptb.MeshPanel(np.log2(stft_power + scales_dyadic.EPSILON16),
                                colormap_scaling="auto", ytick_style="plain")
-    tukey = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    tukey = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     # Gauss STFT
     wf_base.figure_title = f"STFT Gaussian Taper"
     mesh_panel.tfr = np.log2(stft_power_gauss + scales_dyadic.EPSILON16)
-    gauss = plot_wf_mesh_vert(wf_base, wf_panel, mesh_base, mesh_panel)
+    gauss = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     plt.show()
