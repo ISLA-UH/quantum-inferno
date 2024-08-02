@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 import quantum_inferno.plot_templates.plot_base as ptb
+import quantum_inferno.utilities.short_time_fft as stft
 from quantum_inferno.plot_templates.plot_templates import plot_cw_and_power, plot_mesh_wf_vert
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
@@ -76,79 +77,61 @@ if __name__ == "__main__":
         scaling="spectrum",
         average="mean",
     )
-    # TODO: Why is spectrogram truncating the edge windows?
-    # TODO: check if switch to ShortTimeFFT fixes truncating issue
-    # Zero pad the mic_sig to get the full time for signal.spectrogram as it truncates by 1/2 window size
-    mic_sig_zero_padded_by_half_window = np.pad(mic_sig, (time_fft_nd // 2, time_fft_nd // 2), "constant")
 
-    # Compute the spectrogram with the spectrum option
-    frequency_spect_hz, time_spect_s, psd_spec_power = signal.spectrogram(
-        x=mic_sig_zero_padded_by_half_window,
-        fs=frequency_sample_rate_hz,
-        window=("tukey", alpha),
-        nperseg=time_fft_nd,
-        noverlap=time_fft_nd // 2,
-        nfft=time_fft_nd,
-        detrend="constant",
-        return_onesided=True,
-        axis=-1,
-        scaling="spectrum",
-        mode="psd",
+    frequency_spect_hz, time_spect_s, spec_mag = stft.spectrogram_tukey(
+        timeseries=mic_sig,
+        sample_rate_hz=frequency_sample_rate_hz,
+        tukey_alpha=alpha,
+        segment_length=time_fft_nd,
+        overlap_length=time_fft_nd // 2,  # 50% overlap
+        scaling="magnitude",
+        padding="zeros",
     )
+    # Since one-sided, multiply by 2 to get the full power
+    spec_power = 2 * spec_mag
 
-    # TODO: RECONCILE STFT AND SPECTROGRAM
     # Shift the time_spect_s to start at the first time point since it returns the center of the window
     time_spect_s = time_spect_s - time_spect_s[0]
 
     # Compute the spectrogram with the stft option
-    frequency_stft_hz, time_stft_s, stft_complex = signal.stft(
-        x=mic_sig,
-        fs=frequency_sample_rate_hz,
-        window=("tukey", alpha),
-        nperseg=time_fft_nd,
-        noverlap=time_fft_nd // 2,
-        nfft=time_fft_nd,
-        detrend="constant",
-        return_onesided=True,
-        axis=-1,
-        boundary="zeros",
-        padded=True,
+    frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
+        timeseries=mic_sig,
+        sample_rate_hz=frequency_sample_rate_hz,
+        tukey_alpha=alpha,
+        segment_length=time_fft_nd,
+        overlap_length=time_fft_nd // 2,  # 50% overlap
+        scaling="magnitude",
+        padding="zeros",
     )
-    print(time_stft_s[0], time_stft_s[-1])
-
     # Since one-sided, multiply by 2 to get the full power
     stft_power = 2 * np.abs(stft_complex) ** 2
 
     # Compute the ratio of the PSD to the variance
     # Average over the columns for the spectrogram and STFT
     welch_over_var = psd_welch_power / mic_sig_var
-    spect_over_var = np.average(psd_spec_power, axis=1) / mic_sig_var
+    spect_over_var = np.average(spec_power, axis=1) / mic_sig_var
     stft_over_var = np.average(stft_power, axis=1) / mic_sig_var
 
     # Express in log2(power) with epsilon
-    mic_spect_bits = to_log2_with_epsilon(psd_spec_power)
+    mic_spect_bits = to_log2_with_epsilon(spec_power)
     mic_stft_bits = to_log2_with_epsilon(stft_power)
-    print(f"Max spect: {np.max(psd_spec_power)}")
+    print(f"Max spect: {np.max(spec_power)}")
     print(f"Max stft: {np.max(stft_power)}")
     print(f"Max spect bits: {np.max(mic_spect_bits)}")
     print(f"Max stft bits: {np.max(mic_stft_bits)}")
 
     # Compute the inverse stft (istft)
-    sig_time_istft, sig_wf_istft = signal.istft(
-        Zxx=stft_complex,
-        fs=frequency_sample_rate_hz,
-        window=("tukey", alpha),
-        nperseg=time_fft_nd,
-        noverlap=time_fft_nd // 2,
-        nfft=time_fft_nd,
-        input_onesided=True,
-        boundary=True,
-        time_axis=-1,
-        freq_axis=-2,
+    sig_time_istft, sig_wf_istft = stft.istft_tukey(
+        stft_to_invert=stft_complex,
+        sample_rate_hz=frequency_sample_rate_hz,
+        tukey_alpha=alpha,
+        segment_length=time_fft_nd,
+        overlap_length=time_fft_nd // 2,  # 50% overlap
+        scaling="magnitude",
     )
 
     print("\n*** SUMMARY: STFT Time-Frequency Representation (TFR) estimates for a constant-frequency tone  ***")
-    print("The signal.stft and signal.spectrogram with scaling=spectrum and mode=psd are comparable.")
+    print("The signal.ShortTimeFFT's spectrogram and stft with scaling=magnitude are comparable.")
     print("The spectrogram returns power, whereas the stft returns invertible, complex Fourier coefficients.")
     print("The Welch spectrum is reproduced by averaging the stft over the time dimension.")
     print(
@@ -156,13 +139,19 @@ if __name__ == "__main__":
         "ACCEPT AND QUANTIFY COMPROMISE **"
     )
 
-    cw_panel = ptb.CwPanel(mic_sig, time_s, y_units="Norm", x_units="s",
-                           title=f"Synthetic CW with {alpha*100:.2f}% taper")
-    power_panel = ptb.PowerPanel([ptb.PowerPanelData(welch_over_var, frequency_welch_hz, "-", 1, "Welch"),
-                                  ptb.PowerPanelData(spect_over_var, frequency_spect_hz, "-", 2, "Spect"),
-                                  ptb.PowerPanelData(stft_over_var, frequency_stft_hz, "--", 1, "STFT")],
-                                 y_units="Power/VAR(signal)", x_units="Hz",
-                                 title=f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz")
+    cw_panel = ptb.CwPanel(
+        mic_sig, time_s, y_units="Norm", x_units="s", title=f"Synthetic CW with {alpha*100:.2f}% taper"
+    )
+    power_panel = ptb.PowerPanel(
+        [
+            ptb.PowerPanelData(welch_over_var, frequency_welch_hz, "-", 1, "Welch"),
+            ptb.PowerPanelData(spect_over_var, frequency_spect_hz, "-", 2, "Spect"),
+            ptb.PowerPanelData(stft_over_var, frequency_stft_hz, "--", 1, "STFT"),
+        ],
+        y_units="Power/VAR(signal)",
+        x_units="Hz",
+        title=f"Welch, Spect, and STFT Power, f = {frequency_center_fft_hz:.3f} Hz",
+    )
     fig = plot_cw_and_power(cw_panel, power_panel)
 
     # Plot the inverse stft (full recovery)
@@ -180,8 +169,7 @@ if __name__ == "__main__":
     # Select plot frequencies
     fmin = 2 * frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz / 2  # Nyquist
-    wf_base = ptb.WaveformPlotBase(station_id="log$_2\\frac{1}{2}=-1$",
-                                   figure_title=f"Spectrogram for {EVENT_NAME}")
+    wf_base = ptb.WaveformPlotBase(station_id="log$_2\\frac{1}{2}=-1$", figure_title=f"Spectrogram for {EVENT_NAME}")
     wf_panel = ptb.WaveformPanel(mic_sig, time_s)
     mesh_base = ptb.MeshBase(time_spect_s, frequency_spect_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
     mesh_panel = ptb.MeshPanel(mic_spect_bits, colormap_scaling="range", cbar_units="log$_2$(Power)")

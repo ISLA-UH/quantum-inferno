@@ -149,7 +149,7 @@ def spectrogram_tukey(
     :param tukey_alpha: shape parameter of the Tukey window
     :param segment_length: length of the segment
     :param overlap_length: length of the overlap
-    :param scaling: scaling of the spectrogram (default is None, other options are 'magnitude' and 'psd)
+    :param scaling: scaling of the spectrogram (default is 'magnitude', other options are 'psd' and None)
     :param padding: padding of the signal (default is 'zeros', other options are 'periodic' and 'constant')
     :return: time, frequency, and magnitude of the STFT
     """
