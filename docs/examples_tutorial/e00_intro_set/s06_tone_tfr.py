@@ -10,6 +10,7 @@ import scipy.signal as signal
 
 from quantum_inferno import styx_stx, styx_cwt
 import quantum_inferno.plot_templates.plot_base as ptb
+import quantum_inferno.utilities.short_time_fft as stft
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
@@ -67,19 +68,14 @@ if __name__ == "__main__":
         average="mean",
     )
 
-    # Compute the spectrogram with the stft option
-    frequency_stft_hz, time_stft_s, stft_complex = signal.stft(
-        x=mic_sig,
-        fs=frequency_sample_rate_hz,
-        window=("tukey", alpha),
-        nperseg=time_fft_nd,
-        noverlap=time_fft_nd // 2,
-        nfft=time_fft_nd,
-        detrend="constant",
-        return_onesided=True,
-        axis=-1,
-        boundary="zeros",
-        padded=True,
+    frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
+        timeseries=mic_sig,
+        sample_rate_hz=frequency_sample_rate_hz,
+        tukey_alpha=alpha,
+        segment_length=time_fft_nd,
+        overlap_length=time_fft_nd // 2,  # 50% overlap
+        scaling="magnitude",
+        padding="zeros",
     )
 
     stft_power = 2 * np.abs(stft_complex) ** 2
@@ -97,9 +93,7 @@ if __name__ == "__main__":
 
     # Compute Stockwell transform (STX)
     frequency_stx_hz, time_stx_s, stx_complex = styx_stx.stx_complex_any_scale_pow2(
-        band_order_nth=order_number_input,
-        sig_wf=mic_sig,
-        frequency_sample_rate_hz=frequency_sample_rate_hz
+        band_order_nth=order_number_input, sig_wf=mic_sig, frequency_sample_rate_hz=frequency_sample_rate_hz
     )
 
     stx_power = 2 * np.abs(stx_complex) ** 2
