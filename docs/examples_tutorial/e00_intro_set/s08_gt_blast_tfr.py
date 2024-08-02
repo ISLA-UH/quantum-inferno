@@ -14,6 +14,7 @@ from quantum_inferno.styx_stx import tfr_stx_fft
 from quantum_inferno.synth import blast_gt_pulse as kaboom
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 from quantum_inferno.utilities.window import get_tukey
+import quantum_inferno.utilities.short_time_fft as stft
 
 print(__doc__)
 
@@ -84,18 +85,14 @@ if __name__ == "__main__":
     )
 
     # Compute the spectrogram with the stft option
-    frequency_stft_hz, time_stft_s, stft_complex = signal.stft(
-        x=mic_sig,
-        fs=frequency_sample_rate_hz,
-        window=("tukey", alpha),
-        nperseg=time_fft_nd,
-        noverlap=time_fft_nd // 2,
-        nfft=time_fft_nd,
-        detrend="constant",
-        return_onesided=True,
-        axis=-1,
-        boundary="zeros",
-        padded=True,
+    frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
+        timeseries=mic_sig,
+        sample_rate_hz=frequency_sample_rate_hz,
+        tukey_alpha=alpha,
+        segment_length=time_fft_nd,
+        overlap_length=time_fft_nd // 2,  # 50% overlap
+        scaling="magnitude",
+        padding="zeros",
     )
 
     stft_power = 2 * np.abs(stft_complex) ** 2
