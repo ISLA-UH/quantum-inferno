@@ -2,9 +2,7 @@
 Utilities for calculating frequencies for both linear and logarithmic scales.
 """
 from typing import Optional
-
 import numpy as np
-import scipy.signal as signal
 
 
 def get_linear_frequency_bins_range(
@@ -49,7 +47,8 @@ def get_linear_frequency_bins_range(
         segment_length = sample_rate_hz
 
     frequency_step = sample_rate_hz / segment_length
-    return np.arange(start=start_hz, stop=end_hz + frequency_step, step=frequency_step)
+    full_range = np.arange(start=0, stop=sample_rate_hz / 2 + frequency_step, step=frequency_step)
+    return full_range[(full_range >= start_hz) & (full_range <= end_hz)]
 
 
 def get_shorttime_fft_frequency_bins(sample_rate_hz: float, segment_length: int) -> np.ndarray:
