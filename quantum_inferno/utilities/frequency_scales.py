@@ -106,8 +106,8 @@ def get_band_numbers(
         end_hz = sample_rate_hz / 2
 
     # Calculate band numbers
-    j_min = np.floor(band_order * np.log2(start_hz / reference_frequency))
-    j_max = np.ceil(band_order * np.log2(end_hz / reference_frequency))
+    j_min = np.floor(band_order * np.log(start_hz / reference_frequency), base)
+    j_max = np.ceil(band_order * np.log(end_hz / reference_frequency), base)
     return np.arange(j_min, j_max + 1)
 
 
