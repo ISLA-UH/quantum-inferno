@@ -57,6 +57,10 @@ def tile_array_to_shape(array: np.ndarray, shape: tuple, axis: MatrixAxis = None
     :param axis: direction to tile
     :return: 2D array with repeated values
     """
+    if shape[0] == 1 or shape[1] == 1:
+        print("Warning: shape must be greater than 1. Returning original array.")
+        return array
+
     if axis is None:
         if shape[0] == shape[1] and shape[0] == array.shape[0]:
             print("If shape is square, defaulting to row direction.")
@@ -65,6 +69,9 @@ def tile_array_to_shape(array: np.ndarray, shape: tuple, axis: MatrixAxis = None
             axis = MatrixAxis.ROW
         elif shape[1] == array.shape[0]:
             axis = MatrixAxis.COLUMN
+        elif array.ndim == 1:
+            print("Input array is 1D, Defaulting to row direction.")
+            axis = MatrixAxis.ROW
         else:
             raise ValueError("Invalid shape. Must be a multiple of the input array.")
 
@@ -78,7 +85,7 @@ def tile_array_to_shape(array: np.ndarray, shape: tuple, axis: MatrixAxis = None
         raise ValueError("Invalid direction or shape. Must be either ROW or COLUMN and be a multiple of input array.")
 
 
-# TODO: work on simplifying these 3 functions
+# TODO: work on simplifying these 3 functions (Legacy code included in styx functions to be cleaned up)
 def d0tile_x_d0d1(d0: float or np.ndarray, d0d1: np.ndarray) -> np.ndarray:
     """
     Create array of repeated values with dimensions that match those of energy array
