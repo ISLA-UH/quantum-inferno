@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Quantized Information Entropy, Nth Octave (INFERNO)"
 readme = "README.md"
-requires-python = ">=3.8,<=3.11"
+requires-python = ">=3.8,<=3.12"
 license = {file = "LICENSE"}
 
 # Please specify dependencies in alphabetical order
