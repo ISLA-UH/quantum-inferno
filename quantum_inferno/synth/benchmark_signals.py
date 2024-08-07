@@ -59,7 +59,7 @@ def quantum_chirp(
     order: float = 12.0,
     gamma: float = 0.0,
     gauss: bool = True,
-    oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE
+    oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE,
 ) -> Tuple[np.ndarray, int]:
     """
     Constructs a tone or a sweep with a gaussian window option and a duration of 2^n points
@@ -296,18 +296,17 @@ def well_tempered_tone(
     time_fft_nd = 2 ** (int(np.log2(time_fft_s * frequency_sample_rate_hz)))
 
     # Warn user if the time duration or fft duration is not a power of 2 and show the new values
+    # The values are rounded down to the nearest power of 2 in the previous step.
     if time_duration_nd != time_duration_s * frequency_sample_rate_hz:
         print(
             f"Warning: The time duration {time_duration_s} s with given sample rate doesn't produce data points "
-            f"that are power of two, adjusting time duration to {time_duration_nd / frequency_sample_rate_hz} s"
+            f"that are power of two, adjusting time duration to {time_duration_nd} s"
         )
-        time_duration_nd /= frequency_sample_rate_hz
     if time_fft_nd != time_fft_s * frequency_sample_rate_hz:
         print(
             f"Warning: fft duration {time_fft_s} s with given sample rate doesn't produce data points "
-            f"that are power of two, adjusting fft duration to {time_fft_nd / frequency_sample_rate_hz} s"
+            f"that are power of two, adjusting fft duration to {time_fft_nd} s"
         )
-        time_fft_nd /= frequency_sample_rate_hz
 
     # The fft frequencies are set by the duration of the fft
     # In this example we only need the positive frequencies
