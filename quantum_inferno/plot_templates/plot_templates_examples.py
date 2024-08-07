@@ -2,149 +2,14 @@
 This module contains functionalized versions of the quantum inferno plot templates used by examples.
 These functions are intended to run with the full set of parameters for each chart, without the
 user knowing the underlying classes that group the values.
-todo: Pretty sure if there's a better way to present this to users, considering the enormous amount of params
-    required to create one plot
-Some of these functions have been co-opted into plot_templates
 """
-from typing import List, Tuple, Union
-import math
+from typing import List, Union
 import numpy as np
-from matplotlib.colorbar import Colorbar
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable, AxesDivider
 
-from quantum_inferno.plot_templates import plot_base as plt_base
 from quantum_inferno.plot_templates import figure_attributes as fa
+from quantum_inferno.plot_templates import plot_base as plt_base
 from quantum_inferno.plot_templates import plot_templates as plt_tpl
-
-
-def plot_nwf_nmesh_vert(panels_dict: dict,
-                        plot_base: plt_base.PlotBase,
-                        mesh_base: plt_base.MeshBase,
-                        sanitize_times: bool = True, ):
-    """
-    Plot n vertical panels - mesh (top panels) and time series waveforms (bottom panels)
-    :param panels_dict: dictionary containing panel order (key), panel type ("panel_type" value), and the panel object
-                        ("panel" value, either a MeshPanel or a WaveformPanel)
-    :param plot_base: base params for plotting figure
-    :param mesh_base: base params for plotting mesh panel(s)
-    :param sanitize_times: if True (default), sanitize timestamps
-    :return: figure to plot
-    """
-    n: int = len(panels_dict)
-    time_label: str = plt_tpl.get_time_label(plot_base.start_time_epoch, plot_base.units_time)
-    if plot_base.start_time_epoch == 0 and sanitize_times:
-        epoch_start = panels_dict[n - 1]["panel"].time[0]
-    else:
-        epoch_start = plot_base.start_time_epoch
-    fig_params = plot_base.params_tfr
-
-    # Time is in the center of the window, frequency is in the fft coefficient center.
-    # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
-    # frequency and time must be increasing!
-    t_edge, f_edge, frequency_fix_ymin, frequency_fix_ymax = \
-        plt_tpl.mesh_time_frequency_edges(frequency=mesh_base.frequency, time=mesh_base.time,
-                                          frequency_ymin=mesh_base.frequency_hz_ymin,
-                                          frequency_ymax=mesh_base.frequency_hz_ymax,
-                                          frequency_scaling=mesh_base.frequency_scaling)
-
-    wf_panel_n_time_zero = plt_tpl.sanitize_timestamps(panels_dict[n - 1]["panel"].time, epoch_start)
-    time_xmin = wf_panel_n_time_zero[0]
-    time_xmax = t_edge[-1]
-
-    if mesh_base.shading in ["auto", "gouraud"]:
-        mesh_x = mesh_base.time
-        mesh_y = mesh_base.frequency
-        shading = mesh_base.get_shading_as_literal()
-    else:
-        mesh_x = t_edge
-        mesh_y = f_edge
-        shading = None
-    hspace = 0.13
-    [adj_fig_height, title_space, xlabel_space] = plt_tpl.adjust_figure_height(fig_params.figure_size_y, n)
-
-    fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
-        n,
-        1,
-        figsize=(fig_params.figure_size_x, adj_fig_height),
-        sharex=True,
-    )
-    fig: plt.Figure = fig_ax_tuple[0]
-    axes: List[plt.Axes] = fig_ax_tuple[1]
-
-    # format colorbar ticks
-    all_cbar_ticks_lens: List[int] = []
-    for i in range(len(panels_dict)):
-        if panels_dict[i]["panel_type"] == "mesh":
-            mesh_panel = panels_dict[i]["panel"]
-            all_cbar_ticks_lens.append(
-                max(len(str(math.ceil(mesh_panel.color_min))), len(str(math.floor(mesh_panel.color_max)))))
-    max_cbar_tick_len: int = sorted(all_cbar_ticks_lens)[-1]
-    cbar_tick_fmt: str = f"%-{max_cbar_tick_len}s"
-
-    # main plotting loop
-    for i in range(len(panels_dict)):
-        if panels_dict[i]["panel_type"] == "mesh":
-            mesh_panel = panels_dict[i]["panel"]
-            mesh_panel.set_color_min_max()
-            if not mesh_panel.is_auto_color_min_max():
-                print(f"Mesh panel {i} color scaling with user inputs")
-            pcolormesh_i = axes[i].pcolormesh(mesh_x,
-                                              mesh_y,
-                                              mesh_panel.tfr,
-                                              vmin=mesh_panel.color_min,
-                                              vmax=mesh_panel.color_max,
-                                              cmap=mesh_base.colormap,
-                                              shading=shading,
-                                              snap=True)
-            mesh_panel_div: AxesDivider = make_axes_locatable(axes[i])
-            mesh_panel_cax: plt.Axes = mesh_panel_div.append_axes("right", size="1%", pad="0.5%")
-            mesh_panel_cbar: Colorbar = fig.colorbar(
-                pcolormesh_i,
-                cax=mesh_panel_cax,
-                ticks=[math.ceil(mesh_panel.color_min), math.floor(mesh_panel.color_max)],
-                format=cbar_tick_fmt)
-            mesh_panel_cbar.set_label(mesh_panel.cbar_units, rotation=270, size=fig_params.text_size)
-            mesh_panel_cax.tick_params(labelsize="large")
-            axes[i].set_ylabel(mesh_base.units_frequency, size=fig_params.text_size)
-            axes[i].set_xlim(time_xmin, time_xmax)
-            axes[i].set_ylim(frequency_fix_ymin, frequency_fix_ymax)
-            axes[i].set_yscale(mesh_base.frequency_scaling)
-            axes[i].tick_params(axis="x", which="both", bottom=False, labelbottom=False)
-            axes[i].tick_params(axis="y", labelsize="large")
-        elif panels_dict[i]["panel_type"] == "wf":
-            wf_panel = panels_dict[i]["panel"]
-            axes[i].plot(wf_panel_n_time_zero, wf_panel.sig)
-            axes[i].set_ylabel(wf_panel.units, size=fig_params.text_size)
-            axes[i].set_xlim(time_xmin, time_xmax)
-            axes[i].tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
-            axes[i].grid(True)
-            axes[i].tick_params(axis="y", labelsize="large")
-            if wf_panel.yscaling == "auto":
-                axes[i].set_ylim(np.min(wf_panel.sig), np.max(wf_panel.sig))
-                axes[i].ticklabel_format(style="plain", scilimits=(0, 0), axis="y")
-            elif wf_panel.yscaling == "symmetric":
-                axes[i].set_ylim(-np.max(np.abs(wf_panel.sig)), np.max(np.abs(wf_panel.sig)))
-            elif wf_panel.yscaling == "positive":
-                axes[i].set_ylim(0, np.max(np.abs(wf_panel.sig)))
-            else:
-                axes[i].set_ylim(-10, 10)
-            axes[i].ticklabel_format(style="plain", scilimits=(0, 0), axis="y")
-            axes[i].yaxis.get_offset_text().set_x(-0.034)
-            wf_panel_a_div: AxesDivider = make_axes_locatable(axes[i])
-            wf_panel_a_cax: plt.Axes = wf_panel_a_div.append_axes("right", size="1%", pad="0.5%")
-            wf_panel_a_cax.axis("off")
-        if i != 0 and i != n - 1:
-            axes[i].margins(x=0)
-
-    if plot_base.figure_title_show:
-        axes[0].set_title(plot_base.figure_title)
-    fig.text(.5, .01, time_label, ha='center', size=fig_params.text_size)
-    fig.align_ylabels(axes)
-    fig.tight_layout()
-    fig.subplots_adjust(bottom=xlabel_space, top=title_space, hspace=hspace)
-
-    return fig
 
 
 def plot_wf_mesh_vert_example(
@@ -319,13 +184,13 @@ def plot_wf_mesh_mesh_vert_example(
     :param figure_title_show: show title if True. Default is True
     :return: plot
     """
-    plot_base = plt_base.PlotBase(station_id=station_id,
-                                  figure_title=figure_title,
-                                  figure_title_show=figure_title_show,
-                                  start_time_epoch=start_time_epoch,
-                                  params_tfr=params_tfr,
-                                  units_time=units_time
-                                  )
+    plot_base = plt_base.WaveformPlotBase(station_id=station_id,
+                                          figure_title=figure_title,
+                                          figure_title_show=figure_title_show,
+                                          start_time_epoch=start_time_epoch,
+                                          params_tfr=params_tfr,
+                                          units_time=units_time
+                                          )
     mesh_base = plt_base.MeshBase(time=mesh_time, frequency=mesh_frequency,
                                   frequency_scaling=frequency_scaling, shading=mesh_shading,
                                   frequency_hz_ymin=frequency_hz_ymin,
@@ -345,30 +210,9 @@ def plot_wf_mesh_mesh_vert_example(
                                       color_max=mesh_panel_c_color_max,
                                       color_range=mesh_panel_c_color_range, color_min=mesh_panel_c_color_min,
                                       cbar_units=mesh_panel_c_cbar_units, ytick_style=mesh_panel_c_ytick_style)
-    fig = plot_nwf_nmesh_vert(
-        {0: {"panel_type": "mesh", "panel": mesh_panel_c},
-         1: {"panel_type": "mesh", "panel": mesh_panel_b},
-         2: {"panel_type": "wf", "panel": wf_panel}},
-        plot_base=plot_base,
-        sanitize_times=True,
-        mesh_base=mesh_base)
+    fig = plt_tpl.plot_n_mesh_wf_vert(mesh_base, [mesh_panel_c, mesh_panel_b], plot_base, wf_panel)
 
     return fig
-
-
-def set_panel_label_ticks(ax_pnl: plt.Axes, ylabel: str, xlabel: str, text_size: int):
-    """
-    Set the x and y labels and set tick params for the given ax_pnl
-    :param ax_pnl: the Axes object to update
-    :param ylabel: label for y-axis
-    :param xlabel: label for x-axis
-    :param text_size: size of text
-    """
-    ax_pnl.set_ylabel(ylabel, size=text_size)
-    ax_pnl.set_xlabel(f"Frequency ({xlabel})", size=text_size)
-    ax_pnl.tick_params(axis="x", which="both", bottom=True, labelbottom=True, labelsize="large")
-    ax_pnl.tick_params(axis="y", which="both", left=True, labelleft=True, labelsize="large")
-    ax_pnl.grid(True)
 
 
 def plot_cw_and_power(
@@ -382,7 +226,7 @@ def plot_cw_and_power(
         cw_panel_units: str = "Norm",
         power_panel_y_units: str = "Power/Var(signal)",
         power_panel_x_units: str = "Frequency, Hz",
-        params_tfr=fa.FigureParameters(fa.AspectRatioType(3)),
+        params_tfr=fa.AudioParams(),
         units_time: str = "s",
         cw_panel_title: str = "CW",
         power_panel_title: str = "Power",
@@ -408,40 +252,11 @@ def plot_cw_and_power(
     :param figure_title_show: show panel titles if True; default is True
     :return: the figure
     """
-    # Catch cases where there may not be any data
-    time_xmin = cw_panel_time[0]
-    time_xmax = cw_panel_time[-1]
-    if time_xmin == time_xmax:
-        print("No data to plot.")
-        return
-
-    # Figure starts here
-    fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = plt.subplots(
-        1,
-        2,
-        figsize=(params_tfr.figure_size_x, params_tfr.figure_size_y),
-    )
-    fig: plt.Figure = fig_ax_tuple[0]
-    axes: List[plt.Axes] = fig_ax_tuple[1]
-    cw_panel: plt.Axes = axes[0]
-    power_panel: plt.Axes = axes[1]
-
-    if figure_title_show:
-        cw_panel.set_title(cw_panel_title, size=params_tfr.text_size)
-        power_panel.set_title(power_panel_title, size=params_tfr.text_size)
-
-    cw_panel.plot(cw_panel_time, cw_panel_sig)
-    set_panel_label_ticks(cw_panel, cw_panel_units, units_time, params_tfr.text_size)
-
-    for i in range(len(power_panel_sigs)):
-        power_panel.semilogx(power_panel_freqs[i], power_panel_sigs[i],
-                             ls=power_panel_ls[i],
-                             lw=power_panel_lw[i],
-                             label=power_panel_sig_labels[i])
-
-    set_panel_label_ticks(power_panel, power_panel_y_units, power_panel_x_units, params_tfr.text_size)
-    power_panel.legend()
-
-    fig.tight_layout()
-    fig.subplots_adjust()
-    return fig
+    cw_panel = plt_base.CwPanel(cw_panel_sig, cw_panel_time, cw_panel_units, units_time, cw_panel_title)
+    power_panel_data = []
+    for f in range(len(power_panel_sigs)):
+        power_panel_data.append(plt_base.PowerPanelData(power_panel_sigs[f], power_panel_freqs[f], power_panel_ls[f],
+                                                        power_panel_lw[f], power_panel_sig_labels[f]))
+    power_panel = plt_base.PowerPanel(power_panel_data, power_panel_y_units, power_panel_x_units, power_panel_title)
+    cw_pow_base = plt_base.CwPowerPlotBase(params_tfr, figure_title_show)
+    return plt_tpl.plot_cw_and_power(cw_panel, power_panel, cw_pow_base)

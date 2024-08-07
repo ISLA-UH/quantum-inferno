@@ -40,8 +40,8 @@ def oversample_time(time_duration: float, time_sample_interval: float, oversampl
     """
     Return an oversampled time by a factor oversample_scale
 
-    :param time_duration: todo: units?
-    :param time_sample_interval: todo: units?
+    :param time_duration: duration of waveform
+    :param time_sample_interval: length of an interval
     :param oversample_scale: oversample waveform, then decimate by scale
     :return: oversampled timestamps
     """
@@ -122,22 +122,19 @@ def synth_00(
     """
     Generate three sine waves, oversample and decimate to AA
     Always work with non-dimensionalized units (number of points, Nyquist, etc.)
-    todo: finish comments
 
-    :param frequency_0:
-    :param frequency_1:
-    :param frequency_2:
-    :param time_start_2:
-    :param time_stop_2:
-    :param time_sample_interval:
-    :param time_duration:
+    :param frequency_0: first frequency
+    :param frequency_1: second frequency
+    :param frequency_2: third frequency
+    :param time_start_2: start time of third frequency
+    :param time_stop_2: end time of third frequency
+    :param time_sample_interval: length of an interval
+    :param time_duration: length of waveform
     :param oversample_scale: oversample synthetic, then decimate by scale
     :return: synth waveform and timestamps
     """
     # Oversample, then decimate
-    oversample_interval = time_sample_interval / oversample_scale
-    number_points = int(time_duration / oversample_interval)
-    time_all = np.arange(number_points) * oversample_interval
+    time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
 
     # Construct sine waves with unit amplitude [rms * sqrt(2)]
     sin_0 = np.sin(2.0 * np.pi * frequency_0 * time_all)
@@ -167,13 +164,13 @@ def synth_01(
     oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Example Synthetic 1 todo: be more descriptive
+    Example Synthetic 1
 
-    :param a:
-    :param b:
-    :param f:
-    :param time_sample_interval:
-    :param time_duration:
+    :param a: first value
+    :param b: second value
+    :param f: third value
+    :param time_sample_interval: length of an interval
+    :param time_duration: length of waveform
     :param oversample_scale: oversample synthetic, then decimate by scale
     :return: synth waveform and timestamps
     """
@@ -203,16 +200,16 @@ def synth_02(
     oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Example Synthetic 2 todo: be more descriptive
+    Example Synthetic 2
 
-    :param t1:
-    :param t2:
-    :param t3:
-    :param f1:
-    :param f2:
-    :param f3:
-    :param time_sample_interval:
-    :param time_duration:
+    :param t1: first time
+    :param t2: second time
+    :param t3: third time
+    :param f1: first frequency
+    :param f2: second frequency
+    :param f3: third frequency
+    :param time_sample_interval: length of an interval
+    :param time_duration: length of waveform
     :param oversample_scale: oversample synthetic, then decimate by scale
     :return: synth waveform and timestamps
     """
@@ -241,13 +238,13 @@ def synth_03(
     oversample_scale: int = DEFAULT_OVERSAMPLE_SCALE,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Example Synthetic 3 todo: be more descriptive
+    Example Synthetic 3
 
-    :param a:
-    :param b:
-    :param c:
-    :param time_sample_interval:
-    :param time_duration:
+    :param a: first value
+    :param b: second value
+    :param c: third value
+    :param time_sample_interval: length of an interval
+    :param time_duration: length of waveform
     :param oversample_scale: oversample synthetic, then decimate by scale
     :return: synth waveform and timestamps
     """
@@ -279,14 +276,13 @@ def well_tempered_tone(
 ) -> Tuple[np.ndarray, np.ndarray, int, float, float, float]:
     """
     Return a tone of unit amplitude and fixed frequency with a constant sample rate
-    todo: finish comments
 
-    :param frequency_sample_rate_hz:
-    :param frequency_center_hz:
-    :param time_duration_s:
-    :param time_fft_s: Split the record into segments. default 1 second
-    :param use_fft_frequency:
-    :param add_noise_taper_aa:
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param frequency_center_hz: center frequency in Hz
+    :param time_duration_s: duration in seconds
+    :param time_fft_s: length of segments. Default 1 second
+    :param use_fft_frequency: use FFT frequency.  Default True
+    :param add_noise_taper_aa: add noise taper.  Default False
     :param output_desc: if True, output description of waveform.  Default False
     :return: waveform, timestamps, fft duration, sample rate, center frequency, frequency resolution
     """
@@ -305,12 +301,13 @@ def well_tempered_tone(
             f"Warning: The time duration {time_duration_s} s with given sample rate doesn't produce data points "
             f"that are power of two, adjusting time duration to {time_duration_nd / frequency_sample_rate_hz} s"
         )
+        time_duration_nd /= frequency_sample_rate_hz
     if time_fft_nd != time_fft_s * frequency_sample_rate_hz:
         print(
             f"Warning: fft duration {time_fft_s} s with given sample rate doesn't produce data points "
             f"that are power of two, adjusting fft duration to {time_fft_nd / frequency_sample_rate_hz} s"
         )
-    # todo: are the values supposed to get reset?
+        time_fft_nd /= frequency_sample_rate_hz
 
     # The fft frequencies are set by the duration of the fft
     # In this example we only need the positive frequencies

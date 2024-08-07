@@ -1,6 +1,5 @@
 """
 This module constructs synthetic signals
-TODO: ADD MORE INFO
 """
 
 import numpy as np

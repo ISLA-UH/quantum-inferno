@@ -106,7 +106,7 @@ def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER, show_warning: bo
     Ensure no negative, complex, or unreasonably small orders are passed; override to 1/3 octave band
     Standard orders are one of: 1, 3, 6, 12, 24. If order < 0.75 it reverts to order = 3
 
-    :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24
+    :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
     :param show_warning: if True, prints warning of invalid scale_order.  Default True
     :return: sanitized scale order
     """
@@ -121,9 +121,9 @@ def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER, show_warning: bo
     return scale_order
 
 
-def scale_multiplier(scale_order: float = DEFAULT_SCALE_ORDER):
+def scale_multiplier(scale_order: float = DEFAULT_SCALE_ORDER) -> float:
     """
-    :param scale_order: scale order
+    :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
     :return: Scale multiplier for scale bands of order N > 0.75
     """
     return M_OVER_N * scale_order_check(scale_order)
@@ -134,7 +134,7 @@ def cycles_from_order(scale_order: float) -> float:
     Compute the number of cycles M for a specified band order N.
     N is the quantization parameter for the constant Q wavelet filters
 
-    :param scale_order: Band order, must be > 0.75 or reverts to N=0.75
+    :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
     :return: number of cycled per normalized angular frequency
     """
     return scale_multiplier(scale_order)
@@ -154,10 +154,10 @@ def order_from_cycles(cycles_per_scale: float) -> float:
     return scale_order_check(cycles_per_scale / M_OVER_N)
 
 
-def base_multiplier(scale_order: float = DEFAULT_SCALE_ORDER, scale_base: float = DEFAULT_SCALE_BASE):
+def base_multiplier(scale_order: float = DEFAULT_SCALE_ORDER, scale_base: float = DEFAULT_SCALE_BASE) -> float:
     """
-    :param scale_order:
-    :param scale_base:
+    :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
+    :param scale_base: scale base
     :return: Dyadic (log2) foundation for arbitrary base
     """
     return scale_order_check(scale_order) / np.log2(scale_base)
@@ -169,7 +169,7 @@ def scale_from_frequency_hz(
     """
     Non-dimensional scale and angular frequency for canonical Gabor/Morlet wavelet
 
-    :param scale_order:
+    :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
     :param scale_frequency_center_hz: scale frequency in hz
     :param frequency_sample_rate_hz: sample rate in hz
     :return: scale_atom, scaled angular frequency
@@ -196,14 +196,8 @@ def band_frequency_low_high(
     :param frequency_low_input: the lowest frequency of interest
     :param frequency_high_input: highest frequency of interest
     :param frequency_sample_rate_input: sample rate
-    :return:scale_order (Band order N > 1, defaults to 1.),
-        scale_base (positive reference Base G > 1, defaults to G3),
-        scale_band_number (Band number n),
-        frequency_ref (reference frequency value),
-        frequency_center_algebraic (Algebraic center of frequencies),
-        frequency_center_geometric (Geometric center of frequencies),
-        frequency_start (first frequency),
-        frequency_end (last frequency)
+    :return: scale_order, scale_base, scale_band_number, reference frequency value, Algebraic center of frequencies,
+             Geometric center of frequencies, frequency_start, frequency_end
     """
     scale_ref_input = 1 / frequency_ref_input
     scale_nyquist_input = 2 / frequency_sample_rate_input
@@ -365,13 +359,12 @@ def log_frequency_hz_from_fft_points(
     scale_base: float = DEFAULT_SCALE_BASE,
 ) -> np.ndarray:
     """
-
-    :param frequency_sample_hz:
-    :param fft_points:
-    :param scale_order:
-    :param scale_ref_hz:
-    :param scale_base:
-    :return:
+    :param frequency_sample_hz: sample rate of frequency in Hz
+    :param fft_points: number of fft points
+    :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
+    :param scale_ref_hz: reference frequency in Hz
+    :param scale_base: scale base
+    :return: array of scaled values
     """
     # TODO: Make function to round to to nearest power of two and perform all-around error checking for pow2
     # See log 2 functions below

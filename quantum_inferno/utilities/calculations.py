@@ -186,11 +186,8 @@ def round_value(value: float, rounding_type: str = "round") -> int:
 
 def get_num_points(sample_rate_hz: float, duration_s: float, rounding_type: str, output_unit: str) -> int:
     """
-    TODO: Make defaults for RoundingType, OutputType, add POW2 option/function. BITS is maybe not the best descriptor?
     Get number of points in a waveform based on the sample rate and duration and round based on the rounding method.
     For rounding type "round", if the decimal is halfway between two integers, it will round to the nearest even integer
-
-    Refer to OUTPUT_TYPES for available options
 
     :param sample_rate_hz: sample rate in Hz
     :param duration_s: duration in seconds

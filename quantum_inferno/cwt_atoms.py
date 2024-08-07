@@ -7,7 +7,6 @@ import scipy.signal as signal
 from quantum_inferno import scales_dyadic as scales
 from typing import Tuple, Union
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
-# todo: check typing of numerical values
 
 
 def chirp_complex(
@@ -30,7 +29,7 @@ def chirp_complex(
     :param frequency_sample_rate_hz: sample rate on Hz
     :param index_shift: Redshift = -1, Blueshift = +1, None=0
     :param scale_base: G2 or G3
-    :return: waveform_complex, time_shifted_s  # todo: define remaining return values
+    :return: waveform_complex, time_shifted_s, normal_scaling, spectrum_scaling
     """
     xtime_shifted = chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
     time_shifted_s = xtime_shifted / frequency_sample_rate_hz
@@ -39,12 +38,12 @@ def chirp_complex(
     cycles_m, _, gamma = chirp_mqg_from_n(band_order_nth, index_shift, scale_base)
     scale_atom = chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)
     p_complex = chirp_p_complex(scale_atom, gamma, index_shift)
-    amp_dict_0, amp_dict_1 = chirp_amplitude(scale_atom, gamma, index_shift)
+    normal_scaling, spectrum_scaling = chirp_amplitude(scale_atom, gamma, index_shift)
 
     wavelet_gauss = np.exp(-p_complex * xtime_shifted ** 2)
     wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_m * xtime_shifted / scale_atom)
 
-    return wavelet_gabor, time_shifted_s, amp_dict_0, amp_dict_1
+    return wavelet_gabor, time_shifted_s, normal_scaling, spectrum_scaling
 
 
 def chirp_spectrum(
@@ -104,7 +103,6 @@ def chirp_spectrum_centered(
     :param scale_base: positive reference Base G > 1. Default is G2
     :return: Fourier transform of the Gabor atom and shifted frequency in hz
     """
-    # TODO: Generalize to two dictionaries
     cycles_m, _, gamma = chirp_mqg_from_n(band_order_nth, index_shift, scale_base)
     scale_atom = chirp_scale(cycles_m, scale_frequency_center_hz, frequency_sample_rate_hz)
     p_complex = chirp_p_complex(scale_atom, gamma, index_shift)
@@ -216,12 +214,12 @@ def chirp_amplitude(scale_atom: float, gamma: float, index_shift: float) -> Tupl
     :param scale_atom: from chirp_scale or chirp_scale_from_order
     :param gamma: from index_shift, M/(2Q)
     :param index_shift: index of shift
-    :return: amp_dict_0, amp_dict_1
+    :return: normal_scaling, spectrum_scaling
     """
     p_complex = chirp_p_complex(scale_atom, gamma, index_shift)
-    amp_dict_0 = 1 / np.pi ** 0.25 * 1 / np.sqrt(scale_atom)
-    amp_dict_1 = np.sqrt(np.abs(p_complex) / np.pi)
-    return amp_dict_0, amp_dict_1
+    normal_scaling = 1 / np.pi ** 0.25 * 1 / np.sqrt(scale_atom)
+    spectrum_scaling = np.sqrt(np.abs(p_complex) / np.pi)
+    return normal_scaling, spectrum_scaling
 
 
 def chirp_time(time_s: np.ndarray, offset_time_s: float, frequency_sample_rate_hz: float) -> np.ndarray:
@@ -323,7 +321,7 @@ def chirp_centered_4cwt(
     time_s = np.arange(duration_points) / frequency_sample_rate_hz
     offset_time_s = time_s[-1] / 2.0
 
-    wavelet_gabor, time_centered_s, amp_dict_0, amp_dict_1 = chirp_complex(
+    wavelet_gabor, time_centered_s, normal_scaling, spectrum_scaling = chirp_complex(
         band_order_nth,
         time_s,
         offset_time_s,
@@ -333,7 +331,7 @@ def chirp_centered_4cwt(
         scale_base,
     )
 
-    wavelet_chirp = (amp_dict_0 if dictionary_type == "norm" else amp_dict_1) * wavelet_gabor
+    wavelet_chirp = (normal_scaling if dictionary_type == "norm" else spectrum_scaling) * wavelet_gabor
 
     return wavelet_chirp, time_centered_s
 
@@ -396,7 +394,6 @@ def cwt_chirp_complex(
 
     scale_points = len(frequency_cwt_hz_flipped)
 
-    # todo: flipped is an array but the function operates on floats.
     if cwt_type == "morlet2":
         scale_atom = chirp_scale(cycles_M, frequency_cwt_hz_flipped, frequency_sample_rate_hz)
         cwt_flipped = signal.cwt(
@@ -452,7 +449,7 @@ def cwt_chirp_from_sig(
     frequency_ref: float = scales.Slice.F1HZ,
     scale_base: float = scales.Slice.G2,
     dictionary_type: str = "norm",
-):
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate CWT for chirp
 

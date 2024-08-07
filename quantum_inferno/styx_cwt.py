@@ -10,8 +10,6 @@ import scipy.signal as signal
 
 from quantum_inferno import scales_dyadic as scales
 
-# TODO: LOOK AT ATOMS_TO_REPLACE and scaled_dyadic for inline cwt frequency. Same for STX.
-
 
 def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale: float, omega: float) -> Tuple[float, float]:
     """
@@ -27,43 +25,28 @@ def wavelet_variance_theory(amp: float, time_s: np.ndarray, scale: float, omega:
     return base_var / (1 + np.exp(-(scale * omega)**2)), base_var / (1 - np.exp(-(scale * omega)**2))
 
 
-# todo: move description of variables into function itself, along with giving the correct names.
 def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
-    Return chirp amplitude
-
-    amp_dict_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
-
-    amp_dict_unit_spectrum = return unit peak spectrum; for practical implementation.
-
-    amp_dict_unity = 1. Default (no scaling), for testing and validation against real and imaginary wavelets.
-
-    Programmers: Although tempting, do not simplify - this follows the original math and is a touchstone.
-
     :param scale_atom: atom/logon scale
     :return: amp_canonical, amp_unit_spectrum
     """
+    # amp_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
+    # amp_unit_spectrum = return unit peak spectrum; for practical implementation.
+    # Programmers: Although tempting, do not simplify - this follows the original math and is a touchstone.
     amp_canonical = (np.pi * scale_atom ** 2) ** (-1/4)
     amp_unit_spectrum = (4 * np.pi * scale_atom ** 2) ** (-1/4) * amp_canonical
     return amp_canonical, amp_unit_spectrum
 
 
-# todo: move description of variables into function itself, along with giving the correct names.
 def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
         Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
-    Return chirp amplitude
-
-    amp_dict_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
-
-    amp_dict_unit_spectrum = return unit peak spectrum; for practical implementation.
-
-    amp_dict_unity = 1. Default (no scaling), for testing and validation against real and imaginary wavelets.
-
     :param scale_atom: atom/logon scale
     :return: amp_canonical, amp_unit_spectrum
     """
+    # amp_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
+    # amp_unit_spectrum = return unit peak spectrum; for practical implementation.
     amp_canonical = (np.pi * scale_atom ** 2) ** (-1/4)
     amp_unit_spectrum = (4 * np.pi * scale_atom**2) ** (-1/4) * amp_canonical
     amp_norm2spect = amp_unit_spectrum/amp_canonical
@@ -73,17 +56,14 @@ def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
 
 def wavelet_time(time_s: np.ndarray, offset_time_s: float, frequency_sample_rate_hz: float) -> np.ndarray:
     """
-    Scaled time-shifted time
-
     :param time_s: array with time
     :param offset_time_s: offset time in seconds
     :param frequency_sample_rate_hz: sample rate in Hz
-    :return: numpy array with time-shifted time
+    :return: numpy array with scaled time-shifted time
     """
     return frequency_sample_rate_hz * (time_s - offset_time_s)
 
 
-# todo: lots of return values, consider object
 def wavelet_complex(
         band_order_nth: float,
         time_s: np.ndarray,
@@ -94,7 +74,6 @@ def wavelet_complex(
            Union[np.ndarray, float], Union[np.ndarray, float], Union[np.ndarray, float]]:
     """
     Quantized atom for specified band_order_Nth and arbitrary time duration.
-    Unscaled, to be modified by the dictionary type and use case. (<--there is no dictionary type)
     Returns a frequency x time dimension wavelet vector
 
     :param band_order_nth: Nth order of constant Q bands
@@ -102,7 +81,7 @@ def wavelet_complex(
     :param offset_time_s: offset time in seconds, should be between min and max of time_s
     :param scale_frequency_center_hz: center frequency fc in Hz
     :param frequency_sample_rate_hz: sample rate on Hz
-    :return: waveform_complex, time_shifted_s  # todo: finish return values
+    :return: waveform_complex, time_shifted_s, scale_angular_frequency, scale, omega, amp_canonical, amp_unit_spectrum
     """
     # Center and nondimensionalize time
     xtime_shifted = wavelet_time(time_s, offset_time_s, frequency_sample_rate_hz)
@@ -147,9 +126,9 @@ def wavelet_centered_4cwt(
     :param scale_frequency_center_hz: center frequency fc in Hz
     :param frequency_sample_rate_hz: sample rate is Hz
     :param dictionary_type: determines amplification value.  Default "norm"
-    :return: waveform_complex, time_shifted_s  # todo: finish return values
+    :return: waveform_complex, time_shifted_s, scale, omega, amp
     """
-    time_s = np.arange(duration_points)/frequency_sample_rate_hz
+    time_s = np.arange(duration_points) / frequency_sample_rate_hz
 
     wavelet_gabor, xtime_shifted, scale_angular_frequency, scale, omega, amp_canonical, amp_unit_spectrum = \
         wavelet_complex(band_order_nth, time_s, time_s[-1]/2., scale_frequency_center_hz, frequency_sample_rate_hz)
@@ -164,7 +143,6 @@ def wavelet_centered_4cwt(
     return amp * wavelet_gabor, xtime_shifted / frequency_sample_rate_hz, scale, omega, amp
 
 
-# todo: is this the replacement or what?
 def cwt_complex_any_scale_pow2(
         band_order_nth: float,
         sig_wf: np.ndarray,
@@ -215,64 +193,5 @@ def cwt_complex_any_scale_pow2(
         # Convolution using the fft method
         cwt = signal.fftconvolve(np.tile(sig_wf, (len(frequency_cwt_hz), 1)),
                                  np.conj(np.fliplr(cw_complex)), mode='same', axes=-1)
-        # TODO: Where is 'spect' option for dictionary_type?
-
-    return frequency_cwt_hz, time_cwt_s, cwt
-
-
-# todo: did this get replaced by above or not?
-def cwt_complex_any_scale_pow2_TO_REPLACE(
-        band_order_nth: float,
-        sig_wf: np.ndarray,
-        frequency_sample_rate_hz: float,
-        frequency_cwt_hz: np.ndarray,
-        cwt_type: str = "fft",
-        dictionary_type: str = "norm"
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Calculate CWT
-
-    :param band_order_nth: Nth order of constant Q bands
-    :param sig_wf: array with input signal
-    :param frequency_sample_rate_hz: sample rate in Hz, ordered from low to high frequency
-    :param frequency_cwt_hz: center frequency vector
-    :param cwt_type: one of "fft", or "morlet2". Default is "fft"
-    :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
-    :return: frequency_cwt_hz, time_cwt_s, cwt
-    """
-    wavelet_points = len(sig_wf)
-    time_cwt_s = np.arange(wavelet_points) / frequency_sample_rate_hz
-    cycles_m = scales.cycles_from_order(scale_order=band_order_nth)
-
-    # frequencies_cwt_hz = scales.log_frequency_hz_from_fft_points(
-    #     frequency_sample_hz=frequency_sample_rate_hz,
-    #     fft_points=len(sig_wf),
-    #     scale_order=band_order_nth)
-
-    cw_complex, _, _, _, amp = \
-        wavelet_centered_4cwt(band_order_nth=band_order_nth,
-                              duration_points=wavelet_points,
-                              scale_frequency_center_hz=frequency_cwt_hz,
-                              frequency_sample_rate_hz=frequency_sample_rate_hz,
-                              dictionary_type=dictionary_type)
-
-    if cwt_type == "morlet2":
-        scale_atom, _ = \
-            scales.scale_from_frequency_hz(scale_order=band_order_nth,
-                                           frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                           scale_frequency_center_hz=frequency_cwt_hz)
-        cwt = signal.cwt(data=sig_wf, wavelet=signal.morlet2,
-                         widths=scale_atom,
-                         w=cycles_m,
-                         dtype=np.complex128)
-        if dictionary_type == 'spect':
-            # Convert to 2d matrix
-            cwt *= np.tile(amplitude_convert_norm_to_spect(scale_atom=scale_atom), (wavelet_points, 1)).T
-
-    else:
-        # Convolution using the fft method
-        cwt = signal.fftconvolve(np.tile(sig_wf, (len(frequency_cwt_hz), 1)),
-                                 np.conj(np.fliplr(cw_complex)), mode='same', axes=-1)
-        # TODO: Where is 'spect' option for dictionary_type?
 
     return frequency_cwt_hz, time_cwt_s, cwt
