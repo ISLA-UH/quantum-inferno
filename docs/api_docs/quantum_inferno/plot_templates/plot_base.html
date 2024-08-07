@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>quantum_inferno.plot_templates.plot_base API documentation</title>
+<meta name="description" content="Base classes, constants, and functions used to create plots">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>quantum_inferno.plot_templates.plot_base</code></h1>
+</header>
+<section id="section-intro">
+<p>Base classes, constants, and functions used to create plots</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.mesh_colormap_limits"><code class="name flex">
+<span>def <span class="ident">mesh_colormap_limits</span></span>(<span>mesh_array: numpy.ndarray, colormap_scaling: str = 'auto', color_range: float = 16.0) ‑> Tuple[float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find colormap limits for plotting</p>
+<p>:param mesh_array: array with mesh
+:param colormap_scaling: one of: "auto" (max/min of input mesh),
+"range" (max of input mesh - color range given) or
+"abs" (absolute max/min of input mesh).
+Default "auto"
+:param color_range: range of colors.
+Default is 16.0
+:return: colormap min and max values</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPanel"><code class="flex name class">
+<span>class <span class="ident">CwPanel</span></span>
+<span>(</span><span>sig: numpy.ndarray, time: numpy.ndarray, y_units: str = 'Norm', x_units: str = 's', title: str = 'CW')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Panel for Continuous Waveform plots</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>sig</code></strong></dt>
+<dd>np.ndarray, the signal to plot.
+Required</dd>
+<dt><strong><code>time</code></strong></dt>
+<dd>np.ndarray, the timestamps of the data.
+Required</dd>
+<dt><strong><code>y_units</code></strong></dt>
+<dd>str, units of the signal.
+Default "Norm"</dd>
+<dt><strong><code>x_units</code></strong></dt>
+<dd>str, label for the time axis.
+Default "s"</dd>
+<dt><strong><code>title</code></strong></dt>
+<dd>str, title for the panel.
+Default "CW"</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class CwPanel:
+    &#34;&#34;&#34;
+    Panel for Continuous Waveform plots
+
+    Attributes:
+        sig: np.ndarray, the signal to plot.  Required
+        time: np.ndarray, the timestamps of the data.  Required
+        y_units: str, units of the signal.  Default &#34;Norm&#34;
+        x_units: str, label for the time axis.  Default &#34;s&#34;
+        title: str, title for the panel.  Default &#34;CW&#34;
+    &#34;&#34;&#34;
+    sig: np.ndarray
+    time: np.ndarray
+    y_units: str = &#34;Norm&#34;
+    x_units: str = &#34;s&#34;
+    title: str = &#34;CW&#34;
+
+    def is_no_data(self) -&gt; bool:
+        &#34;&#34;&#34;
+        :return: True if no data, False otherwise
+        &#34;&#34;&#34;
+        return self.time[0] == self.time[-1]</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPanel.sig"><code class="name">var <span class="ident">sig</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPanel.time"><code class="name">var <span class="ident">time</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPanel.title"><code class="name">var <span class="ident">title</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPanel.x_units"><code class="name">var <span class="ident">x_units</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPanel.y_units"><code class="name">var <span class="ident">y_units</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPanel.is_no_data"><code class="name flex">
+<span>def <span class="ident">is_no_data</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: True if no data, False otherwise</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPowerPlotBase"><code class="flex name class">
+<span>class <span class="ident">CwPowerPlotBase</span></span>
+<span>(</span><span>params_tfr: <a title="quantum_inferno.plot_templates.figure_attributes.AudioParams" href="figure_attributes.html#quantum_inferno.plot_templates.figure_attributes.AudioParams">AudioParams</a> = &lt;quantum_inferno.plot_templates.figure_attributes.AudioParams object&gt;, figure_title_show: bool = True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for plotting CW and Power plots.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>params_tfr</code></strong></dt>
+<dd>AudioParams, parameters for plotting data.
+Default AudioParams()</dd>
+<dt><strong><code>figure_title_show</code></strong></dt>
+<dd>bool, if True, show the figure title.
+Default True</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class CwPowerPlotBase:
+    &#34;&#34;&#34;
+    Base class for plotting CW and Power plots.
+
+    Attributes:
+        params_tfr: AudioParams, parameters for plotting data.  Default AudioParams()
+        figure_title_show: bool, if True, show the figure title.  Default True
+    &#34;&#34;&#34;
+    params_tfr: AudioParams = AudioParams()
+    figure_title_show: bool = True</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPowerPlotBase.figure_title_show"><code class="name">var <span class="ident">figure_title_show</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.CwPowerPlotBase.params_tfr"><code class="name">var <span class="ident">params_tfr</span> : <a title="quantum_inferno.plot_templates.figure_attributes.AudioParams" href="figure_attributes.html#quantum_inferno.plot_templates.figure_attributes.AudioParams">AudioParams</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase"><code class="flex name class">
+<span>class <span class="ident">MeshBase</span></span>
+<span>(</span><span>time: numpy.ndarray, frequency: numpy.ndarray, frequency_scaling: str = 'log', shading: str = 'auto', frequency_hz_ymin: Optional[float] = None, frequency_hz_ymax: Optional[float] = None, colormap: Optional[str] = None, units_frequency: str = 'Hz')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for Mesh plots.
+Independent of PlotBase.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>time</code></strong></dt>
+<dd>np.ndarray of the timestamps.
+Required</dd>
+<dt><strong><code>frequency</code></strong></dt>
+<dd>np.ndarray of the frequency data.
+Required</dd>
+<dt><strong><code>frequency_scaling</code></strong></dt>
+<dd>str, scaling for the frequency.
+refer to AXIS_SCALE_VALS for options.
+Default "log"</dd>
+<dt><strong><code>shading</code></strong></dt>
+<dd>str, shading of the plot.
+options: "auto", "gouraud", "flat", "nearest".
+Default "auto"</dd>
+<dt><strong><code>frequency_hz_ymin</code></strong></dt>
+<dd>optional float, minimum frequency.
+Default None</dd>
+<dt><strong><code>frequency_hz_ymax</code></strong></dt>
+<dd>optional float, maximum frequency.
+Default None</dd>
+<dt><strong><code>colormap</code></strong></dt>
+<dd>Optional str, colormap.
+Default None</dd>
+<dt><strong><code>units_frequency</code></strong></dt>
+<dd>str, units of the frequency.
+Default "Hz"</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class MeshBase:
+    &#34;&#34;&#34;
+    Base class for Mesh plots.  Independent of PlotBase.
+
+    Attributes:
+        time: np.ndarray of the timestamps.  Required
+        frequency: np.ndarray of the frequency data.  Required
+        frequency_scaling: str, scaling for the frequency.  refer to AXIS_SCALE_VALS for options.  Default &#34;log&#34;
+        shading: str, shading of the plot.  options: &#34;auto&#34;, &#34;gouraud&#34;, &#34;flat&#34;, &#34;nearest&#34;.  Default &#34;auto&#34;
+        frequency_hz_ymin: optional float, minimum frequency.  Default None
+        frequency_hz_ymax: optional float, maximum frequency.  Default None
+        colormap: Optional str, colormap.  Default None
+        units_frequency: str, units of the frequency.  Default &#34;Hz&#34;
+    &#34;&#34;&#34;
+    time: np.ndarray
+    frequency: np.ndarray
+    frequency_scaling: str = &#34;log&#34;
+    shading: str = &#34;auto&#34;
+    frequency_hz_ymin: Optional[float] = None
+    frequency_hz_ymax: Optional[float] = None
+    colormap: Optional[str] = None
+    units_frequency: str = &#34;Hz&#34;
+
+    def __post_init__(self):
+        # Autoscale to mesh frequency range
+        if self.frequency_hz_ymax is None:
+            self.frequency_hz_ymax = self.frequency[-1]
+        if self.frequency_hz_ymin is None:
+            self.frequency_hz_ymin = self.frequency[0]
+        if self.frequency_scaling not in AXIS_SCALE_VALS:
+            self.frequency_scaling = &#34;log&#34;
+        if self.shading not in MESH_SHADING_VALS:
+            self.shading = &#34;auto&#34;
+
+    def get_shading_as_literal(self) -&gt; Literal[&#34;auto&#34;, &#34;gouraud&#34;, &#34;flat&#34;, &#34;nearest&#34;]:
+        &#34;&#34;&#34;
+        :return: Literal value of the shading
+        &#34;&#34;&#34;
+        return cast(Literal, self.shading)
+
+    def get_colormesh_params(self) -&gt; Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional[str]]:
+        &#34;&#34;&#34;
+        :return: time, frequency, and shading for colormesh.  All three could be None
+        &#34;&#34;&#34;
+        if self.shading in [&#34;auto&#34;, &#34;gouraud&#34;]:
+            return self.time, self.frequency, self.get_shading_as_literal()
+        return None, None, None</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.colormap"><code class="name">var <span class="ident">colormap</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.frequency"><code class="name">var <span class="ident">frequency</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.frequency_hz_ymax"><code class="name">var <span class="ident">frequency_hz_ymax</span> : Optional[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.frequency_hz_ymin"><code class="name">var <span class="ident">frequency_hz_ymin</span> : Optional[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.frequency_scaling"><code class="name">var <span class="ident">frequency_scaling</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.shading"><code class="name">var <span class="ident">shading</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.time"><code class="name">var <span class="ident">time</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.units_frequency"><code class="name">var <span class="ident">units_frequency</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.get_colormesh_params"><code class="name flex">
+<span>def <span class="ident">get_colormesh_params</span></span>(<span>self) ‑> Tuple[Optional[numpy.ndarray], Optional[numpy.ndarray], Optional[str]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: time, frequency, and shading for colormesh.
+All three could be None</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshBase.get_shading_as_literal"><code class="name flex">
+<span>def <span class="ident">get_shading_as_literal</span></span>(<span>self) ‑> Literal['auto', 'gouraud', 'flat', 'nearest']</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: Literal value of the shading</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel"><code class="flex name class">
+<span>class <span class="ident">MeshPanel</span></span>
+<span>(</span><span>tfr: numpy.ndarray, colormap_scaling: str = 'auto', color_max: float = 15.0, color_range: float = 15.0, color_min: float = 0.0, cbar_units: str = 'bits', ytick_style: str = 'sci')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Panel for Mesh plots</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>tfr</code></strong></dt>
+<dd>np.ndarray of the data to plot.
+Required</dd>
+<dt><strong><code>colormap_scaling</code></strong></dt>
+<dd>str, scaling for the colormap.
+options: "auto", "range", "else".
+Default "auto"</dd>
+<dt><strong><code>color_max</code></strong></dt>
+<dd>float, maximum color value.
+Default 15</dd>
+<dt><strong><code>color_range</code></strong></dt>
+<dd>float, range of color values.
+Default 15</dd>
+<dt><strong><code>color_min</code></strong></dt>
+<dd>float, minimum color value.
+Default 0</dd>
+<dt><strong><code>cbar_units</code></strong></dt>
+<dd>str, units to display for colorbar.
+Default "bits"</dd>
+<dt><strong><code>ytick_style</code></strong></dt>
+<dd>str, style for yticks.
+options: "sci", "scientific", "plain".
+Default "sci"</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class MeshPanel:
+    &#34;&#34;&#34;
+    Panel for Mesh plots
+
+    Attributes:
+        tfr: np.ndarray of the data to plot.  Required
+        colormap_scaling: str, scaling for the colormap.  options: &#34;auto&#34;, &#34;range&#34;, &#34;else&#34;.  Default &#34;auto&#34;
+        color_max: float, maximum color value.  Default 15
+        color_range: float, range of color values.  Default 15
+        color_min: float, minimum color value.  Default 0
+        cbar_units: str, units to display for colorbar.  Default &#34;bits&#34;
+        ytick_style: str, style for yticks.  options: &#34;sci&#34;, &#34;scientific&#34;, &#34;plain&#34;.  Default &#34;sci&#34;
+    &#34;&#34;&#34;
+    tfr: np.ndarray
+    colormap_scaling: str = &#34;auto&#34;
+    color_max: float = 15.
+    color_range: float = 15.
+    color_min: float = 0.
+    cbar_units: str = &#34;bits&#34;
+    ytick_style: str = &#34;sci&#34;
+
+    def __post_init__(self):
+        if self.colormap_scaling not in COLORMAP_SCALING_VALS:
+            self.colormap_scaling = &#34;else&#34;
+        else:
+            self.set_color_min_max()
+        if self.ytick_style not in YTICK_STYLE_VALS:
+            self.ytick_style = &#34;sci&#34;
+
+    def set_color_min_max(self):
+        &#34;&#34;&#34;
+        Set color min-max if the colormap_scaling is &#34;auto&#34; or &#34;range&#34;
+        &#34;&#34;&#34;
+        if self.is_auto_color_min_max():
+            self.color_min, self.color_max = mesh_colormap_limits(self.tfr, self.colormap_scaling, self.color_range)
+
+    def is_auto_color_min_max(self) -&gt; bool:
+        &#34;&#34;&#34;
+        :return: True if colormap_scaling is &#34;auto&#34; or &#34;range&#34;, which auto-sets the color range
+        &#34;&#34;&#34;
+        return self.colormap_scaling in [&#34;auto&#34;, &#34;range&#34;]</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.cbar_units"><code class="name">var <span class="ident">cbar_units</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.color_max"><code class="name">var <span class="ident">color_max</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.color_min"><code class="name">var <span class="ident">color_min</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.color_range"><code class="name">var <span class="ident">color_range</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.colormap_scaling"><code class="name">var <span class="ident">colormap_scaling</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.tfr"><code class="name">var <span class="ident">tfr</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.ytick_style"><code class="name">var <span class="ident">ytick_style</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.is_auto_color_min_max"><code class="name flex">
+<span>def <span class="ident">is_auto_color_min_max</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: True if colormap_scaling is "auto" or "range", which auto-sets the color range</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.set_color_min_max"><code class="name flex">
+<span>def <span class="ident">set_color_min_max</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set color min-max if the colormap_scaling is "auto" or "range"</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PlotBase"><code class="flex name class">
+<span>class <span class="ident">PlotBase</span></span>
+<span>(</span><span>station_id: str, figure_title: str, figure_title_show: bool = True, start_time_epoch: float = 0.0, params_tfr: <a title="quantum_inferno.plot_templates.figure_attributes.AudioParams" href="figure_attributes.html#quantum_inferno.plot_templates.figure_attributes.AudioParams">AudioParams</a> = &lt;quantum_inferno.plot_templates.figure_attributes.AudioParams object&gt;, units_time: str = 's')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plotting base class with parameters used by all plots</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>station_id</code></strong></dt>
+<dd>str, id of the station being plotted.
+Required</dd>
+<dt><strong><code>figure_title</code></strong></dt>
+<dd>str, the title of the plot.
+Required</dd>
+<dt><strong><code>figure_title_show</code></strong></dt>
+<dd>bool, if True, show the figure title.
+Default True</dd>
+<dt><strong><code>start_time_epoch</code></strong></dt>
+<dd>float, the epoch start time of the data.
+Default 0.</dd>
+<dt><strong><code>params_tfr</code></strong></dt>
+<dd>AudioParams, parameters for plotting audio data.
+Default AudioParams()</dd>
+<dt><strong><code>units_time</code></strong></dt>
+<dd>str, label of units for time component.
+Default "s"</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class PlotBase:
+    &#34;&#34;&#34;
+    Plotting base class with parameters used by all plots
+
+    Attributes:
+        station_id: str, id of the station being plotted.  Required
+        figure_title: str, the title of the plot.  Required
+        figure_title_show: bool, if True, show the figure title.  Default True
+        start_time_epoch: float, the epoch start time of the data.  Default 0.
+        params_tfr: AudioParams, parameters for plotting audio data.  Default AudioParams()
+        units_time: str, label of units for time component.  Default &#34;s&#34;
+    &#34;&#34;&#34;
+    station_id: str
+    figure_title: str
+    figure_title_show: bool = True
+    start_time_epoch: float = 0.
+    params_tfr: AudioParams = AudioParams()
+    units_time: str = &#34;s&#34;</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.PlotBase.figure_title"><code class="name">var <span class="ident">figure_title</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PlotBase.figure_title_show"><code class="name">var <span class="ident">figure_title_show</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PlotBase.params_tfr"><code class="name">var <span class="ident">params_tfr</span> : <a title="quantum_inferno.plot_templates.figure_attributes.AudioParams" href="figure_attributes.html#quantum_inferno.plot_templates.figure_attributes.AudioParams">AudioParams</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PlotBase.start_time_epoch"><code class="name">var <span class="ident">start_time_epoch</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PlotBase.station_id"><code class="name">var <span class="ident">station_id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PlotBase.units_time"><code class="name">var <span class="ident">units_time</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanel"><code class="flex name class">
+<span>class <span class="ident">PowerPanel</span></span>
+<span>(</span><span>panel_data: List[<a title="quantum_inferno.plot_templates.plot_base.PowerPanelData" href="#quantum_inferno.plot_templates.plot_base.PowerPanelData">PowerPanelData</a>], y_units: str = 'Power/Var(signal)', x_units: str = 'Frequency, Hz', title: str = 'Power')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Panel for Power plots</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>panel_data</code></strong></dt>
+<dd>List of PowerPanelData objects to plot.
+Required</dd>
+<dt><strong><code>y_units</code></strong></dt>
+<dd>str, unit label for y-axis.
+Default "Power/Var(signal)"</dd>
+<dt><strong><code>x_units</code></strong></dt>
+<dd>str, unit label for x-axis.
+Default "Frequency, Hz"</dd>
+<dt><strong><code>title</code></strong></dt>
+<dd>str, title of the panel.
+Default "Power"</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class PowerPanel:
+    &#34;&#34;&#34;
+    Panel for Power plots
+
+    Attributes:
+        panel_data: List of PowerPanelData objects to plot.  Required
+        y_units: str, unit label for y-axis.  Default &#34;Power/Var(signal)&#34;
+        x_units: str, unit label for x-axis.  Default &#34;Frequency, Hz&#34;
+        title: str, title of the panel.  Default &#34;Power&#34;
+    &#34;&#34;&#34;
+    panel_data: List[PowerPanelData]
+    y_units: str = &#34;Power/Var(signal)&#34;
+    x_units: str = &#34;Frequency, Hz&#34;
+    title: str = &#34;Power&#34;</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanel.panel_data"><code class="name">var <span class="ident">panel_data</span> : List[<a title="quantum_inferno.plot_templates.plot_base.PowerPanelData" href="#quantum_inferno.plot_templates.plot_base.PowerPanelData">PowerPanelData</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanel.title"><code class="name">var <span class="ident">title</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanel.x_units"><code class="name">var <span class="ident">x_units</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanel.y_units"><code class="name">var <span class="ident">y_units</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanelData"><code class="flex name class">
+<span>class <span class="ident">PowerPanelData</span></span>
+<span>(</span><span>sig: numpy.ndarray, freq: numpy.ndarray, linestyle: str, linewidth: float, sig_label: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Data to be plotted in a PowerPanel.
+All values are required</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>sig</code></strong></dt>
+<dd>np.ndarray, the signal to plot.</dd>
+<dt><strong><code>freq</code></strong></dt>
+<dd>np.ndarray, the frequencies to plot.</dd>
+<dt><strong><code>linestyle</code></strong></dt>
+<dd>str, linestyle; all possible values:
+[‘solid’ | ‘dashed’, ‘dashdot’, ‘dotted’ | '-' | '&ndash;' | '-.' | ':' | 'None' | ' ' | ''].</dd>
+<dt><strong><code>linewidth</code></strong></dt>
+<dd>float, linewidth.</dd>
+<dt><strong><code>sig_label</code></strong></dt>
+<dd>str, label for the signal.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class PowerPanelData:
+    &#34;&#34;&#34;
+    Data to be plotted in a PowerPanel.  All values are required
+
+    Attributes:
+        sig: np.ndarray, the signal to plot.
+        freq: np.ndarray, the frequencies to plot.
+        linestyle: str, linestyle; all possible values:
+            [‘solid’ | ‘dashed’, ‘dashdot’, ‘dotted’ | &#39;-&#39; | &#39;--&#39; | &#39;-.&#39; | &#39;:&#39; | &#39;None&#39; | &#39; &#39; | &#39;&#39;].
+        linewidth: float, linewidth.
+        sig_label: str, label for the signal.
+    &#34;&#34;&#34;
+    sig: np.ndarray
+    freq: np.ndarray
+    linestyle: str
+    linewidth: float
+    sig_label: str</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanelData.freq"><code class="name">var <span class="ident">freq</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanelData.linestyle"><code class="name">var <span class="ident">linestyle</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanelData.linewidth"><code class="name">var <span class="ident">linewidth</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanelData.sig"><code class="name">var <span class="ident">sig</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.PowerPanelData.sig_label"><code class="name">var <span class="ident">sig_label</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel"><code class="flex name class">
+<span>class <span class="ident">WaveformPanel</span></span>
+<span>(</span><span>sig: numpy.ndarray, time: numpy.ndarray, units: str = 'Norm', label: str = '(wf)', yscaling: str = 'auto', ytick_style: str = 'plain')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Panel for Waveform plots</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>sig</code></strong></dt>
+<dd>np.ndarray, the signal to plot.
+Required</dd>
+<dt><strong><code>time</code></strong></dt>
+<dd>np.ndarray, the timestamps of the data.
+Required</dd>
+<dt><strong><code>units</code></strong></dt>
+<dd>str, units of the signal.
+Default "Norm"</dd>
+<dt><strong><code>label</code></strong></dt>
+<dd>str, label for the data.
+Default "(wf)"</dd>
+<dt><strong><code>yscaling</code></strong></dt>
+<dd>str, scaling for y-axis.
+options: "auto", "symmetric", "positive", "else".
+Default "auto"mesh_</dd>
+<dt><strong><code>ytick_style</code></strong></dt>
+<dd>str, style for yticks.
+options: "sci", "scientific", "plain".
+Default "plain"</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class WaveformPanel:
+    &#34;&#34;&#34;
+    Panel for Waveform plots
+
+    Attributes:
+        sig: np.ndarray, the signal to plot.  Required
+        time: np.ndarray, the timestamps of the data.  Required
+        units: str, units of the signal.  Default &#34;Norm&#34;
+        label: str, label for the data.  Default &#34;(wf)&#34;
+        yscaling: str, scaling for y-axis.  options: &#34;auto&#34;, &#34;symmetric&#34;, &#34;positive&#34;, &#34;else&#34;.  Default &#34;auto&#34;mesh_
+        ytick_style: str, style for yticks.  options: &#34;sci&#34;, &#34;scientific&#34;, &#34;plain&#34;.  Default &#34;plain&#34;
+    &#34;&#34;&#34;
+    sig: np.ndarray
+    time: np.ndarray
+    units: str = &#34;Norm&#34;
+    label: str = &#34;(wf)&#34;
+    yscaling: str = &#34;auto&#34;
+    ytick_style: str = &#34;plain&#34;
+
+    def __post_init__(self):
+        if self.ytick_style not in YTICK_STYLE_VALS:
+            self.ytick_style = &#34;plain&#34;
+        if self.yscaling not in WF_Y_SCALING_VALS:
+            self.yscaling = &#34;else&#34;
+
+    def set_y_lims(self, axis: plt.Axes):
+        &#34;&#34;&#34;
+        :param axis: the axis to update y limits for
+        :return: updated axis with new y limits
+        &#34;&#34;&#34;
+        if self.yscaling == &#34;auto&#34;:
+            axis.set_ylim(np.min(self.sig), np.max(self.sig))
+            self.ytick_style = &#34;plain&#34;
+        elif self.yscaling == &#34;symmetric&#34;:
+            axis.set_ylim(-np.max(np.abs(self.sig)), np.max(np.abs(self.sig)))
+        elif self.yscaling == &#34;positive&#34;:
+            axis.set_ylim(0, np.max(np.abs(self.sig)))
+        else:
+            axis.set_ylim(-10, 10)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.label"><code class="name">var <span class="ident">label</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.sig"><code class="name">var <span class="ident">sig</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.time"><code class="name">var <span class="ident">time</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.units"><code class="name">var <span class="ident">units</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.yscaling"><code class="name">var <span class="ident">yscaling</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.ytick_style"><code class="name">var <span class="ident">ytick_style</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.set_y_lims"><code class="name flex">
+<span>def <span class="ident">set_y_lims</span></span>(<span>self, axis: matplotlib.axes._axes.Axes)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param axis: the axis to update y limits for
+:return: updated axis with new y limits</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPlotBase"><code class="flex name class">
+<span>class <span class="ident">WaveformPlotBase</span></span>
+<span>(</span><span>station_id: str, figure_title: str, figure_title_show: bool = True, start_time_epoch: float = 0.0, params_tfr: <a title="quantum_inferno.plot_templates.figure_attributes.AudioParams" href="figure_attributes.html#quantum_inferno.plot_templates.figure_attributes.AudioParams">AudioParams</a> = &lt;quantum_inferno.plot_templates.figure_attributes.AudioParams object&gt;, units_time: str = 's', label_panel_show: bool = False, labels_fontweight: Optional[str] = None, waveform_color: Optional[str] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for Waveform plots.
+Extends PlotBase; refer to PlotBase for additional attributes</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>label_panel_show</code></strong></dt>
+<dd>bool, if True, show the label.
+Default False</dd>
+<dt><strong><code>labels_fontweight</code></strong></dt>
+<dd>optional str, font weight of the labels.
+Default None</dd>
+<dt><strong><code>waveform_color</code></strong></dt>
+<dd>optional str, color of the waveform.
+Default None</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class WaveformPlotBase(PlotBase):
+    &#34;&#34;&#34;
+    Base class for Waveform plots.  Extends PlotBase; refer to PlotBase for additional attributes
+
+    Attributes:
+        label_panel_show: bool, if True, show the label.  Default False
+        labels_fontweight: optional str, font weight of the labels.  Default None
+        waveform_color: optional str, color of the waveform.  Default None
+    &#34;&#34;&#34;
+    label_panel_show: bool = False
+    labels_fontweight: Optional[str] = None
+    waveform_color: Optional[str] = None</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="quantum_inferno.plot_templates.plot_base.PlotBase" href="#quantum_inferno.plot_templates.plot_base.PlotBase">PlotBase</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPlotBase.label_panel_show"><code class="name">var <span class="ident">label_panel_show</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPlotBase.labels_fontweight"><code class="name">var <span class="ident">labels_fontweight</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPlotBase.waveform_color"><code class="name">var <span class="ident">waveform_color</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="quantum_inferno.plot_templates" href="index.html">quantum_inferno.plot_templates</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.mesh_colormap_limits" href="#quantum_inferno.plot_templates.plot_base.mesh_colormap_limits">mesh_colormap_limits</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.CwPanel" href="#quantum_inferno.plot_templates.plot_base.CwPanel">CwPanel</a></code></h4>
+<ul class="two-column">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.CwPanel.is_no_data" href="#quantum_inferno.plot_templates.plot_base.CwPanel.is_no_data">is_no_data</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.CwPanel.sig" href="#quantum_inferno.plot_templates.plot_base.CwPanel.sig">sig</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.CwPanel.time" href="#quantum_inferno.plot_templates.plot_base.CwPanel.time">time</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.CwPanel.title" href="#quantum_inferno.plot_templates.plot_base.CwPanel.title">title</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.CwPanel.x_units" href="#quantum_inferno.plot_templates.plot_base.CwPanel.x_units">x_units</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.CwPanel.y_units" href="#quantum_inferno.plot_templates.plot_base.CwPanel.y_units">y_units</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.CwPowerPlotBase" href="#quantum_inferno.plot_templates.plot_base.CwPowerPlotBase">CwPowerPlotBase</a></code></h4>
+<ul class="">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.CwPowerPlotBase.figure_title_show" href="#quantum_inferno.plot_templates.plot_base.CwPowerPlotBase.figure_title_show">figure_title_show</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.CwPowerPlotBase.params_tfr" href="#quantum_inferno.plot_templates.plot_base.CwPowerPlotBase.params_tfr">params_tfr</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase" href="#quantum_inferno.plot_templates.plot_base.MeshBase">MeshBase</a></code></h4>
+<ul class="">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.colormap" href="#quantum_inferno.plot_templates.plot_base.MeshBase.colormap">colormap</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.frequency" href="#quantum_inferno.plot_templates.plot_base.MeshBase.frequency">frequency</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.frequency_hz_ymax" href="#quantum_inferno.plot_templates.plot_base.MeshBase.frequency_hz_ymax">frequency_hz_ymax</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.frequency_hz_ymin" href="#quantum_inferno.plot_templates.plot_base.MeshBase.frequency_hz_ymin">frequency_hz_ymin</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.frequency_scaling" href="#quantum_inferno.plot_templates.plot_base.MeshBase.frequency_scaling">frequency_scaling</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.get_colormesh_params" href="#quantum_inferno.plot_templates.plot_base.MeshBase.get_colormesh_params">get_colormesh_params</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.get_shading_as_literal" href="#quantum_inferno.plot_templates.plot_base.MeshBase.get_shading_as_literal">get_shading_as_literal</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.shading" href="#quantum_inferno.plot_templates.plot_base.MeshBase.shading">shading</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.time" href="#quantum_inferno.plot_templates.plot_base.MeshBase.time">time</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshBase.units_frequency" href="#quantum_inferno.plot_templates.plot_base.MeshBase.units_frequency">units_frequency</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel" href="#quantum_inferno.plot_templates.plot_base.MeshPanel">MeshPanel</a></code></h4>
+<ul class="">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.cbar_units" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.cbar_units">cbar_units</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.color_max" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.color_max">color_max</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.color_min" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.color_min">color_min</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.color_range" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.color_range">color_range</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.colormap_scaling" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.colormap_scaling">colormap_scaling</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.is_auto_color_min_max" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.is_auto_color_min_max">is_auto_color_min_max</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.set_color_min_max" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.set_color_min_max">set_color_min_max</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.tfr" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.tfr">tfr</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.ytick_style" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.ytick_style">ytick_style</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.PlotBase" href="#quantum_inferno.plot_templates.plot_base.PlotBase">PlotBase</a></code></h4>
+<ul class="two-column">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PlotBase.figure_title" href="#quantum_inferno.plot_templates.plot_base.PlotBase.figure_title">figure_title</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PlotBase.figure_title_show" href="#quantum_inferno.plot_templates.plot_base.PlotBase.figure_title_show">figure_title_show</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PlotBase.params_tfr" href="#quantum_inferno.plot_templates.plot_base.PlotBase.params_tfr">params_tfr</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PlotBase.start_time_epoch" href="#quantum_inferno.plot_templates.plot_base.PlotBase.start_time_epoch">start_time_epoch</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PlotBase.station_id" href="#quantum_inferno.plot_templates.plot_base.PlotBase.station_id">station_id</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PlotBase.units_time" href="#quantum_inferno.plot_templates.plot_base.PlotBase.units_time">units_time</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanel" href="#quantum_inferno.plot_templates.plot_base.PowerPanel">PowerPanel</a></code></h4>
+<ul class="">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanel.panel_data" href="#quantum_inferno.plot_templates.plot_base.PowerPanel.panel_data">panel_data</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanel.title" href="#quantum_inferno.plot_templates.plot_base.PowerPanel.title">title</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanel.x_units" href="#quantum_inferno.plot_templates.plot_base.PowerPanel.x_units">x_units</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanel.y_units" href="#quantum_inferno.plot_templates.plot_base.PowerPanel.y_units">y_units</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanelData" href="#quantum_inferno.plot_templates.plot_base.PowerPanelData">PowerPanelData</a></code></h4>
+<ul class="">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanelData.freq" href="#quantum_inferno.plot_templates.plot_base.PowerPanelData.freq">freq</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanelData.linestyle" href="#quantum_inferno.plot_templates.plot_base.PowerPanelData.linestyle">linestyle</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanelData.linewidth" href="#quantum_inferno.plot_templates.plot_base.PowerPanelData.linewidth">linewidth</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanelData.sig" href="#quantum_inferno.plot_templates.plot_base.PowerPanelData.sig">sig</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.PowerPanelData.sig_label" href="#quantum_inferno.plot_templates.plot_base.PowerPanelData.sig_label">sig_label</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a></code></h4>
+<ul class="two-column">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.label" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.label">label</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.set_y_lims" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.set_y_lims">set_y_lims</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.sig" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.sig">sig</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.time" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.time">time</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.units" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.units">units</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.yscaling" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.yscaling">yscaling</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.ytick_style" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.ytick_style">ytick_style</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a></code></h4>
+<ul class="">
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase.label_panel_show" href="#quantum_inferno.plot_templates.plot_base.WaveformPlotBase.label_panel_show">label_panel_show</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase.labels_fontweight" href="#quantum_inferno.plot_templates.plot_base.WaveformPlotBase.labels_fontweight">labels_fontweight</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase.waveform_color" href="#quantum_inferno.plot_templates.plot_base.WaveformPlotBase.waveform_color">waveform_color</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

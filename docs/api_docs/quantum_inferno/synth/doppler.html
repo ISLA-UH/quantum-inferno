@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>quantum_inferno.synth.doppler API documentation</title>
+<meta name="description" content="This module contains functions for constructing and examining doppler shift in signals">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>quantum_inferno.synth.doppler</code></h1>
+</header>
+<section id="section-intro">
+<p>This module contains functions for constructing and examining doppler shift in signals</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="quantum_inferno.synth.doppler.doppler_forward"><code class="name flex">
+<span>def <span class="ident">doppler_forward</span></span>(<span>tau_source_s: <built-in function array>, signal_speed_mps: float, source_speed_mps: float, receiver_speed_mps: float, space_dimensions: int, source_position_vector_initial_xyz_m: <built-in function array>, source_position_vector_final_xyz_m: <built-in function array>, receiver_position_vector_initial_xyz_m: <built-in function array>, receiver_position_vector_final_xyz_m: <built-in function array>) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Apply a doppler shift on a source moving towards the receiver</p>
+<p>:param tau_source_s: array of source times in seconds
+:param signal_speed_mps: speed of the signal in meters per second
+:param source_speed_mps: speed of the source in meters per second
+:param receiver_speed_mps: speed of the receiver in meters per second
+:param space_dimensions: integer number of dimensions everything is moving in
+:param source_position_vector_initial_xyz_m: position in space where source initially started
+:param source_position_vector_final_xyz_m: position in space where source ends up
+:param receiver_position_vector_initial_xyz_m: position in space where receiver initially started
+:param receiver_position_vector_final_xyz_m: position in space where receiver ends up
+:return: array of receiver times in seconds, Magnitude of range and time, omega over omega center</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.doppler_inverse"><code class="name flex">
+<span>def <span class="ident">doppler_inverse</span></span>(<span>inv_time_receiver_s: <built-in function array>, signal_speed_mps: float, source_speed_mps: float, receiver_speed_mps: float, space_dimensions: int, source_position_vector_initial_xyz_m: <built-in function array>, source_position_vector_final_xyz_m: <built-in function array>, receiver_position_vector_initial_xyz_m: <built-in function array>, receiver_position_vector_final_xyz_m: <built-in function array>) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Apply a doppler shift on an inverse</p>
+<p>:param inv_time_receiver_s: array of receiver times in seconds
+:param signal_speed_mps: speed of the signal in meters per second
+:param source_speed_mps: speed of the source in meters per second
+:param receiver_speed_mps: speed of the receiver in meters per second
+:param space_dimensions: integer number of dimensions everything is moving in
+:param source_position_vector_initial_xyz_m: position in space where source initially started
+:param source_position_vector_final_xyz_m: position in space where source ends up
+:param receiver_position_vector_initial_xyz_m: position in space where receiver initially started
+:param receiver_position_vector_final_xyz_m: position in space where receiver ends up
+:return: array of receiver times in seconds, Magnitude of range and time, omega over omega center</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.hadamard_dot_product_mx"><code class="name flex">
+<span>def <span class="ident">hadamard_dot_product_mx</span></span>(<span>x_mx: numpy.ndarray, y_mx: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Hadamard column-wise dot product with summation</p>
+<p>:param x_mx: MxN matrix x, columns represent directional vectors
+:param y_mx: MxN matrix y
+:return: sum of matrix product over columns</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.image_doppler_forward"><code class="name flex">
+<span>def <span class="ident">image_doppler_forward</span></span>(<span>tau_source_s: <built-in function array>, signal_speed_mps: float, source_speed_mps: float, receiver_speed_mps: float, space_dimensions: int, source_position_vector_initial_xyz_m: <built-in function array>, source_position_vector_final_xyz_m: <built-in function array>, receiver_position_vector_initial_xyz_m: <built-in function array>, receiver_position_vector_final_xyz_m: <built-in function array>) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Apply a doppler shift on a perceived source moving towards the receiver</p>
+<p>:param tau_source_s: array of source times in seconds
+:param signal_speed_mps: speed of the signal in meters per second
+:param source_speed_mps: speed of the source in meters per second
+:param receiver_speed_mps: speed of the receiver in meters per second
+:param space_dimensions: integer number of dimensions everything is moving in
+:param source_position_vector_initial_xyz_m: position in space where source initially started
+:param source_position_vector_final_xyz_m: position in space where source ends up
+:param receiver_position_vector_initial_xyz_m: position in space where receiver initially started
+:param receiver_position_vector_final_xyz_m: position in space where receiver ends up
+:return: array of receiver times in seconds, Magnitude of range and time, omega over omega center</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.image_doppler_inverse"><code class="name flex">
+<span>def <span class="ident">image_doppler_inverse</span></span>(<span>inv_time_receiver_s: <built-in function array>, signal_speed_mps: float, source_speed_mps: float, receiver_speed_mps: float, space_dimensions: int, source_position_vector_initial_xyz_m: <built-in function array>, source_position_vector_final_xyz_m: <built-in function array>, receiver_position_vector_initial_xyz_m: <built-in function array>, receiver_position_vector_final_xyz_m: <built-in function array>) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Apply a doppler shift on an image inverse</p>
+<p>:param inv_time_receiver_s: array of receiver times in seconds
+:param signal_speed_mps: speed of the signal in meters per second
+:param source_speed_mps: speed of the source in meters per second
+:param receiver_speed_mps: speed of the receiver in meters per second
+:param space_dimensions: integer number of dimensions everything is moving in
+:param source_position_vector_initial_xyz_m: position in space where source initially started
+:param source_position_vector_final_xyz_m: position in space where source ends up
+:param receiver_position_vector_initial_xyz_m: position in space where receiver initially started
+:param receiver_position_vector_final_xyz_m: position in space where receiver ends up
+:return: array of receiver times in seconds, Magnitude of range and time, omega over omega center</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.range_hadamard"><code class="name flex">
+<span>def <span class="ident">range_hadamard</span></span>(<span>r_mx: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the magnitude of range and time (Square root of Hadamard dot product over columns)</p>
+<p>:param r_mx: positional range matrix, 3-element XYZ columns, t rows
+:return: Square root of Hadamard dot product over columns</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.range_matrix_sr"><code class="name flex">
+<span>def <span class="ident">range_matrix_sr</span></span>(<span>x_source_mx: numpy.ndarray, x_receiver_mx: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>start to end position, source vs receiver matrix</p>
+<p>:param x_source_mx: starting position, 3-element XYZ columns, t rows
+:param x_receiver_mx: ending position, 3-element XYZ columns, t rows
+:return: receiver - source matrices</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.range_scalar"><code class="name flex">
+<span>def <span class="ident">range_scalar</span></span>(<span>x_source_vector: <built-in function array>, x_receiver_vector: <built-in function array>) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the magnitude of the range (square root of the sum of the range vector squared, element-wise)</p>
+<p>:param x_source_vector: starting position, 3-element XYZ
+:param x_receiver_vector: ending position, 3-element XYZ
+:return: magnitude of the range</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.range_vector_sr"><code class="name flex">
+<span>def <span class="ident">range_vector_sr</span></span>(<span>x_initial_position_vector: <built-in function array>, x_final_position_vector: <built-in function array>) ‑> <built-in function array></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start to end direction, or source vs receiver</p>
+<p>:param x_initial_position_vector: starting position, 3-element XYZ
+:param x_final_position_vector: ending position, 3-element XYZ
+:return: receiver - source vectors</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.space_4d_mx"><code class="name flex">
+<span>def <span class="ident">space_4d_mx</span></span>(<span>space_column_vector: numpy.ndarray, time_number_samples: int) ‑> <built-in function array></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Input XYZ space vector and convert to spacetime matrix [time x XYZ]</p>
+<p>:param space_column_vector: an array representing 3-dimensional space
+:param time_number_samples: number of time samples
+:return: spacetime matrix</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.time_4d_mx"><code class="name flex">
+<span>def <span class="ident">time_4d_mx</span></span>(<span>time_array: numpy.ndarray, space_dimensions: int) ‑> <built-in function array></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Input space and convert to spacetime matrix [time x XYZ]
+i.e. if time is [1, 2, 3, 4] and dimensions is 3
+result is [[1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4]]</p>
+<p>:param time_array: array of times in seconds
+:param space_dimensions: integer number of dimensions of space
+:return: time_array arranged vertically space_dimensions number of times</p></div>
+</dd>
+<dt id="quantum_inferno.synth.doppler.time_duration"><code class="name flex">
+<span>def <span class="ident">time_duration</span></span>(<span>time_vector: numpy.ndarray) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute time from max and min</p>
+<p>:param time_vector: array of times in seconds
+:return: duration in seconds</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="quantum_inferno.synth" href="index.html">quantum_inferno.synth</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="quantum_inferno.synth.doppler.doppler_forward" href="#quantum_inferno.synth.doppler.doppler_forward">doppler_forward</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.doppler_inverse" href="#quantum_inferno.synth.doppler.doppler_inverse">doppler_inverse</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.hadamard_dot_product_mx" href="#quantum_inferno.synth.doppler.hadamard_dot_product_mx">hadamard_dot_product_mx</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.image_doppler_forward" href="#quantum_inferno.synth.doppler.image_doppler_forward">image_doppler_forward</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.image_doppler_inverse" href="#quantum_inferno.synth.doppler.image_doppler_inverse">image_doppler_inverse</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.range_hadamard" href="#quantum_inferno.synth.doppler.range_hadamard">range_hadamard</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.range_matrix_sr" href="#quantum_inferno.synth.doppler.range_matrix_sr">range_matrix_sr</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.range_scalar" href="#quantum_inferno.synth.doppler.range_scalar">range_scalar</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.range_vector_sr" href="#quantum_inferno.synth.doppler.range_vector_sr">range_vector_sr</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.space_4d_mx" href="#quantum_inferno.synth.doppler.space_4d_mx">space_4d_mx</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.time_4d_mx" href="#quantum_inferno.synth.doppler.time_4d_mx">time_4d_mx</a></code></li>
+<li><code><a title="quantum_inferno.synth.doppler.time_duration" href="#quantum_inferno.synth.doppler.time_duration">time_duration</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

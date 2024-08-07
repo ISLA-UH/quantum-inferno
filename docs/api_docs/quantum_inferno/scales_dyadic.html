@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>quantum_inferno.scales_dyadic API documentation</title>
+<meta name="description" content="This module contains constants and functions that help with
+physical to cyber conversion with preferred quasi-dyadic orders.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>quantum_inferno.scales_dyadic</code></h1>
+</header>
+<section id="section-intro">
+<p>This module contains constants and functions that help with
+physical to cyber conversion with preferred quasi-dyadic orders.</p>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="quantum_inferno.scales_dyadic.M_OVER_N"><code class="name">var <span class="ident">M_OVER_N</span></code></dt>
+<dd>
+<div class="desc"><p>Standardized scales</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="quantum_inferno.scales_dyadic.band_frequency_low_high"><code class="name flex">
+<span>def <span class="ident">band_frequency_low_high</span></span>(<span>frequency_order_input: float, frequency_base_input: float, frequency_ref_input: float, frequency_low_input: float, frequency_high_input: float, frequency_sample_rate_input: float) ‑> Tuple[float, float, numpy.ndarray, float, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ</p>
+<p>:param frequency_order_input: Nth order
+:param frequency_base_input: G2 or G3
+:param frequency_ref_input: reference frequency
+:param frequency_low_input: the lowest frequency of interest
+:param frequency_high_input: highest frequency of interest
+:param frequency_sample_rate_input: sample rate
+:return: scale_order, scale_base, scale_band_number, reference frequency value, Algebraic center of frequencies,
+Geometric center of frequencies, frequency_start, frequency_end</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.band_intervals_periods"><code class="name flex">
+<span>def <span class="ident">band_intervals_periods</span></span>(<span>scale_order_input: float, scale_base_input: float, scale_ref_input: float, scale_low_input: float, scale_high_input: float, show_warnings: bool = True) ‑> Tuple[float, float, numpy.ndarray, float, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate Standard Logarithmic Interval Scale Parameters using time scales in seconds
+If scales are provided as frequency, previous computations convert to time.
+Designed to take bappsband to just below Nyquist, within a band edge.
+ALWAYS CONVERT TO SECONDS
+Last updated: 20200905</p>
+<p>:param scale_order_input: Band order N, for ISO3 use N = 1.0 or 3.0 or 6.0 or 12.0 or 24.0
+:param scale_base_input: reference base G; i.e. G3 = 10.**0.3 or G2 = 2.0
+:param scale_ref_input: time reference: in seconds
+:param scale_low_input: Lowest scale. If Nyquist scale, 2 * sample interval in seconds.
+:param scale_high_input: Highest scale of interest in seconds
+:param show_warnings: if True, show any warnings encountered.
+Default True
+:return: scale_order, scale_base, scale_band_number, scale_ref, scale_center_algebraic,
+scale_center_geometric, scale_start, scale_end</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.base_multiplier"><code class="name flex">
+<span>def <span class="ident">base_multiplier</span></span>(<span>scale_order: float = 3.0, scale_base: float = 1.9952623149688795) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.
+Must be &gt; 0.75 or reverts to N=0.75
+:param scale_base: scale base
+:return: Dyadic (log2) foundation for arbitrary base</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.cycles_from_order"><code class="name flex">
+<span>def <span class="ident">cycles_from_order</span></span>(<span>scale_order: float) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the number of cycles M for a specified band order N.
+N is the quantization parameter for the constant Q wavelet filters</p>
+<p>:param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.
+Must be &gt; 0.75 or reverts to N=0.75
+:return: number of cycled per normalized angular frequency</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.get_epsilon"><code class="name flex">
+<span>def <span class="ident">get_epsilon</span></span>(<span>) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return epsilon for float64, float32, float16 by detecting current interpreter's max size</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.log_frequency_hz_from_fft_points"><code class="name flex">
+<span>def <span class="ident">log_frequency_hz_from_fft_points</span></span>(<span>frequency_sample_hz: float, fft_points: int, scale_order: float = 1.9952623149688795, scale_ref_hz: float = 1.0, scale_base: float = 1.9952623149688795) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param frequency_sample_hz: sample rate of frequency in Hz
+:param fft_points: number of fft points
+:param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.
+Must be &gt; 0.75 or reverts to N=0.75
+:param scale_ref_hz: reference frequency in Hz
+:param scale_base: scale base
+:return: array of scaled values</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.order_from_cycles"><code class="name flex">
+<span>def <span class="ident">order_from_cycles</span></span>(<span>cycles_per_scale: float) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the number of cycles M for a specified band order N
+where N is the quantization parameter for the constant Q wavelet filters</p>
+<p>:param cycles_per_scale: Should be greater than or equal than one
+:return: number of cycled per normalized angular frequency</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.scale_from_frequency_hz"><code class="name flex">
+<span>def <span class="ident">scale_from_frequency_hz</span></span>(<span>scale_order: float, scale_frequency_center_hz: Union[numpy.ndarray, float], frequency_sample_rate_hz: float) ‑> Tuple[Union[numpy.ndarray, float], Union[numpy.ndarray, float]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Non-dimensional scale and angular frequency for canonical Gabor/Morlet wavelet</p>
+<p>:param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.
+Must be &gt; 0.75 or reverts to N=0.75
+:param scale_frequency_center_hz: scale frequency in hz
+:param frequency_sample_rate_hz: sample rate in hz
+:return: scale_atom, scaled angular frequency</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.scale_multiplier"><code class="name flex">
+<span>def <span class="ident">scale_multiplier</span></span>(<span>scale_order: float = 3.0) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.
+Must be &gt; 0.75 or reverts to N=0.75
+:return: Scale multiplier for scale bands of order N &gt; 0.75</p></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.scale_order_check"><code class="name flex">
+<span>def <span class="ident">scale_order_check</span></span>(<span>scale_order: float = 3.0, show_warning: bool = True) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Ensure no negative, complex, or unreasonably small orders are passed; override to 1/3 octave band
+Standard orders are one of: 1, 3, 6, 12, 24. If order &lt; 0.75 it reverts to order = 3</p>
+<p>:param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.
+Must be &gt; 0.75 or reverts to N=0.75
+:param show_warning: if True, prints warning of invalid scale_order.
+Default True
+:return: sanitized scale order</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="quantum_inferno.scales_dyadic.Slice"><code class="flex name class">
+<span>class <span class="ident">Slice</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constants for slice calculations, supersedes inferno/slice</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Slice:
+    &#34;&#34;&#34;
+    Constants for slice calculations, supersedes inferno/slice
+    &#34;&#34;&#34;
+    # Preferred Orders
+    ORD1 = 1.0  # Octaves; repeats nearly every three decades (1mHz, 1Hz, 1kHz)
+    ORD3 = 3.0  # 1/3 octaves; reduced temporal uncertainty for sharp transients and good for decade cycles
+    ORD6 = 6.0  # 1/6 octaves, good compromise for time-frequency resolution
+    ORD12 = 12.0  # Musical tones, continuous waves, long duration sweeps
+    ORD24 = 24.0  # High resolution; long duration window, 24 bands per octave
+    ORD48 = 48.0  # Ultra-high spectral resolution for blowing minds and interstellar communications
+    # Constant Q Base
+    G2 = 2.0  # Base two for perfect octaves and fractional octaves
+    G3 = 10.0 ** 0.3  # Reconciles base2 and base10
+    # Time
+    T_PLANCK = 5.4e-44  # 2.**(-144)   Planck time in seconds
+    T0S = 1e-42  # Universal Scale in S
+    T1S = 1.0  # 1 second
+    T100S = 100.0  # 1 hectosecond, IMS low band edge
+    T1000S = 1000.0  # 1 kiloseconds = 1 mHz
+    T1M = 60.0  # 1 minute in seconds
+    T1H = T1M * 60.0  # 1 hour in seconds
+    T1D = T1H * 24.0  # 1 day in seconds
+    TU = 2.0 ** 58  # Estimated age of the known universe in seconds
+    # Frequency
+    F1HZ = 1.0  # 1 Hz
+    F1KHZ = 1_000.0  # 1 kHz
+    F0HZ = 1.0e42  # 1/Universal Scale
+    FU = 2.0 ** -58  # 1/Estimated age of the known universe in s
+
+    # NOMINAL SAMPLE RATES (REDVOX API M, 2022)
+    FS1HZ = 1.0  # SOH
+    FS10HZ = 10.0  # iOS Barometer
+    FS30HZ = 30.0  # Android barometer
+    FS80HZ = 80.0  # Infrasound
+    FS200HZ = 200.0  # Android Magnetometer, Fast
+    FS400HZ = 400.0  # Android Accelerometer and Gyroscope, Fast
+    FS800HZ = 800.0  # Infrasound and Low Audio
+    FS8KHZ = 8_000.0  # Speech Audio
+    FS16KHZ = 16_000.0  # ML Audio
+    FS48KHZ = 48_000.0  # Audio to Ultrasound</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="quantum_inferno.scales_dyadic.Slice.F0HZ"><code class="name">var <span class="ident">F0HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.F1HZ"><code class="name">var <span class="ident">F1HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.F1KHZ"><code class="name">var <span class="ident">F1KHZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS10HZ"><code class="name">var <span class="ident">FS10HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS16KHZ"><code class="name">var <span class="ident">FS16KHZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS1HZ"><code class="name">var <span class="ident">FS1HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS200HZ"><code class="name">var <span class="ident">FS200HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS30HZ"><code class="name">var <span class="ident">FS30HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS400HZ"><code class="name">var <span class="ident">FS400HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS48KHZ"><code class="name">var <span class="ident">FS48KHZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS800HZ"><code class="name">var <span class="ident">FS800HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS80HZ"><code class="name">var <span class="ident">FS80HZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FS8KHZ"><code class="name">var <span class="ident">FS8KHZ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.FU"><code class="name">var <span class="ident">FU</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.G2"><code class="name">var <span class="ident">G2</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.G3"><code class="name">var <span class="ident">G3</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.ORD1"><code class="name">var <span class="ident">ORD1</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.ORD12"><code class="name">var <span class="ident">ORD12</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.ORD24"><code class="name">var <span class="ident">ORD24</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.ORD3"><code class="name">var <span class="ident">ORD3</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.ORD48"><code class="name">var <span class="ident">ORD48</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.ORD6"><code class="name">var <span class="ident">ORD6</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.T0S"><code class="name">var <span class="ident">T0S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.T1000S"><code class="name">var <span class="ident">T1000S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.T100S"><code class="name">var <span class="ident">T100S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.T1D"><code class="name">var <span class="ident">T1D</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.T1H"><code class="name">var <span class="ident">T1H</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.T1M"><code class="name">var <span class="ident">T1M</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.T1S"><code class="name">var <span class="ident">T1S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.TU"><code class="name">var <span class="ident">TU</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.scales_dyadic.Slice.T_PLANCK"><code class="name">var <span class="ident">T_PLANCK</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="quantum_inferno" href="index.html">quantum_inferno</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="quantum_inferno.scales_dyadic.M_OVER_N" href="#quantum_inferno.scales_dyadic.M_OVER_N">M_OVER_N</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="quantum_inferno.scales_dyadic.band_frequency_low_high" href="#quantum_inferno.scales_dyadic.band_frequency_low_high">band_frequency_low_high</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.band_intervals_periods" href="#quantum_inferno.scales_dyadic.band_intervals_periods">band_intervals_periods</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.base_multiplier" href="#quantum_inferno.scales_dyadic.base_multiplier">base_multiplier</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.cycles_from_order" href="#quantum_inferno.scales_dyadic.cycles_from_order">cycles_from_order</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.get_epsilon" href="#quantum_inferno.scales_dyadic.get_epsilon">get_epsilon</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.log_frequency_hz_from_fft_points" href="#quantum_inferno.scales_dyadic.log_frequency_hz_from_fft_points">log_frequency_hz_from_fft_points</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.order_from_cycles" href="#quantum_inferno.scales_dyadic.order_from_cycles">order_from_cycles</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.scale_from_frequency_hz" href="#quantum_inferno.scales_dyadic.scale_from_frequency_hz">scale_from_frequency_hz</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.scale_multiplier" href="#quantum_inferno.scales_dyadic.scale_multiplier">scale_multiplier</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.scale_order_check" href="#quantum_inferno.scales_dyadic.scale_order_check">scale_order_check</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="quantum_inferno.scales_dyadic.Slice" href="#quantum_inferno.scales_dyadic.Slice">Slice</a></code></h4>
+<ul class="two-column">
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.F0HZ" href="#quantum_inferno.scales_dyadic.Slice.F0HZ">F0HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.F1HZ" href="#quantum_inferno.scales_dyadic.Slice.F1HZ">F1HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.F1KHZ" href="#quantum_inferno.scales_dyadic.Slice.F1KHZ">F1KHZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS10HZ" href="#quantum_inferno.scales_dyadic.Slice.FS10HZ">FS10HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS16KHZ" href="#quantum_inferno.scales_dyadic.Slice.FS16KHZ">FS16KHZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS1HZ" href="#quantum_inferno.scales_dyadic.Slice.FS1HZ">FS1HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS200HZ" href="#quantum_inferno.scales_dyadic.Slice.FS200HZ">FS200HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS30HZ" href="#quantum_inferno.scales_dyadic.Slice.FS30HZ">FS30HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS400HZ" href="#quantum_inferno.scales_dyadic.Slice.FS400HZ">FS400HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS48KHZ" href="#quantum_inferno.scales_dyadic.Slice.FS48KHZ">FS48KHZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS800HZ" href="#quantum_inferno.scales_dyadic.Slice.FS800HZ">FS800HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS80HZ" href="#quantum_inferno.scales_dyadic.Slice.FS80HZ">FS80HZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FS8KHZ" href="#quantum_inferno.scales_dyadic.Slice.FS8KHZ">FS8KHZ</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.FU" href="#quantum_inferno.scales_dyadic.Slice.FU">FU</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.G2" href="#quantum_inferno.scales_dyadic.Slice.G2">G2</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.G3" href="#quantum_inferno.scales_dyadic.Slice.G3">G3</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.ORD1" href="#quantum_inferno.scales_dyadic.Slice.ORD1">ORD1</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.ORD12" href="#quantum_inferno.scales_dyadic.Slice.ORD12">ORD12</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.ORD24" href="#quantum_inferno.scales_dyadic.Slice.ORD24">ORD24</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.ORD3" href="#quantum_inferno.scales_dyadic.Slice.ORD3">ORD3</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.ORD48" href="#quantum_inferno.scales_dyadic.Slice.ORD48">ORD48</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.ORD6" href="#quantum_inferno.scales_dyadic.Slice.ORD6">ORD6</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.T0S" href="#quantum_inferno.scales_dyadic.Slice.T0S">T0S</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.T1000S" href="#quantum_inferno.scales_dyadic.Slice.T1000S">T1000S</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.T100S" href="#quantum_inferno.scales_dyadic.Slice.T100S">T100S</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.T1D" href="#quantum_inferno.scales_dyadic.Slice.T1D">T1D</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.T1H" href="#quantum_inferno.scales_dyadic.Slice.T1H">T1H</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.T1M" href="#quantum_inferno.scales_dyadic.Slice.T1M">T1M</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.T1S" href="#quantum_inferno.scales_dyadic.Slice.T1S">T1S</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.TU" href="#quantum_inferno.scales_dyadic.Slice.TU">TU</a></code></li>
+<li><code><a title="quantum_inferno.scales_dyadic.Slice.T_PLANCK" href="#quantum_inferno.scales_dyadic.Slice.T_PLANCK">T_PLANCK</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

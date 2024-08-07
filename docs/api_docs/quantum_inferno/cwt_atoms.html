@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>quantum_inferno.cwt_atoms API documentation</title>
+<meta name="description" content="This module contains functions to construct quantized, standardized information packets using binary metrics.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>quantum_inferno.cwt_atoms</code></h1>
+</header>
+<section id="section-intro">
+<p>This module contains functions to construct quantized, standardized information packets using binary metrics.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="quantum_inferno.cwt_atoms.chirp_amplitude"><code class="name flex">
+<span>def <span class="ident">chirp_amplitude</span></span>(<span>scale_atom: float, gamma: float, index_shift: float) ‑> Tuple[float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find chirp amplitude</p>
+<p>:param scale_atom: from chirp_scale or chirp_scale_from_order
+:param gamma: from index_shift, M/(2Q)
+:param index_shift: index of shift
+:return: normal_scaling, spectrum_scaling</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_centered_4cwt"><code class="name flex">
+<span>def <span class="ident">chirp_centered_4cwt</span></span>(<span>band_order_nth: float, sig_or_time: numpy.ndarray, scale_frequency_center_hz: float, frequency_sample_rate_hz: float, index_shift: float = 0, scale_base: float = 2.0, dictionary_type: str = 'norm') ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gabor atoms for CWT computation centered on the duration of signal</p>
+<p>:param sig_or_time: time or time series, wavelet matches this duration
+:param band_order_nth: Nth order of constant Q bands
+:param scale_frequency_center_hz: center frequency fc in Hz
+:param frequency_sample_rate_hz: sample rate is Hz
+:param index_shift: index of shift
+:param scale_base: G2 or G3
+:param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect")
+:return: waveform_complex, time_shifted_s</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_complex"><code class="name flex">
+<span>def <span class="ident">chirp_complex</span></span>(<span>band_order_nth: float, time_s: numpy.ndarray, offset_time_s: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float, index_shift: float = 0, scale_base: float = 2.0) ‑> Tuple[numpy.ndarray, numpy.ndarray, float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Quantum chirp for specified band_order_Nth and arbitrary time duration
+Unscaled, to be used by both Dictionary 1 and Dictionary 2</p>
+<p>:param band_order_nth: Nth order of constant Q bands
+:param time_s: time in seconds, duration should be greater than or equal to M/fc
+:param offset_time_s: offset time in seconds, should be between min and max of time_s
+:param scale_frequency_center_hz: center frequency fc in Hz
+:param frequency_sample_rate_hz: sample rate on Hz
+:param index_shift: Redshift = -1, Blueshift = +1, None=0
+:param scale_base: G2 or G3
+:return: waveform_complex, time_shifted_s, normal_scaling, spectrum_scaling</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_frequency_bands"><code class="name flex">
+<span>def <span class="ident">chirp_frequency_bands</span></span>(<span>scale_order_input: float, frequency_low_input: float, frequency_sample_rate_input: float, frequency_high_input: float, index_shift: float = 0, frequency_ref: float = 1.0, scale_base: float = 2.0) ‑> Tuple[float, float, float, float, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate frequency bands for chirp</p>
+<p>:param scale_order_input: Nth order specification
+:param frequency_low_input: lowest frequency of interest
+:param frequency_sample_rate_input: sample rate
+:param frequency_high_input: highest frequency of interest
+:param index_shift: index of shift
+:param frequency_ref: reference frequency
+:param scale_base: positive reference Base G &gt; 1. Default is G2
+:return: Nth order, cycles M, quality factor Q, gamma, geometric center of frequencies, start frequency,
+end frequency</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_mqg_from_n"><code class="name flex">
+<span>def <span class="ident">chirp_mqg_from_n</span></span>(<span>band_order_nth: float, index_shift: float = 0, scale_base: float = 2.0) ‑> Tuple[float, float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the quality factor Q and multiplier M for a specified band order N.
+N is THE quantization parameter for the binary constant Q wavelet filters.</p>
+<p>:param band_order_nth: Band order, must be &gt; 0.75 or reverts to N=3
+:param index_shift: index of shift. Default is 0.
+:param scale_base: positive reference Base G &gt; 1. Default is G2
+:return: cycles M, quality factor Q, gamma</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_p_complex"><code class="name flex">
+<span>def <span class="ident">chirp_p_complex</span></span>(<span>scale_atom: float, gamma: float, index_shift: float) ‑> complex</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fundamental chirp variable</p>
+<p>:param scale_atom: from chirp_scale or chirp_scale_from_order
+:param gamma: from index_shift, M/(2Q)
+:param index_shift: index of shift
+:return: p_complex</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_scale"><code class="name flex">
+<span>def <span class="ident">chirp_scale</span></span>(<span>cycles_m: float, scale_frequency_center_hz: Union[numpy.ndarray, float], frequency_sample_rate_hz: float) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Non-dimensional scale for canonical Morlet wavelet</p>
+<p>:param cycles_m: number of cycles per band period
+:param scale_frequency_center_hz: scale frequency in hz
+:param frequency_sample_rate_hz: sample rate in hz
+:return: scale atom</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_scale_from_order"><code class="name flex">
+<span>def <span class="ident">chirp_scale_from_order</span></span>(<span>band_order_nth: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float, index_shift: float = 0, scale_base: float = 2.0) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Non-dimensional scale for canonical Morlet wavelet</p>
+<p>:param band_order_nth: Band order, must be &gt; 0.75 or reverts to N=3
+:param scale_frequency_center_hz: scale frequency in hz
+:param frequency_sample_rate_hz: sample rate in hz
+:param index_shift: index fo shift. Default is 0.0
+:param scale_base: positive reference Base G &gt; 1. Default is G2
+:return: scale atom</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_scales_from_duration"><code class="name flex">
+<span>def <span class="ident">chirp_scales_from_duration</span></span>(<span>band_order_nth: float, sig_duration_s: float, index_shift: float = 0.0, scale_base: float = 2.0) ‑> Tuple[float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate scale factor for time and frequency from chirp duration</p>
+<p>:param band_order_nth: Band order
+:param sig_duration_s: signal duration in seconds
+:param index_shift: index fo shift. Default is 0.0
+:param scale_base: positive reference Base G &gt; 1. Default is G2
+:return: time in seconds and frequency in Hz scale factors</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_spectrum"><code class="name flex">
+<span>def <span class="ident">chirp_spectrum</span></span>(<span>frequency_hz: numpy.ndarray, offset_time_s: float, band_order_nth: float, frequency_center_hz: float, frequency_sample_rate_hz: float, index_shift: float = 0, scale_base: float = 2.0) ‑> Tuple[Union[complex, float, numpy.ndarray], numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Spectrum of quantum wavelet for specified band_order_Nth and arbitrary time duration</p>
+<p>:param frequency_hz: frequency range below Nyquist
+:param offset_time_s: time of wavelet centroid
+:param band_order_nth: Nth order of constant Q bands
+:param frequency_center_hz: band center frequency in Hz
+:param frequency_sample_rate_hz: sample rate on Hz
+:param index_shift: index of shift. Default is 0.0
+:param scale_base: positive reference Base G &gt; 1. Default is G2
+:return: Fourier transform of the Gabor atom and shifted frequency in hz</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_spectrum_centered"><code class="name flex">
+<span>def <span class="ident">chirp_spectrum_centered</span></span>(<span>band_order_nth: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float, index_shift: float = 0, scale_base: float = 2.0) ‑> Tuple[Union[complex, float, numpy.ndarray], numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Spectrum of quantum wavelet for specified band_order_Nth and arbitrary time duration</p>
+<p>:param band_order_nth: Nth order of constant Q-bands
+:param scale_frequency_center_hz: band center frequency in Hz
+:param frequency_sample_rate_hz: sample rate on Hz
+:param index_shift: index of shift. Default is 0.0
+:param scale_base: positive reference Base G &gt; 1. Default is G2
+:return: Fourier transform of the Gabor atom and shifted frequency in hz</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_time"><code class="name flex">
+<span>def <span class="ident">chirp_time</span></span>(<span>time_s: numpy.ndarray, offset_time_s: float, frequency_sample_rate_hz: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Scaled time-shifted time</p>
+<p>:param time_s: array with time
+:param offset_time_s: offset time in seconds
+:param frequency_sample_rate_hz: sample rate in Hz
+:return: numpy array with time-shifted time</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.chirp_uncertainty"><code class="name flex">
+<span>def <span class="ident">chirp_uncertainty</span></span>(<span>scale_atom: float, frequency_sample_rate_hz: float, gamma: float, index_shift: float) ‑> Tuple[float, float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate the uncertainty of chirp</p>
+<p>:param scale_atom: from chirp_scale or chirp_scale_from_order
+:param frequency_sample_rate_hz: sample rate in hz
+:param gamma: from index_shift, M/(2Q)
+:param index_shift: index of shift
+:return: time std in seconds, frequency std in Hz, angular frequency std in Hz</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.cwt_chirp_complex"><code class="name flex">
+<span>def <span class="ident">cwt_chirp_complex</span></span>(<span>band_order_nth: float, sig_wf: numpy.ndarray, frequency_low_hz: float, frequency_sample_rate_hz: float, frequency_high_hz: float = 1e+42, cwt_type: str = 'fft', index_shift: float = 0, frequency_ref: float = 1.0, scale_base: float = 2.0, dictionary_type: str = 'norm') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate CWT for chirp</p>
+<p>:param band_order_nth: Nth order of constant Q bands
+:param sig_wf: array with input signal
+:param frequency_low_hz: lowest frequency in Hz
+:param frequency_sample_rate_hz: sample rate in Hz
+:param frequency_high_hz: highest frequency in Hz
+:param cwt_type: one of "conv", "fft", or "morlet2". Default is "fft"
+Address ghost folding in "fft", compared to "conv"
+:param index_shift: index of shift. Default is 0.0
+:param frequency_ref: reference frequency in Hz. Default is F1HZ
+:param scale_base: G2 or G3. Default is G2
+:param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
+:return: cwt, cwt_bits, time_s, frequency_cwt_hz</p></div>
+</dd>
+<dt id="quantum_inferno.cwt_atoms.cwt_chirp_from_sig"><code class="name flex">
+<span>def <span class="ident">cwt_chirp_from_sig</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, band_order_nth: float = 3, cwt_type: str = 'fft', index_shift: float = 0, frequency_ref: float = 1.0, scale_base: float = 2.0, dictionary_type: str = 'norm') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate CWT for chirp</p>
+<p>:param sig_wf: array with input signal
+:param frequency_sample_rate_hz: sample rate in Hz
+:param band_order_nth: Nth order of constant Q bands
+:param cwt_type: one of "conv", "fft", or "morlet2". Default is "fft"
+:param index_shift: index of shift. Default is 0.0
+:param frequency_ref: reference frequency in Hz. Default is F1HZ
+:param scale_base: G2 or G3. Default is G2
+:param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
+:return: cwt, cwt_bits, time_s, frequency_cwt_hz</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="quantum_inferno" href="index.html">quantum_inferno</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_amplitude" href="#quantum_inferno.cwt_atoms.chirp_amplitude">chirp_amplitude</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_centered_4cwt" href="#quantum_inferno.cwt_atoms.chirp_centered_4cwt">chirp_centered_4cwt</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_complex" href="#quantum_inferno.cwt_atoms.chirp_complex">chirp_complex</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_frequency_bands" href="#quantum_inferno.cwt_atoms.chirp_frequency_bands">chirp_frequency_bands</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_mqg_from_n" href="#quantum_inferno.cwt_atoms.chirp_mqg_from_n">chirp_mqg_from_n</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_p_complex" href="#quantum_inferno.cwt_atoms.chirp_p_complex">chirp_p_complex</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_scale" href="#quantum_inferno.cwt_atoms.chirp_scale">chirp_scale</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_scale_from_order" href="#quantum_inferno.cwt_atoms.chirp_scale_from_order">chirp_scale_from_order</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_scales_from_duration" href="#quantum_inferno.cwt_atoms.chirp_scales_from_duration">chirp_scales_from_duration</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_spectrum" href="#quantum_inferno.cwt_atoms.chirp_spectrum">chirp_spectrum</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_spectrum_centered" href="#quantum_inferno.cwt_atoms.chirp_spectrum_centered">chirp_spectrum_centered</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_time" href="#quantum_inferno.cwt_atoms.chirp_time">chirp_time</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.chirp_uncertainty" href="#quantum_inferno.cwt_atoms.chirp_uncertainty">chirp_uncertainty</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.cwt_chirp_complex" href="#quantum_inferno.cwt_atoms.cwt_chirp_complex">cwt_chirp_complex</a></code></li>
+<li><code><a title="quantum_inferno.cwt_atoms.cwt_chirp_from_sig" href="#quantum_inferno.cwt_atoms.cwt_chirp_from_sig">cwt_chirp_from_sig</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

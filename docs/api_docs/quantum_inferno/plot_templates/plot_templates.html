@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>quantum_inferno.plot_templates.plot_templates API documentation</title>
+<meta name="description" content="Base templates for plots:
+* 3 waveforms
+* 1 waveform, 2 mesh
+* 1 waveform, 1 mesh
+* CW and Power">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>quantum_inferno.plot_templates.plot_templates</code></h1>
+</header>
+<section id="section-intro">
+<p>Base templates for plots:
+* 3 waveforms
+* 1 waveform, 2 mesh
+* 1 waveform, 1 mesh
+* CW and Power</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="quantum_inferno.plot_templates.plot_templates.adjust_figure_height"><code class="name flex">
+<span>def <span class="ident">adjust_figure_height</span></span>(<span>figure_size_y: int, n_rows: int, n_rows_standard: int = 2, hspace: float = 0.13) ‑> Tuple[float, float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adjust the figure height based on the number of rows to preserve standard panel aspect ratios</p>
+<p>:param figure_size_y: figure height
+:param n_rows: number of rows in figure
+:param n_rows_standard: number of rows in the figure for which height is not adjusted.
+Default 2
+:param hspace: height space between panels, fraction of average panel height.
+Default 0.13
+:return: adjusted figure height, space param for title, space param for x label</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.get_colormesh"><code class="name flex">
+<span>def <span class="ident">get_colormesh</span></span>(<span>axes: matplotlib.axes._axes.Axes, time: numpy.ndarray, freq: numpy.ndarray, shading: Optional[str], mesh_base: <a title="quantum_inferno.plot_templates.plot_base.MeshBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshBase">MeshBase</a>, mesh_panel: <a title="quantum_inferno.plot_templates.plot_base.MeshPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshPanel">MeshPanel</a>) ‑> matplotlib.collections.QuadMesh</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param axes: matplotlib axes to invoke the pcolormesh function
+:param time: timestamp array
+:param freq: frequency array
+:param shading: shading value
+:param mesh_base: MeshBase to get info from
+:param mesh_panel: MeshPanel to get info from
+:return: Quadmesh for plotting</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.get_time_label"><code class="name flex">
+<span>def <span class="ident">get_time_label</span></span>(<span>start_time_epoch: float, units_time: str, utc_offset_h: float = 0.0) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param start_time_epoch: start time in seconds since epoch UTC
+:param units_time: units of time
+:param utc_offset_h: hours offset from UTC.
+Default 0 (UTC time)
+:return: label for time units on a chart</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.mesh_time_frequency_edges"><code class="name flex">
+<span>def <span class="ident">mesh_time_frequency_edges</span></span>(<span>frequency: numpy.ndarray, time: numpy.ndarray, frequency_ymin: float, frequency_ymax: float, frequency_scaling: str = 'linear') ‑> Tuple[numpy.ndarray, numpy.ndarray, float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find time and frequency edges for plotting.
+Raises an error if data is invalid.</p>
+<p>:param frequency: frequencies
+:param time: timestamps of the data
+:param frequency_ymin: minimum frequency for y-axis
+:param frequency_ymax: maximum frequency for y-axis
+:param frequency_scaling: "log" or "linear". Default is "linear"
+:return: time and frequency edges, frequency min and max</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.plot_cw_and_power"><code class="name flex">
+<span>def <span class="ident">plot_cw_and_power</span></span>(<span>cw_panel: <a title="quantum_inferno.plot_templates.plot_base.CwPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.CwPanel">CwPanel</a>, power_panel: <a title="quantum_inferno.plot_templates.plot_base.PowerPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.PowerPanel">PowerPanel</a>, cw_plot_base: <a title="quantum_inferno.plot_templates.plot_base.CwPowerPlotBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.CwPowerPlotBase">CwPowerPlotBase</a> = CwPowerPlotBase(params_tfr=&lt;quantum_inferno.plot_templates.figure_attributes.AudioParams object&gt;, figure_title_show=True)) ‑> matplotlib.figure.Figure</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Template for CW and power plots</p>
+<p>:param cw_panel: CW panel to plot
+:param power_panel: Power panel to plot
+:param cw_plot_base: base parameters for plotting.
+Default to default CwPowerPlotBase values
+:return: Figure to plot</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.plot_mesh_wf_vert"><code class="name flex">
+<span>def <span class="ident">plot_mesh_wf_vert</span></span>(<span>mesh_base: <a title="quantum_inferno.plot_templates.plot_base.MeshBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshBase">MeshBase</a>, mesh_panel: <a title="quantum_inferno.plot_templates.plot_base.MeshPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshPanel">MeshPanel</a>, wf_base: <a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a>, wf_panel: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, sanitize_times: bool = True, use_default_size: bool = True) ‑> matplotlib.figure.Figure</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Specifically plot one mesh and one waveform, vertically</p>
+<p>:param mesh_base: base values for mesh plots
+:param mesh_panel: mesh panel to display
+:param wf_base: base values for plotting waveforms
+:param wf_panel: waveform to display
+:param sanitize_times: if True, sanitize timestamps.
+Default True
+:param use_default_size: if True, use the default size for the plots, otherwise size dynamically.
+Default True
+:return: Figure to plot</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.plot_n_mesh_wf_vert"><code class="name flex">
+<span>def <span class="ident">plot_n_mesh_wf_vert</span></span>(<span>mesh_base: <a title="quantum_inferno.plot_templates.plot_base.MeshBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshBase">MeshBase</a>, panels: List[<a title="quantum_inferno.plot_templates.plot_base.MeshPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshPanel">MeshPanel</a>], wf_base: <a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a>, wf_panel: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, sanitize_times: bool = True, use_default_size: bool = True) ‑> matplotlib.figure.Figure</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot 1 or more mesh panels above the base waveform panel in a vertical layout.</p>
+<p>:param mesh_base: base values for mesh plots
+:param panels: list of mesh panels to display, in order of display
+:param wf_base: base values for plotting waveforms
+:param wf_panel: WaveformPanel required for figure
+:param sanitize_times: if True, sanitize timestamps.
+Default True
+:param use_default_size: if True, use the default size for the plots, otherwise size dynamically.
+Default True
+:return: figure to display</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.plot_wf_3_vert"><code class="name flex">
+<span>def <span class="ident">plot_wf_3_vert</span></span>(<span>wf_base: <a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a>, wf_panel_a: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, wf_panel_b: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, wf_panel_c: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, sanitize_times: bool = True) ‑> matplotlib.figure.Figure</span>
+</code></dt>
+<dd>
+<div class="desc"><p>plot 3 waveforms</p>
+<p>:param wf_base: base params for plotting waveforms
+:param wf_panel_a: first waveform to plot
+:param wf_panel_b: second waveform to plot
+:param wf_panel_c: third waveform to plot
+:param sanitize_times: if True, sanitize the timestamps.
+Default True
+:return: figure to plot</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.sanitize_timestamps"><code class="name flex">
+<span>def <span class="ident">sanitize_timestamps</span></span>(<span>time_input: numpy.ndarray, start_epoch: Optional[float] = None) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sanitize timestamps</p>
+<p>:param time_input: array with timestamps
+:param start_epoch: optional start time to sanitize timestamps with.
+Default None (use the first timestamp)
+:return: timestamps re-calculated from given epoch_start or first timestamp</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.setup_cw_power_plot"><code class="name flex">
+<span>def <span class="ident">setup_cw_power_plot</span></span>(<span>ax: matplotlib.axes._axes.Axes, y_units: str, x_units: str, text_size: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the x and y labels and set tick params for the given Axes</p>
+<p>:param ax: the Axes object to update
+:param y_units: label for y-axis
+:param x_units: label for x-axis
+:param text_size: size of text</p></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.setup_plot"><code class="name flex">
+<span>def <span class="ident">setup_plot</span></span>(<span>ax: matplotlib.axes._axes.Axes, ylabel_units: str, text_size: int, is_waveform: bool, is_bottom: bool, ytick_style: str = 'plain')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>set up a plot with common values
+:param ax: pyplot Axes to set values for
+:param ylabel_units: label for y-axis units
+:param text_size: size of text
+:param is_waveform: if True, the Axes is plotting a waveform, otherwise it's a mesh
+:param is_bottom: if True, the Axes being plotted is the bottom subplot
+:param ytick_style: tick style for waveform y-axis.
+Does nothing if is_waveform is False.
+Default "plain"</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="quantum_inferno.plot_templates" href="index.html">quantum_inferno.plot_templates</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.adjust_figure_height" href="#quantum_inferno.plot_templates.plot_templates.adjust_figure_height">adjust_figure_height</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.get_colormesh" href="#quantum_inferno.plot_templates.plot_templates.get_colormesh">get_colormesh</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.get_time_label" href="#quantum_inferno.plot_templates.plot_templates.get_time_label">get_time_label</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.mesh_time_frequency_edges" href="#quantum_inferno.plot_templates.plot_templates.mesh_time_frequency_edges">mesh_time_frequency_edges</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.plot_cw_and_power" href="#quantum_inferno.plot_templates.plot_templates.plot_cw_and_power">plot_cw_and_power</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.plot_mesh_wf_vert" href="#quantum_inferno.plot_templates.plot_templates.plot_mesh_wf_vert">plot_mesh_wf_vert</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.plot_n_mesh_wf_vert" href="#quantum_inferno.plot_templates.plot_templates.plot_n_mesh_wf_vert">plot_n_mesh_wf_vert</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.plot_wf_3_vert" href="#quantum_inferno.plot_templates.plot_templates.plot_wf_3_vert">plot_wf_3_vert</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.sanitize_timestamps" href="#quantum_inferno.plot_templates.plot_templates.sanitize_timestamps">sanitize_timestamps</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.setup_cw_power_plot" href="#quantum_inferno.plot_templates.plot_templates.setup_cw_power_plot">setup_cw_power_plot</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.setup_plot" href="#quantum_inferno.plot_templates.plot_templates.setup_plot">setup_plot</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

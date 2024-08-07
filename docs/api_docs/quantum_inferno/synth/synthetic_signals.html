@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>quantum_inferno.synth.synthetic_signals API documentation</title>
+<meta name="description" content="This module constructs synthetic signals">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>quantum_inferno.synth.synthetic_signals</code></h1>
+</header>
+<section id="section-intro">
+<p>This module constructs synthetic signals</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="quantum_inferno.synth.synthetic_signals.antialias_half_nyquist"><code class="name flex">
+<span>def <span class="ident">antialias_half_nyquist</span></span>(<span>synth: numpy.ndarray, filter_order: int = 4) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Antialiasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist</p>
+<p>:param synth: array with signal data
+:param filter_order: sets decay rate
+:return: numpy array with anti-aliased signal</p></div>
+</dd>
+<dt id="quantum_inferno.synth.synthetic_signals.chirp_linear_in_noise"><code class="name flex">
+<span>def <span class="ident">chirp_linear_in_noise</span></span>(<span>snr_bits: float, sample_rate_hz: float, duration_s: float, frequency_start_hz: float, frequency_end_hz: float, intro_s: Union[float, int], outro_s: Union[float, int]) ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Construct chirp with linear frequency sweep, white noise added.</p>
+<p>:param snr_bits: number of bits below signal standard deviation
+:param sample_rate_hz: sample rate in Hz
+:param duration_s: duration of chirp in seconds
+:param frequency_start_hz: start frequency in Hz
+:param frequency_end_hz: end frequency in Hz
+:param intro_s: number of seconds before chirp
+:param outro_s: number of seconds after chirp
+:return: numpy ndarray with waveform, numpy ndarray with time in seconds</p></div>
+</dd>
+<dt id="quantum_inferno.synth.synthetic_signals.chirp_noise_16bit"><code class="name flex">
+<span>def <span class="ident">chirp_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80.0, noise_std_loss_bits: float = 4.0, frequency_center_hz: Optional[float] = None) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Construct chirp with linear frequency sweep, white noise added, anti-aliased filter applied</p>
+<p>:param duration_points: number of points, length of signal. Default is 2 ** 12
+:param sample_rate_hz: sample rate in Hz. Default is 80.0
+:param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+:param frequency_center_hz: Optional center frequency fc in Hz.
+Default None
+:return: numpy ndarray with anti-aliased chirp with white noise</p></div>
+</dd>
+<dt id="quantum_inferno.synth.synthetic_signals.frequency_algebraic_nth"><code class="name flex">
+<span>def <span class="ident">frequency_algebraic_nth</span></span>(<span>frequency_geometric: numpy.ndarray, band_order_nth: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute algebraic frequencies in band order</p>
+<p>:param frequency_geometric: geometric frequencies
+:param band_order_nth: Nth order of constant Q bands
+:return: algebraic frequencies from band order</p></div>
+</dd>
+<dt id="quantum_inferno.synth.synthetic_signals.gabor_grain_frequencies"><code class="name flex">
+<span>def <span class="ident">gabor_grain_frequencies</span></span>(<span>frequency_order_input: float, frequency_low_input: float, frequency_high_input: float, frequency_sample_rate_input: float, frequency_base_input: float = 2.0, frequency_ref_input: float = 1.0) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Frequencies for g-chirps</p>
+<p>:param frequency_order_input: Nth order
+:param frequency_low_input: lowest frequency of interest
+:param frequency_high_input: highest frequency of interest
+:param frequency_sample_rate_input: sample rate
+:param frequency_base_input: G2 or G3. Default is G2
+:param frequency_ref_input: reference frequency. Default is 1.0
+:return: numpy arrays of center, start and end frequencies</p></div>
+</dd>
+<dt id="quantum_inferno.synth.synthetic_signals.sawtooth_doppler_noise_16bit"><code class="name flex">
+<span>def <span class="ident">sawtooth_doppler_noise_16bit</span></span>(<span>phase_radians: numpy.ndarray, noise_std_loss_bits: float = 4.0) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Construct an anti-aliased sawtooth waveform with white noise</p>
+<p>:param phase_radians: time-varying phase in radians
+:param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+:return: numpy ndarray with anti-aliased sawtooth signal with white noise</p></div>
+</dd>
+<dt id="quantum_inferno.synth.synthetic_signals.sawtooth_noise_16bit"><code class="name flex">
+<span>def <span class="ident">sawtooth_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80.0, noise_std_loss_bits: float = 4.0, frequency_center_hz: Optional[float] = None) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Construct an anti-aliased sawtooth waveform with white noise</p>
+<p>:param duration_points: number of points, length of signal. Default is 2 ** 12
+:param sample_rate_hz: sample rate in Hz. Default is 80.0
+:param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+:param frequency_center_hz: Optional center frequency fc in Hz.
+Default None
+:return: numpy ndarray with anti-aliased sawtooth signal with white noise</p></div>
+</dd>
+<dt id="quantum_inferno.synth.synthetic_signals.taper_tukey"><code class="name flex">
+<span>def <span class="ident">taper_tukey</span></span>(<span>sig_or_time: numpy.ndarray, fraction_cosine: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
+fraction_cosine = 0 is a rectangular window, 1 is a Hann window</p>
+<p>:param sig_or_time: input signal or time
+:param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
+:return: tukey taper window amplitude</p></div>
+</dd>
+<dt id="quantum_inferno.synth.synthetic_signals.white_noise_fbits"><code class="name flex">
+<span>def <span class="ident">white_noise_fbits</span></span>(<span>sig: numpy.ndarray, std_bit_loss: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute white noise with zero mean and standard deviation that is snr_bits below the input signal</p>
+<p>:param sig: detrended input signal
+:param std_bit_loss: number of bits below signal standard deviation
+:return: gaussian noise with zero mean</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="quantum_inferno.synth" href="index.html">quantum_inferno.synth</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="quantum_inferno.synth.synthetic_signals.antialias_half_nyquist" href="#quantum_inferno.synth.synthetic_signals.antialias_half_nyquist">antialias_half_nyquist</a></code></li>
+<li><code><a title="quantum_inferno.synth.synthetic_signals.chirp_linear_in_noise" href="#quantum_inferno.synth.synthetic_signals.chirp_linear_in_noise">chirp_linear_in_noise</a></code></li>
+<li><code><a title="quantum_inferno.synth.synthetic_signals.chirp_noise_16bit" href="#quantum_inferno.synth.synthetic_signals.chirp_noise_16bit">chirp_noise_16bit</a></code></li>
+<li><code><a title="quantum_inferno.synth.synthetic_signals.frequency_algebraic_nth" href="#quantum_inferno.synth.synthetic_signals.frequency_algebraic_nth">frequency_algebraic_nth</a></code></li>
+<li><code><a title="quantum_inferno.synth.synthetic_signals.gabor_grain_frequencies" href="#quantum_inferno.synth.synthetic_signals.gabor_grain_frequencies">gabor_grain_frequencies</a></code></li>
+<li><code><a title="quantum_inferno.synth.synthetic_signals.sawtooth_doppler_noise_16bit" href="#quantum_inferno.synth.synthetic_signals.sawtooth_doppler_noise_16bit">sawtooth_doppler_noise_16bit</a></code></li>
+<li><code><a title="quantum_inferno.synth.synthetic_signals.sawtooth_noise_16bit" href="#quantum_inferno.synth.synthetic_signals.sawtooth_noise_16bit">sawtooth_noise_16bit</a></code></li>
+<li><code><a title="quantum_inferno.synth.synthetic_signals.taper_tukey" href="#quantum_inferno.synth.synthetic_signals.taper_tukey">taper_tukey</a></code></li>
+<li><code><a title="quantum_inferno.synth.synthetic_signals.white_noise_fbits" href="#quantum_inferno.synth.synthetic_signals.white_noise_fbits">white_noise_fbits</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>
