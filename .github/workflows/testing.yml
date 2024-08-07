@@ -3,7 +3,7 @@ name: quantum-inferno testing
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
