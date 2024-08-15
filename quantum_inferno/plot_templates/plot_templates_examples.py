@@ -12,6 +12,43 @@ from quantum_inferno.plot_templates import plot_base as plt_base
 from quantum_inferno.plot_templates import plot_templates as plt_tpl
 
 
+def mesh_panel_colormap_scaling(
+        mesh_panel_custom_color_scaling: Union[tuple, float, None],
+        mesh_panel_tfr: np.ndarray,
+        mesh_panel_cbar_units: str = "bits",
+        mesh_panel_ytick_style: str = "sci") -> plt_base.MeshPanel:
+    """
+    Create a mesh panel with custom colormap scaling
+    :param mesh_panel_custom_color_scaling: either a float, a tuple of floats, or None. If tuple, values in the tuple
+        are used to set panel colormap limits according to (vmin, vmax). If float, range colormap scaling is used with
+        the provided float as the range. If None, auto colormap scaling is used. Default is range colormap scaling at
+        15.0 range.
+    :param mesh_panel_tfr: array with mesh tfr data for mesh plot
+    :param mesh_panel_cbar_units: units of colorbar for mesh plot. Default is "bits"
+    :param mesh_panel_ytick_style: 'plain' or 'sci'. Default is "sci"
+    :return: mesh panel object
+    """
+    if type(mesh_panel_custom_color_scaling) == tuple:
+        mesh_panel = plt_base.MeshPanel(tfr=mesh_panel_tfr,
+                                        colormap_scaling="else",
+                                        color_max=mesh_panel_custom_color_scaling[1],
+                                        color_min=mesh_panel_custom_color_scaling[0],
+                                        cbar_units=mesh_panel_cbar_units,
+                                        ytick_style=mesh_panel_ytick_style)
+    elif type(mesh_panel_custom_color_scaling) == float:
+        mesh_panel = plt_base.MeshPanel(tfr=mesh_panel_tfr,
+                                        colormap_scaling="range",
+                                        color_range=mesh_panel_custom_color_scaling,
+                                        cbar_units=mesh_panel_cbar_units,
+                                        ytick_style=mesh_panel_ytick_style)
+    else:
+        mesh_panel = plt_base.MeshPanel(colormap_scaling="auto",
+                                        tfr=mesh_panel_tfr,
+                                        cbar_units=mesh_panel_cbar_units,
+                                        ytick_style=mesh_panel_ytick_style)
+    return mesh_panel
+
+
 def plot_wf_mesh_vert_example(
         station_id: str,
         wf_panel_a_sig: np.ndarray,
@@ -25,10 +62,7 @@ def plot_wf_mesh_vert_example(
         wf_panel_a_yscaling: str = "auto",
         wf_panel_a_ytick_style: str = "plain",
         mesh_panel_b_ytick_style: str = "sci",
-        mesh_panel_b_colormap_scaling: str = "auto",
-        mesh_panel_b_color_max: float = 15,
-        mesh_panel_b_color_range: float = 15,
-        mesh_panel_b_color_min: float = 0,
+        mesh_panel_b_custom_color_scaling: Union[tuple, float, None] = 15.0,
         start_time_epoch: float = 0,
         frequency_hz_ymin: float = None,
         frequency_hz_ymax: float = None,
@@ -39,7 +73,7 @@ def plot_wf_mesh_vert_example(
         mesh_panel_b_cbar_units: str = "bits",
         figure_title: str = "Time-Frequency Representation",
         figure_title_show: bool = True,
-):
+) -> plt.Figure:
     """
     Plot 2 vertical panels - mesh (top panel) and signal waveform (bottom panel)
 
@@ -53,13 +87,10 @@ def plot_wf_mesh_vert_example(
     :param params_tfr: Display parameters for tfr. Check AudioParams().
     :param frequency_scaling: "log" or "linear". Default is "log"
     :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
-    :param mesh_panel_b_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
-        (use inputs given in mesh_panel_b_color_max, mesh_panel_b_color_range, mesh_panel_b_color_min).
-        Default is "auto"
-    :param mesh_panel_b_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
-    :param mesh_panel_b_color_range:range between maximum and minimum values in color scaling for scatter plot
-        (top panel). Default is 15.0
-    :param mesh_panel_b_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
+    :param mesh_panel_b_custom_color_scaling: either a float, a tuple of floats, or None. If tuple, values in the tuple
+        are used to set panel b colormap limits according to (vmin, vmax). If float, range colormap scaling is used with
+        the provided float as the range. If None, auto colormap scaling is used. Default is range colormap scaling at
+        15.0 range.
     :param start_time_epoch: start time in epoch UTC. Default is 0.0
     :param frequency_hz_ymin: minimum frequency for y-axis
     :param frequency_hz_ymax: maximum frequency for y-axis
@@ -90,17 +121,12 @@ def plot_wf_mesh_vert_example(
     # build panels
     wf_panel = plt_base.WaveformPanel(sig=wf_panel_a_sig, time=wf_panel_a_time, units=wf_panel_a_units, label="(wf)",
                                       yscaling=wf_panel_a_yscaling, ytick_style=wf_panel_a_ytick_style)
-    mesh_panel = plt_base.MeshPanel(tfr=mesh_panel_b_tfr,
-                                    colormap_scaling=mesh_panel_b_colormap_scaling,
-                                    color_max=mesh_panel_b_color_max,
-                                    color_range=mesh_panel_b_color_range, color_min=mesh_panel_b_color_min,
-                                    cbar_units=mesh_panel_b_cbar_units, ytick_style=mesh_panel_b_ytick_style)
-    fig = plt_tpl.plot_mesh_wf_vert(
-        mesh_base=mesh_base,
-        mesh_panel=mesh_panel,
-        wf_base=wf_base,
-        wf_panel=wf_panel,
-        sanitize_times=True)
+    mesh_panel = mesh_panel_colormap_scaling(mesh_panel_custom_color_scaling=mesh_panel_b_custom_color_scaling,
+                                             mesh_panel_tfr=mesh_panel_b_tfr,
+                                             mesh_panel_cbar_units=mesh_panel_b_cbar_units,
+                                             mesh_panel_ytick_style=mesh_panel_b_ytick_style)
+    fig = plt_tpl.plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel,
+                                      use_default_size=False)
 
     return fig
 
@@ -120,14 +146,8 @@ def plot_wf_mesh_mesh_vert_example(
         mesh_panel_c_ytick_style: str = "sci",
         frequency_scaling: str = "log",
         mesh_shading: str = "auto",
-        mesh_panel_b_colormap_scaling: str = "auto",
-        mesh_panel_b_color_max: float = 15,
-        mesh_panel_b_color_range: float = 15,
-        mesh_panel_b_color_min: float = 0,
-        mesh_panel_c_colormap_scaling: str = "auto",
-        mesh_panel_c_color_max: float = 15,
-        mesh_panel_c_color_range: float = 15,
-        mesh_panel_c_color_min: float = 0,
+        mesh_panel_b_custom_color_scaling: Union[tuple, float, None] = 15.0,
+        mesh_panel_c_custom_color_scaling: Union[tuple, float, None] = 15.0,
         start_time_epoch: float = 0,
         frequency_hz_ymin: float = None,
         frequency_hz_ymax: float = None,
@@ -139,7 +159,7 @@ def plot_wf_mesh_mesh_vert_example(
         mesh_panel_c_cbar_units: str = "bits",
         figure_title: str = "Time-Frequency Representation",
         figure_title_show: bool = True,
-):
+) -> plt.Figure:
     """
     Plot 3 vertical panels - mesh (top panel), mesh (middle panel) and signal waveform (bottom panel)
 
@@ -157,24 +177,18 @@ def plot_wf_mesh_mesh_vert_example(
     :param params_tfr: parameters for tfr. Check AudioParams().
     :param frequency_scaling: "log" or "linear". Default is "log"
     :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
-     :param mesh_panel_b_colormap_scaling: color scaling for mesh plot (middle panel). One of: "auto", "range" or "else"
-        (use inputs given in mesh_panel_b_color_max, mesh_panel_b_color_range, mesh_panel_b_color_min).
-        Default is "auto"
-    :param mesh_panel_b_color_max: maximum value for color scaling for mesh plot (middle panel). Default is 15.0
-    :param mesh_panel_b_color_range: range between maximum and minimum values in color scaling for mesh plot
-        (middle panel). Default is 15.0
-    :param mesh_panel_b_color_min: minimum value for color scaling for mesh plot (middle panel). Default is 0.0
-    :param mesh_panel_c_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
-        (use inputs given in mesh_panel_c_color_max, mesh_panel_c_color_range, mesh_panel_c_color_min).
-        Default is "auto"
-    :param mesh_panel_c_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
-    :param mesh_panel_c_color_range:range between maximum and minimum values in color scaling for scatter plot
-        (top panel). Default is 15.0
-    :param mesh_panel_c_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
+    :param mesh_panel_b_custom_color_scaling: either a float, a tuple of floats, or None. If tuple, values in the tuple
+        are used to set panel b colormap limits according to (vmin, vmax). If float, range colormap scaling is used with
+        the provided float as the range. If None, auto colormap scaling is used. Default is range colormap scaling at
+        15.0 range.
+    :param mesh_panel_c_custom_color_scaling: either a float, a tuple of floats, or None. If tuple, values in the tuple
+        are used to set panel c colormap limits according to (vmin, vmax). If float, range colormap scaling is used with
+        the provided float as the range. If None, auto colormap scaling is used. Default is range colormap scaling at
+        15.0 range.
     :param start_time_epoch: start time in epoch UTC. Default is 0.0
     :param frequency_hz_ymin: minimum frequency for y-axis
     :param frequency_hz_ymax: maximum frequency for y-axis
-    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
+    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. If None, inherits style sheet spec
     :param units_time: units of time. Default is "s"
     :param units_frequency: units of frequency. Default is "Hz"
     :param wf_panel_a_units: units of waveform plot (bottom panel). Default is "Norm"
@@ -200,17 +214,18 @@ def plot_wf_mesh_mesh_vert_example(
     # build panels
     wf_panel = plt_base.WaveformPanel(sig=wf_panel_a_sig, time=wf_panel_a_time, units=wf_panel_a_units, label="(wf)",
                                       yscaling=wf_panel_a_yscaling, ytick_style=wf_panel_a_ytick_style)
-    mesh_panel_b = plt_base.MeshPanel(tfr=mesh_panel_b_tfr,
-                                      colormap_scaling=mesh_panel_b_colormap_scaling,
-                                      color_max=mesh_panel_b_color_max,
-                                      color_range=mesh_panel_b_color_range, color_min=mesh_panel_b_color_min,
-                                      cbar_units=mesh_panel_b_cbar_units, ytick_style=mesh_panel_b_ytick_style)
-    mesh_panel_c = plt_base.MeshPanel(tfr=mesh_panel_c_tfr,
-                                      colormap_scaling=mesh_panel_c_colormap_scaling,
-                                      color_max=mesh_panel_c_color_max,
-                                      color_range=mesh_panel_c_color_range, color_min=mesh_panel_c_color_min,
-                                      cbar_units=mesh_panel_c_cbar_units, ytick_style=mesh_panel_c_ytick_style)
-    fig = plt_tpl.plot_n_mesh_wf_vert(mesh_base, [mesh_panel_c, mesh_panel_b], plot_base, wf_panel)
+    mesh_panel_b = mesh_panel_colormap_scaling(
+        mesh_panel_custom_color_scaling=mesh_panel_b_custom_color_scaling,
+        mesh_panel_tfr=mesh_panel_b_tfr,
+        mesh_panel_cbar_units=mesh_panel_b_cbar_units,
+        mesh_panel_ytick_style=mesh_panel_b_ytick_style)
+    mesh_panel_c = mesh_panel_colormap_scaling(
+        mesh_panel_custom_color_scaling=mesh_panel_c_custom_color_scaling,
+        mesh_panel_tfr=mesh_panel_c_tfr,
+        mesh_panel_cbar_units=mesh_panel_c_cbar_units,
+        mesh_panel_ytick_style=mesh_panel_c_ytick_style)
+    fig = plt_tpl.plot_n_mesh_wf_vert(mesh_base, [mesh_panel_c, mesh_panel_b], plot_base, wf_panel,
+                                      use_default_size=False)
 
     return fig
 
