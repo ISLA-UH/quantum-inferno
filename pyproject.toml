@@ -4,13 +4,13 @@
 
 [project]
 name = "quantum_inferno"
-version = "1.0"
+version = "1.0.1"
 authors = [
     { name = "ISLA, UH", email = "milton@isla.hawaii.edu" }
 ]
 description = "Quantized Information Entropy, Nth Octave (INFERNO)"
 readme = "README.md"
-requires-python = ">=3.8,<=3.12"
+requires-python = ">=3.8,<=3.13"
 license = {file = "LICENSE"}
 
 # Please specify dependencies in alphabetical order

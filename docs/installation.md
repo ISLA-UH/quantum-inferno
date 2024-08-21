@@ -23,7 +23,7 @@ installed module. An example is shown below:
 
 ```
 Name: quantum-inferno
-Version: 0.1
+Version: 1.0
 Summary: Quantized Information Entropy, Nth Octave (INFERNO)
 ...
 ```
