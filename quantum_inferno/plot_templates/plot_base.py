@@ -174,7 +174,7 @@ class WaveformPlotBase(PlotBase):
 
     Attributes:
         label_panel_show: bool, if True, show the label.  Default False
-        labels_fontweight: optional str, font weight of the labels.  Default None
+        labels_fontweight: optional str, font weight of the labels.  Default "bold"
         waveform_color: optional str, color of the waveform.  Default None
     """
     label_panel_show: bool = False
