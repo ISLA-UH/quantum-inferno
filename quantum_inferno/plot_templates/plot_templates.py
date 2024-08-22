@@ -150,12 +150,21 @@ def setup_plot(ax: plt.Axes, ylabel_units: str, text_size: int, is_waveform: boo
     :param ytick_style: tick style for waveform y-axis.  Does nothing if is_waveform is False.  Default "plain"
     """
     ax.set_ylabel(ylabel_units, size=text_size)
-    ax.tick_params(axis="x", which="both", bottom=is_bottom, labelbottom=is_bottom, labelsize="large")
-    ax.tick_params(axis="y", labelsize="large")
+    ax.tick_params(axis="x", which="both", bottom=is_bottom, labelbottom=is_bottom, labelsize=text_size)
+    ax.tick_params(axis="y", labelsize=text_size)
     if is_waveform:
         ax.grid(True)
         ax.ticklabel_format(style=ytick_style, scilimits=(0, 0), axis="y")
         ax.yaxis.get_offset_text().set_x(-0.034)
+
+
+def get_panel_labels(n: int):
+    """
+    Get panel labels for a figure with n panels
+    :param n: number of panels
+    """
+    letters = "abcdefghijklmnopqrstuvwxyz"
+    return [f"({letters[i]})" for i in range(n)]
 
 
 def plot_n_mesh_wf_vert(
@@ -239,6 +248,7 @@ def plot_n_mesh_wf_vert(
                 ticks=[math.ceil(p.color_min), math.floor(p.color_max)],
                 format=cbar_tick_fmt)
             mesh_panel_cbar.set_label(p.cbar_units, rotation=270, size=fig_params.text_size)
+            mesh_panel_cax.tick_params(labelsize=fig_params.text_size)
             axes[panel_index].set_ylim(frequency_fix_ymin, frequency_fix_ymax)
             axes[panel_index].set_yscale(mesh_base.frequency_scaling)
             if mesh_base.frequency_scaling == "linear":
@@ -248,7 +258,7 @@ def plot_n_mesh_wf_vert(
             axes[panel_index].margins(x=0)
         panel_index += 1
 
-    axes[-1].plot(wf_panel_n_time_zero, wf_panel.sig)
+    axes[-1].plot(wf_panel_n_time_zero, wf_panel.sig, color=wf_base.waveform_color)
     axes[-1].set_xlim(time_xmin, time_xmax)
     wf_panel.set_y_lims(axes[-1])
     setup_plot(axes[-1], wf_panel.units, fig_params.text_size, True, True, wf_panel.ytick_style)
@@ -260,7 +270,16 @@ def plot_n_mesh_wf_vert(
         title = f"{wf_base.figure_title}"
         if wf_base.station_id:
             title += f" at Station {wf_base.station_id}"
-        axes[0].set_title(title)
+        axes[0].set_title(title, fontsize=fig_params.text_size)
+    if wf_base.label_panel_show:
+        panel_labels = get_panel_labels(n=len(axes))
+        for i in range(len(panels)):
+            axes[i].text(0.01, 0.95, panel_labels[i], transform=axes[i].transAxes,
+                         fontsize=fig_params.text_size, fontweight=wf_base.labels_fontweight, va="top",
+                         color=panels[i].panel_label_color)
+        axes[-1].text(0.01, 0.95, panel_labels[-1], transform=axes[-1].transAxes,
+                      fontsize=fig_params.text_size, fontweight=wf_base.labels_fontweight, va="top",
+                      color=wf_panel.panel_label_color)
     fig.text(.5, .01, time_label, ha="center", size=fig_params.text_size)
     fig.align_ylabels(axes)
     fig.tight_layout()

@@ -76,6 +76,8 @@ class MeshBase:
             self.frequency_scaling = "log"
         if self.shading not in MESH_SHADING_VALS:
             self.shading = "auto"
+        if self.frequency_scaling == "log" and self.frequency_hz_ymin <= 0:
+            self.frequency_hz_ymin = self.frequency[1]
 
     def get_shading_as_literal(self) -> Literal["auto", "gouraud", "flat", "nearest"]:
         """
@@ -141,6 +143,7 @@ class MeshPanel:
     color_min: float = 0.
     cbar_units: str = "bits"
     ytick_style: str = "sci"
+    panel_label_color: str = "k"
 
     def __post_init__(self):
         if self.colormap_scaling not in COLORMAP_SCALING_VALS:
@@ -175,7 +178,7 @@ class WaveformPlotBase(PlotBase):
         waveform_color: optional str, color of the waveform.  Default None
     """
     label_panel_show: bool = False
-    labels_fontweight: Optional[str] = None
+    labels_fontweight: Optional[str] = "bold"
     waveform_color: Optional[str] = None
 
 
@@ -196,6 +199,7 @@ class WaveformPanel:
     time: np.ndarray
     units: str = "Norm"
     label: str = "(wf)"
+    panel_label_color: str = "k"
     yscaling: str = "auto"
     ytick_style: str = "plain"
 
