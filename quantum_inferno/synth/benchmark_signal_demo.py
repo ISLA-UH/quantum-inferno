@@ -1,8 +1,7 @@
 """
-Demonstrate the synthetic benchmark signals.
+Demonstrate selected synthetic benchmark signals.
 """
 import matplotlib.pyplot as plt
-
 import quantum_inferno.synth.benchmark_signals as bsig
 
 
