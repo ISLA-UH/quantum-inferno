@@ -97,7 +97,7 @@ def main():
     print("We'll turn on the panel labels, change the waveform color, and update the title.")
     # set wf_base optional parameters
     wf_base.label_panel_show = True
-    wf_base.waveform_color = "orange"
+    wf_base.waveform_color = "#1f77b4"  # Default color for matplotlib
     wf_base.figure_title = "2-panel plot with custom Base and Panel parameters"
     print("\nIn wf_panel, we can change the following parameters:")
     print("\t- units: str, units of the waveform.  Default 'Norm'")
