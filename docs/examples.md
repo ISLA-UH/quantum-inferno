@@ -19,7 +19,7 @@ Python files you can individually download and run.
 0. [Intro to Fast Fourier Transform (FFT) on simple tones](https://github.com/ISLA-UH/quantum-inferno/tree/main/docs/examples_tutorial/e00_intro_set/s00_tone_fft_intro.py)
 1. [Compute Welch power spectral density (PSD) on simple tone](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s01_tone_fft_welch.py)
 2. [Compute and display STFT PSD and spectrogram on simple tone](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s02_tone_stft_vs_spectrogram.py)
-3. [Compute spectrogram with different scaling and mode options](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s03_tone_spectrogram_variations.py)
+3. [Compute spectrogram with different scaling and mode options](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s03_tone_stft_spectrogram_variations.py)
 4. [Compute different time-frequency representations on a tone](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s04_tone_tfr.py)
 5. [Compute different time-frequency representations on a quantized Gabor atom](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s05_atom_tfr.py)
 6. [Compute different time-frequency representations on the GT blast](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s06_gt_blast_tfr.py)
