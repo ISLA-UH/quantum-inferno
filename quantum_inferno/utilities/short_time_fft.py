@@ -91,7 +91,7 @@ def stft_tukey(
     stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling)
 
     # calculate the STFT with detrending
-    stft_magnitude = stft_obj.stft_detrend(x=timeseries, detr="constant", padding=padding)
+    stft_magnitude = np.abs(stft_obj.stft_detrend(x=timeseries, detr="constant", padding=padding))
 
     # calculate the time and frequency bins
     time_bins = np.arange(start=0, stop=stft_obj.delta_t * np.shape(stft_magnitude)[1], step=stft_obj.delta_t)

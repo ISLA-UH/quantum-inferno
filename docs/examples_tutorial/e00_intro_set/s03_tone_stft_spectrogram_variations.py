@@ -141,7 +141,7 @@ if __name__ == "__main__":
     plt.xlabel("Frequency, Hz")
     plt.ylabel("Power/VAR(signal)")
     plt.grid(True)
-    plt.legend()
+    # plt.legend()
 
     # Density scaling option is more sensitive to the taper
     # Power spectral density is scaled by spectral resolution in Hz.
