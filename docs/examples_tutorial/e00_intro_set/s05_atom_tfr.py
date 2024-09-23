@@ -1,7 +1,7 @@
 """
-Quantum inferno example: s07_grain_tfr
-Time frequency representation (TFR) of a Gabor atom, or sound grain
-TODO: Select better scaling units to assess grain performance
+Quantum inferno example: s05_atom_tfr
+Time frequency representation (TFR) of a Gabor atom, otherwise referred to as logon, or sound grain
+TODO: Refine scaling units to assess grain performance
 
 """
 import numpy as np
