@@ -1,5 +1,6 @@
 """
 This module contains methods used in resampling signals
+
 """
 from typing import Tuple
 

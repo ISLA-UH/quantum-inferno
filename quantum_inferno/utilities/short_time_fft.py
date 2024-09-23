@@ -1,9 +1,11 @@
 """
 Methods for calculating frequency and time-frequency representations of signals.
 Try to match all the defaults...
+
 """
 
 from typing import Tuple
+
 import numpy as np
 from scipy import signal
 
