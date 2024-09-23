@@ -6,8 +6,6 @@ from typing import Tuple, Union
 import numpy as np
 import scipy.signal as signal
 
-from quantum_inferno import scales_dyadic as scales
-
 
 def butter_bandpass(
     sig_wf: np.ndarray,

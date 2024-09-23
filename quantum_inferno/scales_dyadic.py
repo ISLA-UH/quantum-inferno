@@ -1,6 +1,7 @@
 """
 This module contains constants and functions that help with
 physical to cyber conversion with preferred quasi-dyadic orders.
+The preferred orders are 1, 3, 6, 12, 24, 48, and 96.
 """
 
 import sys

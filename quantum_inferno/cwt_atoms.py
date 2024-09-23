@@ -1,11 +1,15 @@
 """
 This module contains functions to construct quantized, standardized information packets using binary metrics.
+No-chirp/sweep (index_shift=0, variable removed), simplified for the base stockwell transform.
+
 """
+
+from typing import Tuple, Union
 
 import numpy as np
 import scipy.signal as signal
+
 from quantum_inferno import scales_dyadic as scales
-from typing import Tuple, Union
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 

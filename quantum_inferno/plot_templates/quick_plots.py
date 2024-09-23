@@ -3,7 +3,6 @@ This module contains quick plotting routines
 """
 import numpy as np
 import matplotlib.pyplot as plt
-
 from quantum_inferno.scales_dyadic import get_epsilon
 
 
