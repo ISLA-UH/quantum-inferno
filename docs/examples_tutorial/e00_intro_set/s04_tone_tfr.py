@@ -1,5 +1,5 @@
 """
-Quantum inferno example: s06_tone_tfr.py
+Quantum inferno example: s04_tone_tfr.py
 Compute and compare Welch, STFT, CWT, and STWV on simple tone with a taper window.
 TODO: Turn signal welch and stft into functions with hard-coded defaults
 
@@ -10,10 +10,10 @@ import scipy.signal as signal
 
 from quantum_inferno import styx_stx, styx_cwt
 import quantum_inferno.plot_templates.plot_base as ptb
+import quantum_inferno.utilities.short_time_fft as stft
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
-from quantum_inferno.utilities.short_time_fft import stft_tukey
 
 print(__doc__)
 
@@ -68,8 +68,7 @@ if __name__ == "__main__":
         average="mean",
     )
 
-    # Compute the spectrogram with the stft option
-    frequency_stft_hz, time_stft_s, stft_complex = stft_tukey(
+    frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
@@ -139,7 +138,7 @@ if __name__ == "__main__":
     fmax = frequency_sample_rate_hz / 2  # Nyquist
 
     # Plot the STFT
-    wf_base = ptb.WaveformPlotBase(station_id="", figure_title=f"STFT for {EVENT_NAME}")
+    wf_base = ptb.WaveformPlotBase("", f"STFT for {EVENT_NAME}")
     wf_panel = ptb.WaveformPanel(mic_sig, time_s)
     mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
     mesh_panel = ptb.MeshPanel(mic_stft_bits, colormap_scaling="range", cbar_units="log$_2$(Power)")

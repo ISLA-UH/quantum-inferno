@@ -8,7 +8,7 @@ This section showcases examples using various quantum-inferno modules.
 - [Intro](#intro)
 - [Entropy](#entropy)
 - [Doppler](#doppler)
-- [TFTB](#tftb)
+- [Plotting set](#plotting-set)
 
 <!-- tocstop -->
 
@@ -16,14 +16,14 @@ This section showcases examples using various quantum-inferno modules.
 These examples are an introduction to quantum-inferno and are self-contained 
 Python files you can individually download and run.
 
-1. [Intro to Fast Fourier Transform (FFT) on simple tones](https://github.com/ISLA-UH/quantum-inferno/tree/main/docs/examples_tutorial/e00_intro_set/s00_tone_fft_intro.py)
-2. [Compute Welch power spectral density (PSD) on simple tone](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s01_tone_fft_welch.py)
-3. [Compute and display spectrogram on simple tone](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s02_tone_stft_vs_spectrogram.py)
-4. [Compute spectrogram with different scaling and mode options](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s03_tone_spectrogram_variations.py)
-5. [Compute stft spectrogram with libquantum]()
-6. [Compute stft spectrogram with libquantum atom styx]()
-7. [grain tfr]()
-8. [blast tfr]()
+0. [Intro to Fast Fourier Transform (FFT) on simple tones](https://github.com/ISLA-UH/quantum-inferno/tree/main/docs/examples_tutorial/e00_intro_set/s00_tone_fft_intro.py)
+1. [Compute Welch power spectral density (PSD) on simple tone](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s01_tone_fft_welch.py)
+2. [Compute and display STFT PSD and spectrogram on simple tone](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s02_tone_stft_vs_spectrogram.py)
+3. [Compute spectrogram with different scaling and mode options](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e00_intro_set/s03_tone_spectrogram_variations.py)
+4. [Compute different time-frequency representations on a tone]()
+5. [Compute different time-frequency representations on a quantized Gabor atom]()
+6. [Compute different time-frequency representations on the GT blast]()
+7. [Compute time-domain representation of an N-wave (tfr in progress)]()
 
 ### Entropy
 These examples showcase the entropy aspect of quantum-inferno and are self-contained
@@ -38,11 +38,5 @@ are self-contained Python files you can individually download and run.
 1. [doppler 20hz]()
 2. [doppler redshift]()
 
-### TFTB
-These examples showcase [TFTB](https://tftb.readthedocs.io/en/latest/index.html) implementations
-with quantum-inferno and are self-contained Python files you can individually download and run.
-
-1. [Intro to TFTB](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tftb_set/tftb_example_01.py)
-2. [One-sided exponential amplitude modulation](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tftb_set/tftb_example_02.py)
-3. [TFTB with noisy signal](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tftb_set/tftb_example_03.py)
-4. [TFTB with stationary and non-stationary signals](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples_tutorial/e03_tftb_set/tftb_example_03_stationarity.py)
+### Plotting set
+These examples showcase the plotting capabilities of quantum-inferno and are self-contained
