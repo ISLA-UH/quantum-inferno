@@ -1,6 +1,6 @@
 """
-Quantum inferno example: s00_vertical_wf_mesh_plots.py
-Tutorial on the quantum-inferno vertical waveform and spectrogram plotting functions and their parameters.
+Quantum inferno example: s01_cw_power_plots.py
+Tutorial on the quantum-inferno continuous waveform and power plotting functions and their parameters.
 """
 import numpy as np
 import matplotlib.pyplot as plt
