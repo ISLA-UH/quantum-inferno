@@ -83,7 +83,9 @@ class MeshBase:
         """
         :return: Literal value of the shading
         """
-        return cast(Literal, self.shading)
+        if self.shading not in MESH_SHADING_VALS:
+            return Literal("auto")
+        return Literal(self.shading)
 
     def get_colormesh_params(self) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional[str]]:
         """

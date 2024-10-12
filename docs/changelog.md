@@ -4,6 +4,9 @@
 - Simplified dependencies
 - Fixed bug with tukey magnitude calculations
 
+## 1.0.3 (2024-09-23)
+- Added example for power plots
+
 ## 1.0.2 (2024-08-28)
 - Update matplotlib requirement to 3.9.2
 

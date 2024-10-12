@@ -81,7 +81,7 @@ def calculate_power_example_values(mic_sig, time_fft_nd, frequency_sample_rate_h
 def main():
     print("\nWe'll start by generating the times series and power arrays from s02_tone_stft_vs_spectrogram.py.")
     # Calculate some values to be plotted (see s02_tone_stft_vs_spectrogram.py for details on the values themselves)
-    [freq_resolution_fft_hz, freq_sample_rate_hz, mic_sig, time_s, time_fft_nd] = calculate_t_domain_example_values()
+    freq_resolution_fft_hz, freq_sample_rate_hz, mic_sig, time_s, time_fft_nd = calculate_t_domain_example_values()
     mic_sig_var = np.var(mic_sig)
     f_welch_hz, welch_over_var, f_spect_hz, spect_over_var, f_stft_hz, stft_over_var = calculate_power_example_values(
         mic_sig, time_fft_nd, freq_sample_rate_hz, mic_sig_var)
