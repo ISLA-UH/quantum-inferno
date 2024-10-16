@@ -69,9 +69,9 @@ class MeshBase:
     def __post_init__(self):
         # Autoscale to mesh frequency range
         if self.frequency_hz_ymax is None:
-            self.frequency_hz_ymax = self.frequency[-1]
+            self.frequency_hz_ymax = np.nanmax(self.frequency)
         if self.frequency_hz_ymin is None:
-            self.frequency_hz_ymin = self.frequency[0]
+            self.frequency_hz_ymin = np.nanmin(self.frequency)
         if self.frequency_scaling not in AXIS_SCALE_VALS:
             self.frequency_scaling = "log"
         if self.shading not in MESH_SHADING_VALS:

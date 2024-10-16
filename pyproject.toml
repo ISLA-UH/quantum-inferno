@@ -4,7 +4,7 @@
 
 [project]
 name = "quantum_inferno"
-version = "1.1.0"
+version = "1.1.1"
 authors = [
     { name = "ISLA, UH", email = "milton@isla.hawaii.edu" }
 ]

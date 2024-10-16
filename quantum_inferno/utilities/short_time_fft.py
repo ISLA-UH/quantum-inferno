@@ -4,7 +4,7 @@ Try to match all the defaults...
 
 """
 
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 from scipy import signal
@@ -62,7 +62,7 @@ def get_stft_object_tukey(
 
 def stft_tukey(
     timeseries: np.ndarray,
-    sample_rate_hz: float or int,
+    sample_rate_hz: Union[float, int],
     tukey_alpha: float,
     segment_length: int,
     overlap_length: int,
@@ -71,7 +71,7 @@ def stft_tukey(
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
-    Returns the time, frequency, and magnitude of the STFT similar to legacy scipy.signal.stft
+    Returns the frequency, time bins, and magnitude of the STFT similar to legacy scipy.signal.stft
 
     :param timeseries: input signal
     :param sample_rate_hz: sample rate of the signal
@@ -80,7 +80,7 @@ def stft_tukey(
     :param overlap_length: length of the overlap
     :param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
     :param padding: padding method for the STFT (default is 'zeros', other options are 'edge', 'even', and 'odd')
-    :return: time, frequency, and magnitude of the STFT
+    :return: frequency, time bins, and magnitude of the STFT
     """
     # check if padding is valid
     if padding not in padding_type:
@@ -103,7 +103,7 @@ def stft_tukey(
 # get inverse Short-Time Fourier Transform (iSTFT) with default parameters
 def istft_tukey(
     stft_to_invert: np.ndarray,
-    sample_rate_hz: float or int,
+    sample_rate_hz: Union[float, int],
     tukey_alpha: float,
     segment_length: int,
     overlap_length: int,
@@ -135,7 +135,7 @@ def istft_tukey(
 # get the spectrogram with default parameters
 def spectrogram_tukey(
     timeseries: np.ndarray,
-    sample_rate_hz: float or int,
+    sample_rate_hz: Union[float, int],
     tukey_alpha: float,
     segment_length: int,
     overlap_length: int,
