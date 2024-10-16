@@ -27,6 +27,7 @@ class MeshBaseTest(unittest.TestCase):
         self.assertEqual(test_mesh_base.frequency_hz_ymax, 3)
         self.assertIsNone(test_mesh_base.colormap)
         self.assertEqual(test_mesh_base.units_frequency, "Hz")
+        self.assertEqual(test_mesh_base.shading, "auto")
         test_mesh_base = pb.MeshBase(time=np.array([0, 1, 2, 3]), frequency=np.array([0, 1, 2, 3]))
         self.assertEqual(test_mesh_base.frequency_hz_ymin, 1)
         self.assertEqual(test_mesh_base.frequency_hz_ymax, 3)

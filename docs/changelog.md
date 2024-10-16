@@ -1,5 +1,8 @@
 ## Quantum Inferno Version History
 
+## 1.1.2 (2024-10-16)
+- Fixed error when forcing Literal return value
+
 ## 1.1.1 (2024-10-16)
 - Fixed comments for stft_tukey functions
 - Fixed error when getting MeshBase min/max frequency

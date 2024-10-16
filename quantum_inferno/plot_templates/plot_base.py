@@ -69,9 +69,9 @@ class MeshBase:
     def __post_init__(self):
         # Autoscale to mesh frequency range
         if self.frequency_hz_ymax is None:
-            self.frequency_hz_ymax = np.nanmax(self.frequency)
+            self.frequency_hz_ymax = float(np.nanmax(self.frequency))
         if self.frequency_hz_ymin is None:
-            self.frequency_hz_ymin = np.nanmin(self.frequency)
+            self.frequency_hz_ymin = float(np.nanmin(self.frequency))
         if self.frequency_scaling not in AXIS_SCALE_VALS:
             self.frequency_scaling = "log"
         if self.shading not in MESH_SHADING_VALS:
@@ -84,8 +84,8 @@ class MeshBase:
         :return: Literal value of the shading
         """
         if self.shading not in MESH_SHADING_VALS:
-            return Literal("auto")
-        return Literal(self.shading)
+            return cast(Literal, "auto")
+        return cast(Literal, self.shading)
 
     def get_colormesh_params(self) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional[str]]:
         """
