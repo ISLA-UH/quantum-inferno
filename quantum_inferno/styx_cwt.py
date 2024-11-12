@@ -2,6 +2,7 @@
 This module contains functions to construct quantized, standardized information packets using binary metrics.
 No-chirp/sweep (index_shift=0, variable removed), simplified for the base stockwell transform.
 Based on Garces (2023).
+
 """
 from typing import Tuple, Union
 

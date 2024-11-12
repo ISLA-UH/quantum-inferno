@@ -421,8 +421,8 @@ def plot_cw_and_power(
 
     # Figure starts here
     fig, ax = plt.subplots(
-        2,
         1,
+        2,
         figsize=(cw_plot_base.params_tfr.figure_size_x, cw_plot_base.params_tfr.figure_size_y),
     )
     fig_cw_panel: plt.Axes = ax[0]

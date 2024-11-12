@@ -1,5 +1,6 @@
 """
 A set of functions to pick key portions of a signal.
+
 """
 
 from typing import Tuple, Optional, Union

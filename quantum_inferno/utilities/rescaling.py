@@ -1,5 +1,6 @@
 """
 A set of functions to rescale data.
+
 """
 from typing import Union
 import numpy as np

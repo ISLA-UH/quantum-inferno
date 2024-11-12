@@ -12,7 +12,7 @@ Nominal FFT power averaged over the signal duration is 1/2
 """
 import numpy as np
 import matplotlib.pyplot as plt
-# from quantum_inferno.utilities import calculations
+
 print(__doc__)
 
 if __name__ == "__main__":

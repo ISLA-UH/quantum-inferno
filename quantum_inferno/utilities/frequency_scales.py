@@ -1,5 +1,6 @@
 """
 Utilities for calculating frequencies for both linear and logarithmic scales.
+
 """
 from typing import Optional
 import numpy as np

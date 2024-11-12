@@ -1,6 +1,7 @@
 """
 This module contains constants and functions that help with
 physical to cyber conversion with preferred quasi-dyadic orders.
+The preferred orders are 1, 3, 6, 12, 24, 48, and 96.
 """
 
 import sys
@@ -135,18 +136,18 @@ def cycles_from_order(scale_order: float) -> float:
     N is the quantization parameter for the constant Q wavelet filters
 
     :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
-    :return: number of cycled per normalized angular frequency
+    :return: number of cycles per normalized angular frequency
     """
     return scale_multiplier(scale_order)
 
 
 def order_from_cycles(cycles_per_scale: float) -> float:
     """
-    Compute the number of cycles M for a specified band order N
+    Compute the band order N for a specified number of cycles M
     where N is the quantization parameter for the constant Q wavelet filters
 
     :param cycles_per_scale: Should be greater than or equal than one
-    :return: number of cycled per normalized angular frequency
+    :return: band order N per number of cycles
     """
     # A single cycle is the min req
     if np.abs(cycles_per_scale) < 1:

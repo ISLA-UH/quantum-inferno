@@ -9,6 +9,7 @@ TODO: Add the quantum functions to compute the Welch PSD; add to fft or construc
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
+
 from quantum_inferno.synth import benchmark_signals
 
 print(__doc__)

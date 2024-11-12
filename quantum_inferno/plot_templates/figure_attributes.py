@@ -2,7 +2,6 @@
 Base class for plotting figures.  Sets most common attributes for all plots.
 """
 import enum
-
 import numpy as np
 
 

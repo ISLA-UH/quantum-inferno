@@ -1,6 +1,6 @@
 """
-Quantum inferno example: nwave_tdr_highpass
-Constructs and processes N wave
+Quantum inferno example s07_nwave_tdr
+Constructs and processes N wave, and highpasses to model response of the human ear and audio mics.
 """
 import numpy as np
 import matplotlib.pyplot as plt

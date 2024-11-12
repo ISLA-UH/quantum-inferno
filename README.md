@@ -1,7 +1,7 @@
 # quantum-inferno
 ## Quantized Information Entropy, Nth Octave
 
-### Caveat Emptor: Early Release Dev Version
+### Caveat Emptor: Early Release Version
 
 ### Description
 Computes standardized time-frequency representations (TFRs) for power, information, and entropy, 

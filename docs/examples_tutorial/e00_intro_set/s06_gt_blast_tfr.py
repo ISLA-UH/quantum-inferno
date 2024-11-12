@@ -1,5 +1,5 @@
 """
-Quantum inferno example: s08_blast_tfr
+Quantum inferno example: s06_blast_tfr
 Use GT blast synthetic to compare time-frequency representations of explosion transients.
 
 """

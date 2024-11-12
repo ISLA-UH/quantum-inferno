@@ -1,5 +1,19 @@
 ## Quantum Inferno Version History
 
+## 1.1.2 (2024-10-16)
+- Fixed error when forcing Literal return value
+
+## 1.1.1 (2024-10-16)
+- Fixed comments for stft_tukey functions
+- Fixed error when getting MeshBase min/max frequency
+
+## 1.1.0 (2024-09-23)
+- Simplified dependencies
+- Fixed bug with tukey magnitude calculations
+
+## 1.0.3 (2024-09-23)
+- Added example for power plots
+
 ## 1.0.2 (2024-08-28)
 - Update matplotlib requirement to 3.9.2
 
