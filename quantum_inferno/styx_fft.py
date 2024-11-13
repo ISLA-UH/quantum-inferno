@@ -6,6 +6,54 @@ from typing import Tuple, Union
 import numpy as np
 import scipy.signal as signal
 
+from scales_dyadic import cycles_from_order
+from utilities.calculations import get_num_points
+from utilities.rescaling import to_log2_with_epsilon
+
+
+def stft_from_sig(
+        sig_wf: np.ndarray,
+        frequency_sample_rate_hz: float,
+        band_order_nth: float,
+        center_frequency_hz: float = None,
+        octaves_below_center: int = 4
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Stft from signal
+
+    :param sig_wf: array with input signal
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param band_order_nth: Nth order of constant Q bands
+    :param center_frequency_hz: optional center frequency of the signal in Hz.  Default 3/20 of Nyquist
+    :param octaves_below_center: number of octaves below center frequency to set the averaging frequency.  Default 4
+    :return: numpy arrays of: STFT, STFT_bits, time_stft_s, frequency_stft_hz
+    """
+    if center_frequency_hz is None:
+        center_frequency_hz = frequency_sample_rate_hz * 60.0 / 800.0  # 0.075
+        # todo: is rate always 800?  if so, can reduce to 3/40
+    frequency_averaging_hz = center_frequency_hz / octaves_below_center
+    duration_fft_s = cycles_from_order(band_order_nth) / frequency_averaging_hz
+    ave_points_ceil_log2 = get_num_points(
+        sample_rate_hz=frequency_sample_rate_hz,
+        duration_s=duration_fft_s,
+        rounding_type="ceil",
+        output_unit="log2",
+    )
+    time_fft_nd: int = 2 ** ave_points_ceil_log2
+    # todo: quit or something if waveform is too short for time_fft_nd
+    stft_scaling = 2 * np.sqrt(np.pi) / time_fft_nd
+
+    frequency_stft_hz, time_stft_s, stft_complex = stft_complex_pow2(
+        sig_wf=sig_wf,
+        frequency_sample_rate_hz=frequency_sample_rate_hz,
+        segment_points=time_fft_nd,
+        alpha=1.0,
+    )
+    stft_complex *= stft_scaling
+    stft_bits = to_log2_with_epsilon(stft_complex)
+
+    return stft_complex, stft_bits, time_stft_s, frequency_stft_hz
+
 
 def butter_bandpass(
     sig_wf: np.ndarray,
