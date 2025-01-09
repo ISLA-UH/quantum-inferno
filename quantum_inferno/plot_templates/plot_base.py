@@ -77,6 +77,7 @@ class MeshBase:
         if self.shading not in MESH_SHADING_VALS:
             self.shading = "auto"
         if self.frequency_scaling == "log" and self.frequency_hz_ymin <= 0:
+            # noinspection PyTypeChecker
             self.frequency_hz_ymin = self.frequency[1]
 
     def get_shading_as_literal(self) -> Literal["auto", "gouraud", "flat", "nearest"]:

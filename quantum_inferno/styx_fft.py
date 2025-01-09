@@ -6,9 +6,9 @@ from typing import Tuple, Union
 import numpy as np
 import scipy.signal as signal
 
-from scales_dyadic import cycles_from_order
-from utilities.calculations import get_num_points
-from utilities.rescaling import to_log2_with_epsilon
+from quantum_inferno.scales_dyadic import cycles_from_order
+from quantum_inferno.utilities.calculations import get_num_points
+from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 
 def stft_from_sig(

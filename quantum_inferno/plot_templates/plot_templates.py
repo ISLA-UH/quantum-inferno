@@ -105,6 +105,7 @@ def mesh_time_frequency_edges(
         k_edge: float = np.sqrt(frequency[-1] / frequency[-2])
         f_edge: np.ndarray = np.append(frequency / k_edge, k_edge * frequency[-1])
     else:
+        # noinspection PyTypeChecker
         f_half_bin: float = (frequency[2] - frequency[1]) / 2.
         f_edge: np.ndarray = np.append(frequency[0] - f_half_bin, frequency + f_half_bin)
 
