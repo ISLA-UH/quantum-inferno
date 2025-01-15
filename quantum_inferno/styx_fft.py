@@ -29,8 +29,7 @@ def stft_from_sig(
     :return: numpy arrays of: STFT, STFT_bits, time_stft_s, frequency_stft_hz
     """
     if center_frequency_hz is None:
-        center_frequency_hz = frequency_sample_rate_hz * 60.0 / 800.0  # 0.075
-        # todo: is rate always 800?  if so, can reduce to 3/40
+        center_frequency_hz = frequency_sample_rate_hz * 0.075  # 3/20th of Nyquist
     frequency_averaging_hz = center_frequency_hz / octaves_below_center
     duration_fft_s = cycles_from_order(band_order_nth) / frequency_averaging_hz
     ave_points_ceil_log2 = get_num_points(
