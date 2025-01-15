@@ -45,14 +45,14 @@ class TestPicker(unittest.TestCase):
         self.assertEqual(stfts.shape, (self.fft_nd // 2 + 1, len(self.timestamps) // (self.fft_nd // 2) + 1))
 
     def test_istft_tukey(self):
-        frequencies, times, stfts = short_time_fft.stft_tukey(
-            timeseries=self.signal,
+        stft_obj = short_time_fft.get_stft_object_tukey(
             sample_rate_hz=self.sample_rate,
             tukey_alpha=self.tukey_alpha,
             segment_length=self.fft_nd,
             overlap_length=self.fft_nd // 2,
             scaling="magnitude",
         )
+        stfts = stft_obj.stft(self.signal)
         reconstructed_time, reconstructed_signal = short_time_fft.istft_tukey(
             stft_to_invert=stfts,
             sample_rate_hz=self.sample_rate,

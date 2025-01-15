@@ -40,7 +40,10 @@ def stft_from_sig(
         output_unit="log2",
     )
     time_fft_nd: int = 2 ** ave_points_ceil_log2
-    # todo: quit or something if waveform is too short for time_fft_nd
+    if len(sig_wf) < time_fft_nd:
+        raise ValueError(
+            f"Signal length: {len(sig_wf)} is less than time_fft_nd: {time_fft_nd}"
+        )
     stft_scaling = 2 * np.sqrt(np.pi) / time_fft_nd
 
     frequency_stft_hz, time_stft_s, stft_complex = stft_complex_pow2(

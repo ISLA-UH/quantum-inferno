@@ -1,5 +1,8 @@
 ## Quantum Inferno Version History
 
+## 1.1.3 (2025-01-14)
+- Added exception for signals too short for STFT
+
 ## 1.1.2 (2024-10-16)
 - Fixed error when forcing Literal return value
 
