@@ -86,14 +86,13 @@ def tile_array_to_shape(array: np.ndarray, shape: tuple, axis: MatrixAxis = None
         raise ValueError("Invalid direction or shape. Must be either ROW or COLUMN and be a multiple of input array.")
 
 
-# TODO: work on simplifying these 3 functions (Legacy code included in styx functions to be cleaned up)
 def d0tile_x_d0d1(d0: float or np.ndarray, d0d1: np.ndarray) -> np.ndarray:
     """
     Create array of repeated values with dimensions that match those of energy array
     Useful to multiply frequency-dependent values to frequency-time matrices
 
     :param d0: 1D input vector, nominally column frequency/scale multipliers
-    :param d0d1: 2D array, first dimension should be that same as d1
+    :param d0d1: 2D array, first dimension should be the same length as d0
     :return: array with matching values
     """
     shape_out = d0d1.shape
@@ -106,10 +105,9 @@ def d0tile_x_d0d1(d0: float or np.ndarray, d0d1: np.ndarray) -> np.ndarray:
         raise TypeError(f"Cannot handle an array of shape {d0.shape}.")
 
     if d0_matrix.shape == d0d1.shape:
-        d0_x_d0d1 = d0_matrix * d0d1
+        return d0_matrix * d0d1
     else:
         raise TypeError(f"Cannot handle an array of shape {d0.shape}.")
-    return d0_x_d0d1
 
 
 def d1tile_x_d0d1(d1: float or np.ndarray, d0d1: np.ndarray) -> np.ndarray:
@@ -118,7 +116,7 @@ def d1tile_x_d0d1(d1: float or np.ndarray, d0d1: np.ndarray) -> np.ndarray:
     Useful to multiply time-dependent values to frequency-time matrices
 
     :param d1: 1D input vector, nominally row time multipliers
-    :param d0d1: 2D array, second dimension should be that same as d1
+    :param d0d1: 2D array, second dimension should be the same length as d1
     :return: array with matching values
     """
     shape_out = d0d1.shape
@@ -131,10 +129,9 @@ def d1tile_x_d0d1(d1: float or np.ndarray, d0d1: np.ndarray) -> np.ndarray:
         raise TypeError(f"Cannot handle an array of shape {d1.shape}.")
 
     if d1_matrix.shape == d0d1.shape:
-        d1_x_d0d1 = d1_matrix * d0d1
+        return d1_matrix * d0d1
     else:
         raise TypeError(f"Cannot handle an array of shape {d1.shape}.")
-    return d1_x_d0d1
 
 
 def just_tile_d1(d1_array1d_in: float or np.ndarray, d0d1_shape: tuple) -> np.ndarray:
@@ -143,14 +140,12 @@ def just_tile_d1(d1_array1d_in: float or np.ndarray, d0d1_shape: tuple) -> np.nd
     Useful to multiply time-dependent values to frequency-time matrices
 
     :param d1_array1d_in: 1D input vector, nominally row time multipliers
-    :param d0d1_shape: 2D array, second dimension should be that same as d1
+    :param d0d1_shape: 2D array, second dimension should be the same length as d1_array1d_in
     :return: array with matching values
     """
     if len(d0d1_shape) == 1:
-        tiled_matrix = np.tile(d1_array1d_in, (d0d1_shape[0]))
+        return np.tile(d1_array1d_in, (d0d1_shape[0]))
     elif len(d0d1_shape) == 2 and d0d1_shape[1] == len(d1_array1d_in):
-        tiled_matrix = np.tile(d1_array1d_in, (d0d1_shape[0], 1))
+        return np.tile(d1_array1d_in, (d0d1_shape[0], 1))
     else:
         raise TypeError(f"Cannot handle an array of shape {d1_array1d_in.shape}.")
-
-    return tiled_matrix

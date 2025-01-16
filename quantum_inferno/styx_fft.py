@@ -29,8 +29,7 @@ def stft_from_sig(
     :return: numpy arrays of: STFT, STFT_bits, time_stft_s, frequency_stft_hz
     """
     if center_frequency_hz is None:
-        center_frequency_hz = frequency_sample_rate_hz * 60.0 / 800.0  # 0.075
-        # todo: is rate always 800?  if so, can reduce to 3/40
+        center_frequency_hz = frequency_sample_rate_hz * 0.075  # 3/20th of Nyquist
     frequency_averaging_hz = center_frequency_hz / octaves_below_center
     duration_fft_s = cycles_from_order(band_order_nth) / frequency_averaging_hz
     ave_points_ceil_log2 = get_num_points(
@@ -40,7 +39,10 @@ def stft_from_sig(
         output_unit="log2",
     )
     time_fft_nd: int = 2 ** ave_points_ceil_log2
-    # todo: quit or something if waveform is too short for time_fft_nd
+    if len(sig_wf) < time_fft_nd:
+        raise ValueError(
+            f"Signal length: {len(sig_wf)} is less than time_fft_nd: {time_fft_nd}"
+        )
     stft_scaling = 2 * np.sqrt(np.pi) / time_fft_nd
 
     frequency_stft_hz, time_stft_s, stft_complex = stft_complex_pow2(
