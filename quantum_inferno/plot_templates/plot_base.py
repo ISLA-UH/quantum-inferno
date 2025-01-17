@@ -195,7 +195,7 @@ class WaveformPanel:
         time: np.ndarray, the timestamps of the data.  Required
         units: str, units of the signal.  Default "Norm"
         label: str, label for the data.  Default "(wf)"
-        yscaling: str, scaling for y-axis.  options: "auto", "symmetric", "positive", "else".  Default "auto"mesh_
+        yscaling: str, scaling for y-axis.  options: "auto", "symmetric", "positive", "else".  Default "auto"
         ytick_style: str, style for yticks.  options: "sci", "scientific", "plain".  Default "plain"
     """
     sig: np.ndarray
@@ -214,8 +214,8 @@ class WaveformPanel:
 
     def set_y_lims(self, axis: plt.Axes):
         """
+        sets the given axis with new y limits
         :param axis: the axis to update y limits for
-        :return: updated axis with new y limits
         """
         if self.yscaling == "auto":
             axis.set_ylim(np.min(self.sig), np.max(self.sig))
@@ -250,7 +250,7 @@ class CwPanel:
         """
         :return: True if no data, False otherwise
         """
-        return self.time[0] == self.time[-1]
+        return len(self.time) < 1 or len(self.sig) < 1 or self.time[0] == self.time[-1]
 
 
 @dataclass
