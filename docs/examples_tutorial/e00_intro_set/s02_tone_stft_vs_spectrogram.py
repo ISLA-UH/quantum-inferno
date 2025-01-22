@@ -94,15 +94,24 @@ if __name__ == "__main__":
     time_spect_s = time_spect_s - time_spect_s[0]
 
     # Compute the spectrogram with the stft option
-    frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
-        timeseries=mic_sig,
+    stft_obj = stft.get_stft_object_tukey(
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
         segment_length=time_fft_nd,
         overlap_length=time_fft_nd // 2,  # 50% overlap
         scaling="magnitude",
-        padding="zeros",
     )
+    stft_complex = stft_obj.stft(mic_sig, padding="zeros")
+
+    stft_magnitude = np.abs(stft_obj.stft_detrend(x=mic_sig, detr="constant", padding="zeros"))
+    # calculate the time and frequency bins
+    time_stft_s = np.arange(start=0, stop=stft_obj.delta_t * np.shape(stft_magnitude)[1], step=stft_obj.delta_t)
+    frequency_stft_hz = stft_obj.f
+
+    # frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
+    #     timeseries=mic_sig,
+    #     padding="zeros",
+    # )
     # Since one-sided, multiply by 2 to get the full power
     stft_power = 2 * np.abs(stft_complex) ** 2
 

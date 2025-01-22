@@ -60,6 +60,7 @@ def get_stft_object_tukey(
     return stft_obj
 
 
+#todo: check for ways to return the stft object instead of the magnitude and rewrite calls to the function
 def stft_tukey(
     timeseries: np.ndarray,
     sample_rate_hz: Union[float, int],
@@ -72,6 +73,7 @@ def stft_tukey(
     """
     Calculate the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
     Returns the frequency, time bins, and magnitude of the STFT similar to legacy scipy.signal.stft
+    NOTE: the stft_detrend method used to get the magnitude makes it unable to be inverted using istft_tukey
 
     :param timeseries: input signal
     :param sample_rate_hz: sample rate of the signal
