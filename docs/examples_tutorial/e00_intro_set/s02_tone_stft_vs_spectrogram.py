@@ -144,7 +144,7 @@ if __name__ == "__main__":
     print("The spectrogram returns power, whereas the stft returns invertible, complex Fourier coefficients.")
     print("The Welch spectrum is reproduced by averaging the stft over the time dimension.")
     print(
-        "** NOTE: EXACT RECONSTRUCTION NOT EXPECTED WITH TAPER AND OTHER DEVIATIONS FROM IDEAL. PLAY WITH alpha."
+        "** NOTE: EXACT RECONSTRUCTION NOT EXPECTED WITH TAPER AND OTHER DEVIATIONS FROM IDEAL. PLAY WITH alpha. "
         "ACCEPT AND QUANTIFY COMPROMISE **"
     )
 

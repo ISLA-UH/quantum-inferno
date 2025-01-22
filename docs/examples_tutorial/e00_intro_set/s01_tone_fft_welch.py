@@ -17,8 +17,7 @@ print(__doc__)
 
 if __name__ == "__main__":
     """
-    Average the Fast Fourier Transform (FFT) over sliding windows
-    using the Welch method
+    Average the Fast Fourier Transform (FFT) over sliding windows using the Welch method
     """
 
     # Construct a tone of fixed frequency with a constant sample rate
