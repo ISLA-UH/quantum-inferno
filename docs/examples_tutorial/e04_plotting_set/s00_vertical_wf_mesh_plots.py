@@ -39,7 +39,7 @@ def calculate_t_domain_example_values():
 
 def calculate_tf_domain_example_values(mic_sig, time_fft_nd, frequency_sample_rate_hz, frequency_resolution_fft_hz,
                                        alpha=0.25):
-    frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
+    frequency_stft_hz, time_stft_s, stft_complex = stft.get_stft_tukey_mag(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,

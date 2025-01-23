@@ -103,7 +103,7 @@ if __name__ == "__main__":
     )
 
     # STFT
-    _, _, stft_mag = stft.stft_tukey(
+    _, _, stft_mag = stft.get_stft_tukey_mag(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         padding="zeros",
     )
 
-    _, _, stft_psd = stft.stft_tukey(
+    _, _, stft_psd = stft.get_stft_tukey_mag(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,

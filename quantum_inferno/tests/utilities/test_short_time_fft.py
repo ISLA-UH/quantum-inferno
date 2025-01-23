@@ -32,7 +32,7 @@ class TestPicker(unittest.TestCase):
         self.assertEqual(stft_obj.delta_f, self.resolution)
 
     def test_stft_tukey(self):
-        frequencies, times, stfts = short_time_fft.stft_tukey(
+        frequencies, times, stfts = short_time_fft.get_stft_tukey_mag(
             timeseries=self.signal,
             sample_rate_hz=self.sample_rate,
             tukey_alpha=self.tukey_alpha,

@@ -68,7 +68,7 @@ if __name__ == "__main__":
         average="mean",
     )
 
-    frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
+    frequency_stft_hz, time_stft_s, stft_complex = stft.get_stft_tukey_mag(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,

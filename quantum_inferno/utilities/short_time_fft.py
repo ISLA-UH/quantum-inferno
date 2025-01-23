@@ -28,7 +28,7 @@ def get_stft_object_tukey(
     :param tukey_alpha: shape parameter of the Tukey window
     :param segment_length: length of the segment
     :param overlap_length: length of the overlap
-    :param scaling: scaling of the STFT (default is magnitude, other options are 'psd' and None)
+    :param scaling: scaling of the STFT (default is "magnitude", other options are "psd" and None)
     :return: ShortTimeFFT object
     """
     # checks
@@ -60,20 +60,19 @@ def get_stft_object_tukey(
     return stft_obj
 
 
-#todo: check for ways to return the stft object instead of the magnitude and rewrite calls to the function
-def stft_tukey(
-    timeseries: np.ndarray,
-    sample_rate_hz: Union[float, int],
-    tukey_alpha: float,
-    segment_length: int,
-    overlap_length: int,
-    scaling: str = "magnitude",
-    padding: str = "zeros",
+def get_stft_tukey_mag(
+        timeseries:np.ndarray,
+        sample_rate_hz: Union[float, int],
+        tukey_alpha: float,
+        segment_length: int,
+        overlap_length: int,
+        scaling: str = "magnitude",
+        padding: str = "zeros"
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Calculate the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
+    Calculates the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
     Returns the frequency, time bins, and magnitude of the STFT similar to legacy scipy.signal.stft
-    NOTE: the stft_detrend method used to get the magnitude makes it unable to be inverted using istft_tukey
+    Note: If you want the STFT object, use get_stft_object_tukey
 
     :param timeseries: input signal
     :param sample_rate_hz: sample rate of the signal

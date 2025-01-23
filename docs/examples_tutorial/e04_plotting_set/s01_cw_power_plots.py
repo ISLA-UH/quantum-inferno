@@ -61,7 +61,7 @@ def calculate_power_example_values(mic_sig, time_fft_nd, frequency_sample_rate_h
     # Since one-sided, multiply by 2 to get the full power
     spec_power = 2 * spec_mag
     # Compute the spectrogram with the stft option
-    frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
+    frequency_stft_hz, time_stft_s, stft_complex = stft.get_stft_tukey_mag(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
