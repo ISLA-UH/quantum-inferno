@@ -108,10 +108,6 @@ if __name__ == "__main__":
     time_stft_s = np.arange(start=0, stop=stft_obj.delta_t * np.shape(stft_magnitude)[1], step=stft_obj.delta_t)
     frequency_stft_hz = stft_obj.f
 
-    # frequency_stft_hz, time_stft_s, stft_complex = stft.stft_tukey(
-    #     timeseries=mic_sig,
-    #     padding="zeros",
-    # )
     # Since one-sided, multiply by 2 to get the full power
     stft_power = 2 * np.abs(stft_complex) ** 2
 
