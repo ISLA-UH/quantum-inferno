@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
     print('\n*** SUMMARY: FFT of a constant frequency tone with unit peak amplitude ***')
     print('Positive frequency FFT amplitude is 1/2, negative frequency FFT amplitude is 1/2')
-    print('Power averaged over the signal duration is P**2 = 2 |RFFT|**2 = 1/2')
+    print('Power averaged over the signal duration is P**2 = 2 |RFFT/N|**2 = 1/2')
     print('RMS amplitude is sqrt(P**2) = 1/sqrt(2)')
     print('** IMPORTANT NOTE: EXACT RECONSTRUCTION ONLY OCCURS AT FFT FREQUENCY **')
 

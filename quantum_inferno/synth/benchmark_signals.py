@@ -276,11 +276,12 @@ def well_tempered_tone(
 ) -> Tuple[np.ndarray, np.ndarray, int, float, float, float]:
     """
     Return a tone of unit amplitude and fixed frequency with a constant sample rate
-
+    The resulting synthetic has a duration of 2^n points and fft duration of 2^n points
+    Constructs default 60Hz tone with 10.24s duration at 800Hz sample rate
     :param frequency_sample_rate_hz: sample rate of frequency in Hz
     :param frequency_center_hz: center frequency in Hz
-    :param time_duration_s: duration in seconds
-    :param time_fft_s: length of segments. Default 1 second
+    :param time_duration_s: record duration in seconds
+    :param time_fft_s: length of fft segments (or frames)
     :param use_fft_frequency: use FFT frequency.  Default True
     :param add_noise_taper_aa: add noise taper.  Default False
     :param output_desc: if True, output description of waveform.  Default False
@@ -352,4 +353,5 @@ def well_tempered_tone(
         print("Number of FFT points:", time_fft_nd)
         print("log2(FFT points):", np.log2(time_fft_nd))
 
+    # TODO: Check type of returned values
     return mic_sig, time_s, time_fft_nd, frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz

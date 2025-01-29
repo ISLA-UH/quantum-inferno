@@ -39,12 +39,13 @@ if __name__ == "__main__":
         time_fft_s=1,
         use_fft_frequency=True,
         add_noise_taper_aa=False,
+        output_desc=True
     )
 
     # alpha: Shape parameter of the Welch Tukey window, representing the fraction of the window inside the cosine
     #        tapered region.
-    # If zero, the Tukey window is equivalent to a rectangular window.
-    # If one, the Tukey window is equivalent to a Hann window.
+    # If zero [0], the Tukey window is equivalent to a rectangular window.
+    # If one [1], the Tukey window is equivalent to a Hann window.
     alpha = 0
 
     # Compute Variance: divides by the number of points
