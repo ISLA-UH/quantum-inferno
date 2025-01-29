@@ -41,7 +41,7 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int, verbosity: bool = False):
                 "Applying zero padding."
             )
         zero_pad: int = n_fft - n_times
-        sig_wf = np.concatenate((sig_wf, np.zeros(sig_wf.shape[:-1] + zero_pad, sig_wf.dtype)), axis=-1)
+        sig_wf = np.concatenate((sig_wf, np.zeros(zero_pad, sig_wf.dtype)), axis=-1)
     else:
         zero_pad: int = 0
 
@@ -73,8 +73,8 @@ def tfr_stx_fft(
     :param time_sample_interval: sample interval, inverse of sample rate
     :param scale_order_input: fractional octave band order; 12 is the musical standard
     :param n_fft_in: requested nfft, should be greater or equal to the signal length. Method zero pads up.
-    :param frequency_min: lowest stx frequency of interest
-    :param frequency_max: highest stx frequency of interest
+    :param frequency_min: lowest stx frequency of interest, must be positive and real
+    :param frequency_max: highest stx frequency of interest, must be positive and real
     :param frequency_step: stx frequency of interest if linearly sampled
     :param factor_q: sigma_scaling adjustment, under evaluation
     :param power_p: sigma_scaling adjustment, under evaluation
@@ -106,10 +106,19 @@ def tfr_stx_fft(
     window_longest_time = n_fft_pow2 / frequency_sample_rate
     frequency_min_nth = cycles_m / window_longest_time
 
-    # Initialize stx frequencies
+    # Initialize stx frequencies, catch invalid values
+    if frequency_max is None:
+        frequency_max = frequency_sample_rate / 2.0
+    elif isinstance(frequency_max, complex) or frequency_max <= 0:
+        print(f"WARNING: frequency_max of {frequency_max} is invalid.  Resetting to {frequency_sample_rate / 2.}.")
+        frequency_max = frequency_sample_rate / 2.0
     if frequency_min is None:
         frequency_min = frequency_min_nth
-    if frequency_max is None:
+    elif isinstance(frequency_min, complex) or frequency_min <= 0 or frequency_min >= frequency_max:
+        print(f"WARNING: frequency_min of {frequency_min} is invalid.  Resetting to {frequency_min_nth}.")
+        frequency_min = frequency_min_nth
+    if frequency_max <= frequency_min:
+        print(f"WARNING: frequency_max of {frequency_max} is too small. Resetting to {frequency_sample_rate / 2.}.")
         frequency_max = frequency_sample_rate / 2.0
 
     # Computing nearest frequency later on anyway, and then using that to compute the fft.
@@ -131,14 +140,14 @@ def tfr_stx_fft(
         # if standardized to ISO3
         if is_inferno is True:
             (
-                order_Nth,
-                scale_base,
-                scale_band_number,
-                frequency_ref,
-                frequency_center_algebraic,
-                frequency_center_geometric,
-                frequency_start,
-                frequency_end,
+                _,
+                _,
+                _,
+                _,
+                _,
+                frequency_stx,
+                _,
+                _,
             ) = scales.band_frequency_low_high(
                 frequency_order_input=scale_order_input,
                 frequency_low_input=f_start,
@@ -147,7 +156,6 @@ def tfr_stx_fft(
                 frequency_base_input=scale_base_input,
                 frequency_ref_input=scale_ref_input,
             )
-            frequency_stx = frequency_center_geometric
         else:
             num_octaves = np.log2(f_stop / f_start)
             num_bands = int(num_octaves * scale_order_input)
