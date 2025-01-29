@@ -5,6 +5,7 @@ This module provides benchmark synthetic functions
 from typing import Tuple
 
 import numpy as np
+import scipy.fft as fft
 import scipy.signal as signal
 
 from quantum_inferno.utilities.window import get_tukey
@@ -294,7 +295,7 @@ def well_tempered_tone(
     # Set the record duration, make a power of 2. Note that int rounds down
     time_duration_nd = 2 ** (int(np.log2(time_duration_s * frequency_sample_rate_hz)))
     # Set the fft duration, make a power of 2
-    time_fft_nd = 2 ** (int(np.log2(time_fft_s * frequency_sample_rate_hz)))
+    time_fft_nd: int = 2 ** (int(np.log2(time_fft_s * frequency_sample_rate_hz)))
 
     # Warn user if the time duration or fft duration is not a power of 2 and show the new values
     # The values are rounded down to the nearest power of 2 in the previous step.
@@ -311,14 +312,14 @@ def well_tempered_tone(
 
     # The fft frequencies are set by the duration of the fft
     # In this example we only need the positive frequencies
-    frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
-    fft_index = np.argmin(np.abs(frequency_fft_pos_hz - frequency_center_hz))
-    frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
+    frequency_fft_pos_hz = fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
+    fft_index: int = np.argmin(np.abs(frequency_fft_pos_hz - frequency_center_hz))
+    frequency_center_fft_hz: float = float(frequency_fft_pos_hz[fft_index])
     frequency_resolution_fft_hz = frequency_sample_rate_hz / time_fft_nd
 
     # Dimensionless time (samples)
     time_nd = np.arange(time_duration_nd)
-    time_s = time_nd / frequency_sample_rate_hz
+    time_s: np.ndarray = time_nd / frequency_sample_rate_hz
 
     # Convert to dimensionless time and frequency, which is typically used in mathematical formulas.
     # Scale by the sample rate.
@@ -331,7 +332,7 @@ def well_tempered_tone(
         f_c = frequency_center_hz / frequency_sample_rate_hz
         # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
         # It does NOT return unit amplitude (but it's close)
-    mic_sig = np.cos(2.0 * np.pi * f_c * time_nd)
+    mic_sig: np.ndarray = np.cos(2.0 * np.pi * f_c * time_nd)
 
     if add_noise_taper_aa:
         # Add noise
@@ -339,7 +340,7 @@ def well_tempered_tone(
         # Taper before AA
         mic_sig *= get_tukey(array=mic_sig, alpha=0.1)
         # Antialias (AA)
-        synthetic_signals.antialias_half_nyquist(mic_sig)
+        mic_sig = synthetic_signals.antialias_half_nyquist(mic_sig)
 
     if output_desc:
         print("WELL TEMPERED TONE SYNTHETIC")
@@ -353,5 +354,4 @@ def well_tempered_tone(
         print("Number of FFT points:", time_fft_nd)
         print("log2(FFT points):", np.log2(time_fft_nd))
 
-    # TODO: Check type of returned values
     return mic_sig, time_s, time_fft_nd, frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz
