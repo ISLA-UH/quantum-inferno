@@ -8,6 +8,7 @@ Case study:
 Sinusoid input with unit amplitude
 Validate:
 Nominal FFT power averaged over the signal duration is 1/2
+See also: https://docs.scipy.org/doc/scipy-1.15.1/tutorial/signal.html#tutorial-spectralanalysis
 
 """
 import numpy as np
