@@ -102,7 +102,6 @@ if __name__ == "__main__":
     print("The Welch density scaling is divided by the spectral resolution")
     print("** IMPORTANT NOTE: THE WELCH METHOD IMPLEMENTS FACTOR OF 2 POWER CORRECTION FOR NEGATIVE FREQUENCIES **")
 
-    # TODO: double check titles with M (taper or no taper?)
     # Show the waveform and the averaged FFT over the whole record:
     fig1, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
