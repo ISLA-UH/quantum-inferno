@@ -1,9 +1,9 @@
 """
 Quantum inferno example: s01_tone_fft_welch.py
 Compute Welch power spectral density (PSD) on simple tone to verify amplitudes
-Case study: Sinusoid input with unit amplitude
+Case study: Real-valued cosine input with unit amplitude
 Validate: Nominal Welch power averaged over the signal duration is 1/2
-TODO: Add the quantum functions to compute the Welch PSD; add to fft or construct styx_welch
+See also: https://docs.scipy.org/doc/scipy-1.15.1/tutorial/signal.html#tutorial-spectralanalysis
 
 """
 import numpy as np
@@ -18,6 +18,7 @@ print(__doc__)
 if __name__ == "__main__":
     """
     Average the Fast Fourier Transform (FFT) over sliding windows using the Welch method
+    Inspect and verify amplitude corrections for different scalings (density, spectrum)
     """
 
     # Construct a tone of fixed frequency with a constant sample rate
@@ -39,7 +40,7 @@ if __name__ == "__main__":
         time_fft_s=1,
         use_fft_frequency=True,
         add_noise_taper_aa=False,
-        output_desc=True
+        output_desc=False
     )
 
     # alpha: Shape parameter of the Welch Tukey window, representing the fraction of the window inside the cosine
@@ -51,8 +52,10 @@ if __name__ == "__main__":
     # Compute Variance: divides by the number of points
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1 / 2.0
+    print("mic_sig_var/mic_sig_var_nominal", mic_sig_var/mic_sig_var_nominal)
 
     # Compute the Welch PSD: averaged spectrum over sliding windows
+    # Use the spectrum scaling and explicit defaults for nfft and noverlap
     frequency_welch_hz, power_welch_spectrum = signal.welch(
         x=mic_sig,
         fs=frequency_sample_rate_hz,
@@ -67,7 +70,7 @@ if __name__ == "__main__":
         average="mean",
     )
 
-    # The density option is the spectrum divided by the spectral resolution.
+    # The density scaling option is the spectrum divided by the spectral resolution.
     # The density option also depends more on the window type, can verify by varying alpha.
     _, power_welch_density = signal.welch(
         x=mic_sig,
@@ -94,10 +97,10 @@ if __name__ == "__main__":
     print("The Welch spectral estimate averages the FFT over overlapping windows.")
     print(
         "For the Welch spectrum scaling, "
-        "the amplitude variance of a tone with no DC offset is P**2 = 1/2 = var(signal)"
+        "the variance of an untapered unit amplitude tone with no DC offset is P**2 = 1/2 = var(signal)"
     )
     print("The Welch density scaling is divided by the spectral resolution")
-    print("** IMPORTANT NOTE: THE WELCH METHOD IMPLEMENTS x2 POWER CORRECTION FOR NEGATIVE FREQUENCIES **")
+    print("** IMPORTANT NOTE: THE WELCH METHOD IMPLEMENTS FACTOR OF 2 POWER CORRECTION FOR NEGATIVE FREQUENCIES **")
 
     # TODO: double check titles with M (taper or no taper?)
     # Show the waveform and the averaged FFT over the whole record:
