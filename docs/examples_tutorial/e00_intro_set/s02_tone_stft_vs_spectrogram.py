@@ -50,6 +50,7 @@ if __name__ == "__main__":
         time_fft_s=1,
         use_fft_frequency=True,
         add_noise_taper_aa=True,
+        output_desc=True
     )
 
     # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window inside the
@@ -62,7 +63,6 @@ if __name__ == "__main__":
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1 / 2.0
 
-    # sig_s = 10.23875, time_spect_s = 9.92, time_stft_s = 10.24
     # Compute the Welch PSD; averaged spectrum over sliding windows
     frequency_welch_hz, psd_welch_power = signal.welch(
         x=mic_sig,
