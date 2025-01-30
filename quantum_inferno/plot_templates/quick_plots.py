@@ -1,8 +1,8 @@
 """
 This module contains quick plotting routines
 """
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from quantum_inferno.scales_dyadic import get_epsilon
 
 
@@ -10,9 +10,9 @@ def plot_tdr_sig(sig_wfm: np.ndarray, sig_time: np.ndarray, signal_time_base: st
     """
     Waveform
 
-    :param sig_wfm:
-    :param sig_time:
-    :param signal_time_base:
+    :param sig_wfm: waveform to plot
+    :param sig_time: timestamps for waveform
+    :param signal_time_base: label for time axis
     :return: figure of waveform for plotting
     """
     fig = plt.figure()
@@ -32,11 +32,11 @@ def plot_tdr_rms(
     """
     Waveform
 
-    :param sig_wfm:
-    :param sig_time:
-    :param sig_rms_wf:
-    :param sig_rms_time:
-    :param signal_time_base:
+    :param sig_wfm: waveform to plot
+    :param sig_time: timestamps for waveform
+    :param sig_rms_wf: rms waveform
+    :param sig_rms_time: rms timestamps
+    :param signal_time_base: label for time axis
     :return: figure of waveform for plotting
     """
     fig = plt.figure()
@@ -135,9 +135,9 @@ def plot_st_window_tfr_bits(window: np.ndarray, frequency_sx: np.ndarray, freque
     """
     plot something
 
-    :param window:
-    :param frequency_sx:
-    :param frequency_fft:
+    :param window: window to plot
+    :param frequency_sx: frequencies
+    :param frequency_fft: frequency fft
     :return: figure of waveform for plotting
     """
     fig = plt.figure(figsize=(8, 8))
@@ -152,9 +152,9 @@ def plot_st_window_tfr_lin(window: np.ndarray, frequency_sx: np.ndarray, frequen
     """
     plot something
 
-    :param window:
-    :param frequency_sx:
-    :param frequency_fft:
+    :param window: window to plot
+    :param frequency_sx: frequencies
+    :param frequency_fft: frequency fft
     :return: figure of waveform for plotting
     """
     fig = plt.figure(figsize=(8, 8))

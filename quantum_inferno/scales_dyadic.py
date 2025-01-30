@@ -367,8 +367,7 @@ def log_frequency_hz_from_fft_points(
     :param scale_base: scale base
     :return: array of scaled values
     """
-    # TODO: Make function to round to to nearest power of two and perform all-around error checking for pow2
-    # See log 2 functions below
+    # See log2 functions below
     log2_ave_life_dyad = int(np.ceil(np.log2(fft_points)))
     # Framework constants
     scale_mult = scale_multiplier(scale_order)
