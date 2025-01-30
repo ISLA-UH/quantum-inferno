@@ -131,9 +131,10 @@ def tfr_stx_fft(
     if frequency_step is None:
         # Reduce the fft resolution by a factor of lin_fft_decimate
         frequency_step = (frequency_max - frequency_min) * lin_fft_decimate / len(frequency_fft)
-        frequency_stx = np.arange(f_start, f_stop, frequency_step)
-    else:
-        frequency_stx = np.arange(f_start, f_stop, frequency_step)
+    elif isinstance(frequency_step, complex) or frequency_step <= 0 or frequency_step > (f_stop - f_start):
+        print(f"WARNING: frequency_step of {frequency_step} is invalid. Using default.")
+        frequency_step = (frequency_max - frequency_min) * lin_fft_decimate / len(frequency_fft)
+    frequency_stx = np.arange(f_start, f_stop, frequency_step)
 
     # if geometric (log) frequency
     if is_geometric is True:
