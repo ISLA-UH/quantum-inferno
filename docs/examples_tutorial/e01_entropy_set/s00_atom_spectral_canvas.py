@@ -12,6 +12,7 @@ from quantum_inferno import styx_fft, styx_cwt, scales_dyadic
 import quantum_inferno.plot_templates.plot_base as ptb
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.utilities.calculations import get_num_points
+from quantum_inferno.utilities.short_time_fft import gtx_complex_pow2, stft_complex_pow2
 
 print(__doc__)
 
@@ -93,7 +94,7 @@ if __name__ == "__main__":
     frequency_resolution_cwt_hz = frequency_sample_rate_hz / time_nd
     # STFT
     stft_fft_index = np.argmin(np.abs(frequency_stft_pos_hz - frequency_center_hz))
-    frequency_center_stft_hz = frequency_stft_pos_hz[stft_fft_index]
+    frequency_center_stft_hz = float(frequency_stft_pos_hz[stft_fft_index])
     frequency_resolution_stft_hz = frequency_sample_rate_hz / time_fft_nd
 
     # Compare:
@@ -174,6 +175,14 @@ if __name__ == "__main__":
         alpha=tukey_alpha,
     )
 
+    frequency_stft_hz2, time_stft_s2, stft_complex2 = stft_complex_pow2(
+        sig_wf=mic_sig,
+        frequency_sample_rate_hz=frequency_sample_rate_hz,
+        segment_points=time_fft_nd,
+        overlap_points=overlap_pts,
+        alpha=tukey_alpha,
+    )
+
     # STFT with sliding Gaussian window will have same time and frequency specs
     _, _, stft_complex_gauss = styx_fft.gtx_complex_pow2(
         sig_wf=mic_sig,
@@ -182,16 +191,28 @@ if __name__ == "__main__":
         overlap_points=overlap_pts,
     )
 
+    # STFT with sliding Gaussian window will have same time and frequency specs
+    gauss_freq, gauss_time, stft_complex_gauss2 = gtx_complex_pow2(
+        sig_wf=mic_sig,
+        frequency_sample_rate_hz=frequency_sample_rate_hz,
+        segment_points=time_fft_nd,
+        overlap_points=overlap_pts,
+    )
+
     stft_power = 2 * np.abs(stft_complex) ** 2
+    stft_power2 = 2 * np.abs(stft_complex2) ** 2
     stft_power_gauss = 2 * np.abs(stft_complex_gauss) ** 2
+    stft_power_gauss2 = 2 * np.abs(stft_complex_gauss2) ** 2
 
     # Scale power by variance
     welch_over_var = psd_welch_power / mic_sig_var
     stft_over_var = np.average(stft_power, axis=1) / mic_sig_var
+    stft_over_var2 = np.average(stft_power2, axis=1) / mic_sig_var
 
     print("\nSum scaled spectral power")
     print("Sum Welch:", np.sum(welch_over_var))
     print("Sum STFT:", np.sum(stft_over_var))
+    print("Sum STFT2:", np.sum(stft_over_var2))
 
     # Set the background
     plt.style.use("dark_background")
@@ -206,6 +227,7 @@ if __name__ == "__main__":
     ax1.set_ylabel("Norm")
     ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
     ax2.semilogx(frequency_stft_hz, stft_over_var, ".-", label="STFT")
+    ax2.semilogx(frequency_stft_hz2, stft_over_var2, "--", label="STFT2")
 
     ax2.set_title("Welch and Spect FFT, f = " + str(round(frequency_center_stft_hz * 100) / 100) + " Hz")
     ax2.set_xlabel("Frequency, hz")
@@ -231,5 +253,18 @@ if __name__ == "__main__":
     wf_base.figure_title = f"STFT Gaussian Taper"
     mesh_panel.tfr = np.log2(stft_power_gauss + scales_dyadic.EPSILON16)
     gauss = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
+
+    # new funcs
+    wf_base.figure_title = f"STFT Tukey Taper2"
+    mesh_base.time = time_stft_s2
+    mesh_base.frequency = frequency_stft_hz2
+    mesh_panel.tfr = np.log2(stft_power2 + scales_dyadic.EPSILON16)
+    tukey2 = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
+
+    wf_base.figure_title = f"STFT Gaussian Taper2"
+    mesh_base.time = gauss_time
+    mesh_base.frequency = gauss_freq
+    mesh_panel.tfr = np.log2(stft_power_gauss2 + scales_dyadic.EPSILON16)
+    gauss2 = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     plt.show()

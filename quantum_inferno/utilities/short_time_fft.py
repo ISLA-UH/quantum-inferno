@@ -74,7 +74,7 @@ def get_stft_tukey_mag(
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculates the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
-    Returns the frequency, time bins, and magnitude of the STFT similar to legacy scipy.signal.stft
+    Returns the frequency, time bins, and magnitude of the detrended STFT similar to legacy scipy.signal.stft
     Note: If you want the STFT object, use get_stft_object_tukey
 
     :param timeseries: input signal
@@ -84,7 +84,7 @@ def get_stft_tukey_mag(
     :param overlap_length: length of the overlap, if not supplied, it is half of the segment_length
     :param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
     :param padding: padding method for the STFT (default is 'zeros', other options are 'edge', 'even', and 'odd')
-    :return: frequency, time bins, and magnitude of the STFT
+    :return: frequency, time bins, and magnitude of the detrended STFT
     """
     # check if padding is valid
     if padding not in padding_type:
@@ -236,7 +236,7 @@ def stft_complex_pow2(
         alpha: float = 0.25,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Simplest, with 50% overlap and built-in defaults.  Uses nfft length of nearest power of two for segment_points.
+    Simplest, with 50% overlap and built-in defaults.  Uses nfft length of nearest power of two of segment_points.
 
     :param sig_wf: signal waveform as numpy array
     :param frequency_sample_rate_hz: frequency sample rate in Hz
