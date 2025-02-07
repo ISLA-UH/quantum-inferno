@@ -1,7 +1,6 @@
 """
 Methods for calculating frequency and time-frequency representations of signals.
 Try to match all the defaults...
-
 """
 
 from typing import Optional, Tuple, Union
@@ -9,6 +8,7 @@ from typing import Optional, Tuple, Union
 import numpy as np
 from scipy import signal
 
+from quantum_inferno import qi_debugger
 from quantum_inferno.scales_dyadic import cycles_from_order
 from quantum_inferno.utilities.calculations import get_num_points, round_value
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
@@ -36,18 +36,28 @@ def get_stft_object_tukey(
     """
     # checks
     if segment_length < overlap_length:
-        print(
+        qi_debugger.add_message(
             f"overlap length {overlap_length} must be smaller than segment length {segment_length}"
             " using half of the segment length as the overlap length"
         )
+        # print(
+        #     f"overlap length {overlap_length} must be smaller than segment length {segment_length}"
+        #     " using half of the segment length as the overlap length"
+        # )
         overlap_length = segment_length // 2
 
     if tukey_alpha < 0 or tukey_alpha > 1:
-        print(f"Warning: Tukey alpha {tukey_alpha} must be between 0 and 1, using 0.25 as the default value")
+        qi_debugger.add_message(
+            f"Warning: Tukey alpha {tukey_alpha} must be between 0 and 1, using 0.25 as the default value"
+        )
+        # print(f"Warning: Tukey alpha {tukey_alpha} must be between 0 and 1, using 0.25 as the default value")
         tukey_alpha = 0.25
 
     if scaling not in scaling_type:
-        print(f"Warning: scaling {scaling} must be one of {scaling_type}, using 'magnitude' as the default value")
+        qi_debugger.add_message(
+            f"Warning: scaling {scaling} must be one of {scaling_type}, using 'magnitude' as the default value"
+        )
+        # print(f"Warning: scaling {scaling} must be one of {scaling_type}, using 'magnitude' as the default value")
         scaling = "magnitude"
 
     # calculate the values to be used in the ShortTimeFFT object
@@ -88,7 +98,10 @@ def get_stft_tukey_mag(
     """
     # check if padding is valid
     if padding not in padding_type:
-        print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
+        qi_debugger.add_message(
+            f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
+        )
+        # print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
         padding = "zeros"
 
     # todo: check segment length and overlap length compared to timeseries length?
@@ -165,7 +178,10 @@ def spectrogram_tukey(
     """
     # check if padding is valid
     if padding not in padding_type:
-        print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
+        qi_debugger.add_message(
+            f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
+        )
+        # print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
         padding = "zeros"
 
     # Make the ShortTimeFFT object
@@ -273,7 +289,10 @@ def gtx_complex_pow2(
     """
     # check if padding is valid
     if padding not in padding_type:
-        print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
+        qi_debugger.add_message(
+            f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
+        )
+        # print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
         padding = "zeros"
     if overlap_points is None:
         overlap_points = int(segment_points / 2)

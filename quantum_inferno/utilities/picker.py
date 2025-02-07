@@ -1,6 +1,5 @@
 """
 A set of functions to pick key portions of a signal.
-
 """
 
 from typing import Tuple, Optional, Union
@@ -9,12 +8,23 @@ import numpy as np
 from scipy import signal
 from scipy.signal import butter, sosfiltfilt
 
+from quantum_inferno import qi_debugger
 from quantum_inferno.utilities.date_time import convert_time_unit
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
 
 INPUT_SCALE_TYPE = ["amplitude", "log2"]
 EXTRACTION_TYPE = ["sigmax", "sigmin", "sigabs", "log2", "log2max"]
+
+
+def find_nans(in_signal: np.ndarray) -> np.ndarray:
+    """
+    Find the locations of NaNs in the input signal
+
+    :param in_signal: input signal
+    :return: locations of NaNs in the signal
+    """
+    return np.argwhere(np.isnan(in_signal))
 
 
 def find_sample_rate_hz_from_timestamps(timestamps: np.ndarray, time_unit: str = "s") -> float:
@@ -38,7 +48,8 @@ def scale_signal_by_extraction_type(in_signal: np.ndarray, extraction_type: str 
     :return: normalized signal
     """
     if extraction_type not in EXTRACTION_TYPE:
-        print("Invalid extraction type.  Defaulting to sigmax.")
+        qi_debugger.add_message("Invalid extraction type.  Defaulting to sigmax.")
+        # print("Invalid extraction type.  Defaulting to sigmax.")
         extraction_type = "sigmax"
 
     if extraction_type == "sigmax":
@@ -184,10 +195,12 @@ def extract_signal_with_buffer_seconds(
     intro_index, outro_index = extract_signal_index_with_buffer(sample_rate_hz, peak, intro_buffer_s, outro_buffer_s)
 
     if intro_index < 0:
-        print(f"Warning: intro buffer exceeds the signal length, intro_index: {intro_index}")
+        qi_debugger.add_message(f"Warning: intro buffer exceeds the signal length, intro_index: {intro_index}")
+        # print(f"Warning: intro buffer exceeds the signal length, intro_index: {intro_index}")
         intro_index = 0
     if outro_index > len(timeseries):
-        print(f"Warning: outro buffer exceeds the signal length, outro_index: {outro_index}")
+        qi_debugger.add_message(f"Warning: outro buffer exceeds the signal length, outro_index: {outro_index}")
+        # print(f"Warning: outro buffer exceeds the signal length, outro_index: {outro_index}")
         outro_index = len(timeseries)
 
     return timeseries[intro_index:outro_index]

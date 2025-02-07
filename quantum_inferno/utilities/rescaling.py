@@ -2,12 +2,28 @@
 A set of functions to rescale data.
 
 """
-from typing import Union
+from typing import Iterable, Union
 import numpy as np
+
+from quantum_inferno import qi_debugger
 from quantum_inferno.scales_dyadic import get_epsilon
 
 
 DATA_SCALE_TYPE = ["amplitude", "power"]
+
+
+def set_vals_to(in_data: np.ndarray, target_indices: Union[Iterable, int], new_val: float) -> np.ndarray:
+    """
+    Set all values in the specified indices of the input data to a new value.
+    Raises an error if any are encountered.
+
+    :param in_data: data to set values
+    :param target_indices: indices to change
+    :param new_val: new value to set
+    :return: data with all values set to new value
+    """
+    np.put(in_data, target_indices, new_val)
+    return in_data
 
 
 def to_log2_with_epsilon(x: Union[np.ndarray, float, list]) -> Union[np.ndarray, float]:
@@ -40,7 +56,8 @@ def to_decibel_with_epsilon(
     :return: rescaled data or value as decibels
     """
     if input_scaling not in DATA_SCALE_TYPE:
-        print("Invalid input scaling type.  Defaulting to amplitude.")
+        qi_debugger.add_message("Invalid input scaling type.  Defaulting to amplitude.")
+        # print("Invalid input scaling type.  Defaulting to amplitude.")
         input_scaling = "amplitude"
     scale_val = 10 if input_scaling == "power" else 20
 

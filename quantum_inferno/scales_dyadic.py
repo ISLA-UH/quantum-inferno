@@ -9,6 +9,8 @@ from typing import List, Tuple, Union
 
 import numpy as np
 
+from quantum_inferno import qi_debugger
+
 """ 
 Smallest number > 0 for 64-, 32-, and 16-bit floats.  
 Use to avoid division by zero or log zero singularities
@@ -113,11 +115,17 @@ def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER, show_warning: bo
     """
     scale_order = np.abs(scale_order)  # Force to be a real, positive float
     if scale_order < DEFAULT_SCALE_ORDER_MIN:
+        error_msg = f"Warning from scales_dyadic.scale_order_check:\n"\
+                    f"N < {DEFAULT_SCALE_ORDER_MIN} specified, overriding using N = {DEFAULT_SCALE_ORDER_MIN}"
         if show_warning:
-            print(
-                f"** Warning from scales_dyadic.scale_order_check:\n"
-                f"N < {DEFAULT_SCALE_ORDER_MIN} specified, overriding using N = {DEFAULT_SCALE_ORDER_MIN}"
-            )
+            qi_debugger.add_message_with_print(error_msg)
+        else:
+            qi_debugger.add_message(error_msg)
+        # if show_warning:
+        #     print(
+        #         f"** Warning from scales_dyadic.scale_order_check:\n"
+        #         f"N < {DEFAULT_SCALE_ORDER_MIN} specified, overriding using N = {DEFAULT_SCALE_ORDER_MIN}"
+        #     )
         scale_order = DEFAULT_SCALE_ORDER_MIN
     return scale_order
 
@@ -268,28 +276,47 @@ def band_intervals_periods(
         [scale_ref_input, scale_low_input, scale_high_input, scale_base_input, scale_order_input]
     )
 
+    err_msg = f"WARNING: Base is not ISO3 or ANSI S1.11 compliant"\
+              f"\nContinuing With Non-standard base = {scale_base}..."
     # Check for compliance with ISO3 and/or ANSI S1.11 and for scale_order = 1, 3, 6, 12, and 24
     if scale_base == Slice.G3 or scale_base == Slice.G2:
         pass
     elif scale_base < 1.0:
+        err_msg = "WARNING: Base must be greater than unity. Overriding to G = 2"
         if show_warnings:
-            print("\nWARNING: Base must be greater than unity. Overriding to G = 2")
+            qi_debugger.add_message_with_print(err_msg)
+        else:
+            qi_debugger.add_message(err_msg)
+        # if show_warnings:
+        #     print("\nWARNING: Base must be greater than unity. Overriding to G = 2")
         scale_base = Slice.G2
     elif show_warnings:
-        print("\nWARNING: Base is not ISO3 or ANSI S1.11 compliant")
-        print(f"Continuing With Non-standard base = {scale_base}...")
+        qi_debugger.add_message_with_print(err_msg)
+        # print("\nWARNING: Base is not ISO3 or ANSI S1.11 compliant")
+        # print(f"Continuing With Non-standard base = {scale_base}...")
+    else:
+        qi_debugger.add_message(err_msg)
 
+    err_msg = f"WARNING: Recommend Orders {VALID_SCALE_ORDERS}"\
+              f"\nContinuing With Non-standard Order = {scale_order}..."
     # Check for compliance with ISO3 for scale_order = 1, 3, 6, 12, and 24
     # and the two 'special' orders 0.75 and 1.5
     if scale_order in VALID_SCALE_ORDERS:
         pass
     elif scale_order < 0.75:
+        err_msg = "Order must be greater than 0.75. Overriding to Order 1"
         if show_warnings:
-            print("Order must be greater than 0.75. Overriding to Order 1")
+            qi_debugger.add_message_with_print(err_msg)
+            # print("Order must be greater than 0.75. Overriding to Order 1")
+        else:
+            qi_debugger.add_message(err_msg)
         scale_order = 1
     elif show_warnings:
-        print(f"\nWARNING: Recommend Orders {VALID_SCALE_ORDERS}")
-        print(f"Continuing With Non-standard Order = {scale_order}...")
+        qi_debugger.add_message_with_print(err_msg)
+        # print(f"\nWARNING: Recommend Orders {VALID_SCALE_ORDERS}")
+        # print(f"Continuing With Non-standard Order = {scale_order}...")
+    else:
+        qi_debugger.add_message(err_msg)
 
     # Compute scale edge and width parameters
     scale_edge = scale_base ** (1.0 / (2.0 * scale_order))
@@ -298,13 +325,21 @@ def band_intervals_periods(
     if scale_low < Slice.T0S:
         scale_low = Slice.T0S / scale_edge
     if scale_high < scale_low:
+        err_msg = "WARNING: Upper scale must be larger than the lowest scale\nOverriding to min = max/G\n"
         if show_warnings:
-            print("\nWARNING: Upper scale must be larger than the lowest scale")
-            print("Overriding to min = max/G\n")
+            qi_debugger.add_message_with_print(err_msg)
+            # print("\nWARNING: Upper scale must be larger than the lowest scale")
+            # print("Overriding to min = max/G\n")
+        else:
+            qi_debugger.add_message(err_msg)
         scale_low = scale_high / scale_base
     if scale_high == scale_low:
+        err_msg = "WARNING: Upper scale = lowest scale, returning closest band edges"
         if show_warnings:
-            print("\nWARNING: Upper scale = lowest scale, returning closest band edges")
+            qi_debugger.add_message_with_print(err_msg)
+            # print("\nWARNING: Upper scale = lowest scale, returning closest band edges")
+        else:
+            qi_debugger.add_message(err_msg)
         scale_high *= scale_edge
         scale_low /= scale_edge
 
@@ -319,11 +354,17 @@ def band_intervals_periods(
 
     # Check for band number anomalies
     if n_max < n_min:
+        err_msg = f"SPECMOD: Insufficient bandwidth for Nth band specification"\
+                  f"\nMinimum scaled bandwidth (scale_high - scale_low)/scale_center = {scale_width}"\
+                  "\nCorrect scale High/Low input parameters\nApply one order"
         if show_warnings:
-            print("\nSPECMOD: Insufficient bandwidth for Nth band specification")
-            print(f"Minimum scaled bandwidth (scale_high - scale_low)/scale_center = {scale_width}")
-            print("Correct scale High/Low input parameters")
-            print("Apply one order")
+            qi_debugger.add_message_with_print(err_msg)
+            # print("\nSPECMOD: Insufficient bandwidth for Nth band specification")
+            # print(f"Minimum scaled bandwidth (scale_high - scale_low)/scale_center = {scale_width}")
+            # print("Correct scale High/Low input parameters")
+            # print("Apply one order")
+        else:
+            qi_debugger.add_message(err_msg)
         n_max = np.floor(np.log10(scale_high) / np.log10(scale_base))
         n_min = n_max - scale_order
 

@@ -9,6 +9,7 @@ from typing import Tuple, Union
 import numpy as np
 import scipy.signal as signal
 
+from quantum_inferno import qi_debugger
 from quantum_inferno import scales_dyadic as scales
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
@@ -133,7 +134,8 @@ def chirp_mqg_from_n(
     """
     if band_order_nth < 0.7:
         band_order_nth = 3.0
-        print(f"N < 0.7 specified, using N = {band_order_nth}")
+        qi_debugger.add_message(f"N < 0.7 specified, using N = {band_order_nth}")
+        # print(f"N < 0.7 specified, using N = {band_order_nth}")
     order_bandedge = scale_base ** (1.0 / 2.0 / band_order_nth)  # kN in Garces 2013
     order_scaled_bandwidth = order_bandedge - 1.0 / order_bandedge
     quality_factor_q = 1.0 / order_scaled_bandwidth  # Exact for Nth octave bands

@@ -6,6 +6,7 @@ from typing import Tuple, Union
 import numpy as np
 import scipy.signal as signal
 
+from quantum_inferno import qi_debugger
 from quantum_inferno.scales_dyadic import cycles_from_order
 from quantum_inferno.utilities.calculations import get_num_points
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
@@ -80,9 +81,12 @@ def butter_bandpass(
     edge_low = frequency_cut_low_hz / nyquist
     edge_high = frequency_cut_high_hz / nyquist
     if edge_high >= 1:
-        print(
+        qi_debugger.add_message(
             f"Warning: Frequency cutoff {frequency_cut_high_hz} greater than Nyquist {nyquist} Hz, using half Nyquist"
         )
+        # print(
+        #     f"Warning: Frequency cutoff {frequency_cut_high_hz} greater than Nyquist {nyquist} Hz, using half Nyquist"
+        # )
         edge_high = 0.5  # Half of nyquist
     [b, a] = signal.butter(N=filter_order, Wn=[edge_low, edge_high], btype="bandpass")
     sig_taper = np.copy(sig_wf)

@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable, AxesDivider
 import numpy as np
 
+from quantum_inferno import qi_debugger
 import quantum_inferno.utilities.date_time as dt
 from quantum_inferno.plot_templates import plot_base as plt_base
 
@@ -239,7 +240,8 @@ def plot_n_mesh_wf_vert(
         if isinstance(p, plt_base.MeshPanel):
             p.set_color_min_max()
             if not p.is_auto_color_min_max():
-                print(f"Mesh panel {panel_index} color scaling with user inputs")
+                qi_debugger.add_message(f"Mesh panel {panel_index} color scaling with user inputs")
+                # print(f"Mesh panel {panel_index} color scaling with user inputs")
             setup_plot(axes[panel_index], mesh_base.units_frequency, fig_params.text_size, False, False)
             ax_div: AxesDivider = make_axes_locatable(axes[panel_index])
             mesh_panel_cax: plt.Axes = ax_div.append_axes("right", size="1%", pad="0.5%")
@@ -338,7 +340,7 @@ def plot_wf_3_vert(
     # Catch cases where there may not be any data
     if wf_panel_a_time_zero[0] == wf_panel_a_time_zero[-1] and wf_panel_b_time_zero[0] == wf_panel_b_time_zero[-1]\
             and wf_panel_c_time_zero[0] == wf_panel_c_time_zero[-1]:
-        print("No data to plot for " + wf_base.figure_title)
+        qi_debugger.add_message_with_print(f"Error: No data to plot for {wf_base.figure_title}")
         return plt.figure()
 
     if wf_panel_a_time_zero[0] == wf_panel_b_time_zero[0] == wf_panel_c_time_zero[0]:
@@ -417,7 +419,7 @@ def plot_cw_and_power(
     """
     # Catch cases where there may not be any data
     if cw_panel.is_no_data():
-        print("No data to plot.")
+        qi_debugger.add_message_with_print("Error: No data to plot.")
         return plt.Figure()
 
     # Figure starts here

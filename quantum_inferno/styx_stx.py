@@ -4,11 +4,12 @@ After Moukadem et al., 2022, A new optimized Stockwell transform applied on synt
 Rederivation in preparation, last updated in Garces et al. 2023
 
 """
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from scipy.fft import fft, ifft, fftfreq
 
+from quantum_inferno import qi_debugger
 from quantum_inferno import scales_dyadic as scales
 from quantum_inferno.utilities.rescaling import is_power_of_two
 
@@ -53,10 +54,10 @@ def tfr_stx_fft(
     sig_wf: np.ndarray,
     time_sample_interval: float,
     scale_order_input: float = 8.0,
-    n_fft_in: int = None,
-    frequency_min: float = None,
-    frequency_max: float = None,
-    frequency_step: float = None,
+    n_fft_in: Optional[int] = None,
+    frequency_min: Optional[float] = None,
+    frequency_max: Optional[float] = None,
+    frequency_step: Optional[float] = None,
     factor_q: float = 0.0,
     power_p: float = 0.0,
     power_r: float = 1.0,
@@ -110,15 +111,24 @@ def tfr_stx_fft(
     if frequency_max is None:
         frequency_max = frequency_sample_rate / 2.0
     elif isinstance(frequency_max, complex) or frequency_max <= 0:
-        print(f"WARNING: frequency_max of {frequency_max} is invalid.  Resetting to {frequency_sample_rate / 2.}.")
+        qi_debugger.add_message(
+            f"WARNING: frequency_max of {frequency_max} is invalid.  Resetting to {frequency_sample_rate / 2.}."
+        )
+        # print(f"WARNING: frequency_max of {frequency_max} is invalid.  Resetting to {frequency_sample_rate / 2.}.")
         frequency_max = frequency_sample_rate / 2.0
     if frequency_min is None:
         frequency_min = frequency_min_nth
     elif isinstance(frequency_min, complex) or frequency_min <= 0 or frequency_min >= frequency_max:
-        print(f"WARNING: frequency_min of {frequency_min} is invalid.  Resetting to {frequency_min_nth}.")
+        qi_debugger.add_message(
+            f"WARNING: frequency_min of {frequency_min} is invalid.  Resetting to {frequency_min_nth}."
+        )
+        # print(f"WARNING: frequency_min of {frequency_min} is invalid.  Resetting to {frequency_min_nth}.")
         frequency_min = frequency_min_nth
     if frequency_max <= frequency_min:
-        print(f"WARNING: frequency_max of {frequency_max} is too small. Resetting to {frequency_sample_rate / 2.}.")
+        qi_debugger.add_message(
+            f"WARNING: frequency_max of {frequency_max} is too small. Resetting to {frequency_sample_rate / 2.}."
+        )
+        # print(f"WARNING: frequency_max of {frequency_max} is too small. Resetting to {frequency_sample_rate / 2.}.")
         frequency_max = frequency_sample_rate / 2.0
 
     # Computing nearest frequency later on anyway, and then using that to compute the fft.
@@ -132,7 +142,8 @@ def tfr_stx_fft(
         # Reduce the fft resolution by a factor of lin_fft_decimate
         frequency_step = (frequency_max - frequency_min) * lin_fft_decimate / len(frequency_fft)
     elif isinstance(frequency_step, complex) or frequency_step <= 0 or frequency_step > (f_stop - f_start):
-        print(f"WARNING: frequency_step of {frequency_step} is invalid. Using default.")
+        qi_debugger.add_message(f"WARNING: frequency_step of {frequency_step} is invalid. Using default.")
+        # print(f"WARNING: frequency_step of {frequency_step} is invalid. Using default.")
         frequency_step = (frequency_max - frequency_min) * lin_fft_decimate / len(frequency_fft)
     frequency_stx = np.arange(f_start, f_stop, frequency_step)
 

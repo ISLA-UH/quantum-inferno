@@ -1,10 +1,11 @@
 """
 Utilities for matrix operations.
-
 """
 
 from enum import Enum
 import numpy as np
+
+from quantum_inferno import qi_debugger
 
 
 class MatrixAxis(Enum):
@@ -35,7 +36,8 @@ def n_tile_array(array: np.ndarray, n: int, axis: MatrixAxis) -> np.ndarray:
     :return: 2D array with repeated values
     """
     if n < 1:
-        print("Warning: n must be greater than 1. Returning original array.")
+        qi_debugger.add_message("Warning: n must be greater than 1. Returning original array.")
+        # print("Warning: n must be greater than 1. Returning original array.")
         return array
 
     if axis == MatrixAxis.ROW:
@@ -59,28 +61,29 @@ def tile_array_to_shape(array: np.ndarray, shape: tuple, axis: MatrixAxis = None
     :return: 2D array with repeated values
     """
     if shape[0] == 1 or shape[1] == 1:
-        print("Warning: shape must be greater than 1. Returning original array.")
+        qi_debugger.add_message("Warning: shape must be greater than 1. Returning original array.")
+        # print("Warning: shape must be greater than 1. Returning original array.")
         return array
 
     if axis is None:
         if shape[0] == shape[1] and shape[0] == array.shape[0]:
-            print("If shape is square, defaulting to row direction.")
+            qi_debugger.add_message("If shape is square, defaulting to row direction.")
+            # print("If shape is square, defaulting to row direction.")
             axis = MatrixAxis.ROW
         elif shape[0] == array.shape[0]:
             axis = MatrixAxis.ROW
         elif shape[1] == array.shape[0]:
             axis = MatrixAxis.COLUMN
         elif array.ndim == 1:
-            print("Input array is 1D, Defaulting to row direction.")
+            qi_debugger.add_message("Input array is 1D, Defaulting to row direction.")
+            # print("Input array is 1D, Defaulting to row direction.")
             axis = MatrixAxis.ROW
         else:
             raise ValueError("Invalid shape. Must be a multiple of the input array.")
 
     if axis == MatrixAxis.ROW and shape[0] == array.shape[0]:
-        print("row")
         return np.tile(array, (shape[1], 1))
     elif axis == MatrixAxis.COLUMN and shape[1] == array.shape[0]:
-        print("column")
         return np.reshape(np.tile(array, (1, shape[0])), (-1, shape[0]), order="F")
     else:
         raise ValueError("Invalid direction or shape. Must be either ROW or COLUMN and be a multiple of input array.")

@@ -5,6 +5,8 @@ Methods for creating windows.
 import numpy as np
 from scipy.signal import windows
 
+from quantum_inferno import qi_debugger
+
 
 def get_tukey(array: np.ndarray, alpha: float = 0.5) -> np.ndarray:
     """
@@ -26,7 +28,10 @@ def get_tukey_by_buffer_num(array: np.ndarray, taper_num: int, alpha: float = 0.
     :param alpha: fraction of the window inside the cosine tapered window, shared between the head and tail
     """
     if len(array) < taper_num * 2:
-        print(f"Warning: array length {len(array)} is less than taper_num {taper_num * 2}. Using full array length.")
+        qi_debugger.add_message(
+            f"Warning: array length {len(array)} is less than taper_num {taper_num * 2}. Using full array length."
+        )
+        # print(f"Warning: array length {len(array)} is less than taper_num {taper_num * 2}. Using full array length.")
         return get_tukey(array, alpha=alpha)
 
     tukey = windows.tukey(taper_num * 2, alpha=alpha, sym=True)
