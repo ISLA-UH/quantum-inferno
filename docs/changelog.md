@@ -1,8 +1,9 @@
 ## Quantum Inferno Version History
 
-## 1.1.4 (2025-XX-XX)
+## 1.2.0 (2025-XX-XX)
 - Added debugger class with global usage for debugging statements
 - Added a function to check for nans and another to replace values at given indices with a new value
+- Utilize newer STFT scipy functions
 
 ## 1.1.3 (2025-01-16)
 - Updated requirements

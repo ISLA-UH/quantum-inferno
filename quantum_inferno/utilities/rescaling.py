@@ -12,6 +12,16 @@ from quantum_inferno.scales_dyadic import get_epsilon
 DATA_SCALE_TYPE = ["amplitude", "power"]
 
 
+def remove_nanmean(in_data: np.ndarray) -> np.ndarray:
+    """
+    Remove the mean of the input data.
+
+    :param in_data: data to remove mean
+    :return: data with mean removed
+    """
+    return in_data - np.nanmean(in_data)
+
+
 def set_vals_to(in_data: np.ndarray, target_indices: Union[Iterable, int], new_val: float) -> np.ndarray:
     """
     Set all values in the specified indices of the input data to a new value.
@@ -22,8 +32,19 @@ def set_vals_to(in_data: np.ndarray, target_indices: Union[Iterable, int], new_v
     :param new_val: new value to set
     :return: data with all values set to new value
     """
-    np.put(in_data, target_indices, new_val)
-    return in_data
+    repl_data = np.copy(in_data)
+    np.put(repl_data, target_indices, new_val)
+    return repl_data
+
+
+def remove_dc_offset_and_nans(in_data: np.ndarray) -> np.ndarray:
+    """
+    Remove the DC offset and set NaNs to 0 from the input data.
+
+    :param in_data: data to update
+    :return: data with DC offset removed and NaNs replaced with 0
+    """
+    return set_vals_to(remove_nanmean(in_data), np.argwhere(np.isnan(in_data)), 0.)
 
 
 def to_log2_with_epsilon(x: Union[np.ndarray, float, list]) -> Union[np.ndarray, float]:

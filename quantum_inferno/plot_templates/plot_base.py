@@ -19,6 +19,7 @@ MESH_SHADING_VALS = ["auto", "gouraud", "flat", "nearest"]  # pyplot pcolormesh.
 COLORMAP_SCALING_VALS = ["auto", "range", "else"]
 YTICK_STYLE_VALS = ["sci", "scientific", "plain"]  # pyplot ytick style
 AXIS_SCALE_VALS = ["function", "linear", "log", "functionlog", "symlog", "logit", "asinh"]  # pyplot yscale and xscale
+LINE_STYLES = ["solid", "dashed", "dashdot", "dotted", '-', "--", "-.", ':', "None", ' ', '']
 
 
 @dataclass
@@ -112,15 +113,18 @@ def mesh_colormap_limits(
     :param color_range: range of colors.  Default is 16.0
     :return: colormap min and max values
     """
+    non_nan_mesh = mesh_array[~np.isnan(mesh_array)]
+    if len(non_nan_mesh) == 0:
+        raise ValueError("Mesh has no valid data to plot")
     if colormap_scaling == "auto":
-        color_max = np.max(mesh_array)
-        color_min = np.min(mesh_array)
+        color_max = np.max(non_nan_mesh)
+        color_min = np.min(non_nan_mesh)
     elif colormap_scaling == "range":
-        color_max = np.max(mesh_array)
+        color_max = np.max(non_nan_mesh)
         color_min = color_max - color_range
     else:
-        color_max = np.max(np.abs(mesh_array))
-        color_min = np.min(np.abs(mesh_array))
+        color_max = np.max(np.abs(non_nan_mesh))
+        color_min = np.min(np.abs(non_nan_mesh))
 
     return color_min, color_max
 
@@ -217,13 +221,16 @@ class WaveformPanel:
         sets the given axis with new y limits
         :param axis: the axis to update y limits for
         """
+        non_nan_sig = self.sig[~np.isnan(self.sig)]
+        if len(non_nan_sig) == 0:
+            raise ValueError("Waveform has no valid data to plot")
         if self.yscaling == "auto":
-            axis.set_ylim(np.min(self.sig), np.max(self.sig))
+            axis.set_ylim(np.min(non_nan_sig), np.max(non_nan_sig))
             self.ytick_style = "plain"
         elif self.yscaling == "symmetric":
-            axis.set_ylim(-np.max(np.abs(self.sig)), np.max(np.abs(self.sig)))
+            axis.set_ylim(-np.max(np.abs(non_nan_sig)), np.max(np.abs(non_nan_sig)))
         elif self.yscaling == "positive":
-            axis.set_ylim(0, np.max(np.abs(self.sig)))
+            axis.set_ylim(0, np.max(np.abs(non_nan_sig)))
         else:
             axis.set_ylim(-10, 10)
 
@@ -263,6 +270,7 @@ class PowerPanelData:
         freq: np.ndarray, the frequencies to plot.
         linestyle: str, linestyle; all possible values:
             [‘solid’ | ‘dashed’, ‘dashdot’, ‘dotted’ | '-' | '--' | '-.' | ':' | 'None' | ' ' | ''].
+            If invalid value given, defaults to 'solid'.
         linewidth: float, linewidth.
         sig_label: str, label for the signal.
     """
@@ -271,6 +279,10 @@ class PowerPanelData:
     linestyle: str
     linewidth: float
     sig_label: str
+
+    def __post_init__(self):
+        if self.linestyle not in LINE_STYLES:
+            self.linestyle = "solid"
 
 
 @dataclass
