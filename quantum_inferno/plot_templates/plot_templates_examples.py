@@ -73,6 +73,7 @@ def plot_wf_mesh_vert_example(
         mesh_panel_b_cbar_units: str = "bits",
         figure_title: str = "Time-Frequency Representation",
         figure_title_show: bool = True,
+        share_x_axis: bool = True,
 ) -> plt.Figure:
     """
     Plot 2 vertical panels - mesh (top panel) and signal waveform (bottom panel)
@@ -103,6 +104,8 @@ def plot_wf_mesh_vert_example(
     :param mesh_panel_b_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
     :param figure_title: title of figure. Default is "Time-Frequency Representation"
     :param figure_title_show: show title if True. Default is True
+    :param share_x_axis: uses larger of the waveform or frequency end timestamp for all charts' x-axis upper limit
+        if True.  Default True.
     :return: plot
     """
     wf_base = plt_base.WaveformPlotBase(station_id=station_id,
@@ -126,7 +129,7 @@ def plot_wf_mesh_vert_example(
                                              mesh_panel_cbar_units=mesh_panel_b_cbar_units,
                                              mesh_panel_ytick_style=mesh_panel_b_ytick_style)
     fig = plt_tpl.plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel,
-                                      use_default_size=False)
+                                      use_default_size=False, share_x_axis=share_x_axis)
 
     return fig
 
@@ -159,6 +162,7 @@ def plot_wf_mesh_mesh_vert_example(
         mesh_panel_c_cbar_units: str = "bits",
         figure_title: str = "Time-Frequency Representation",
         figure_title_show: bool = True,
+        share_x_axis: bool = True,
 ) -> plt.Figure:
     """
     Plot 3 vertical panels - mesh (top panel), mesh (middle panel) and signal waveform (bottom panel)
@@ -196,6 +200,8 @@ def plot_wf_mesh_mesh_vert_example(
     :param mesh_panel_c_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
     :param figure_title: title of figure. Default is "Time-Frequency Representation"
     :param figure_title_show: show title if True. Default is True
+    :param share_x_axis: uses larger of the waveform or frequency end timestamp for all charts' x-axis upper limit
+        if True.  Default True.
     :return: plot
     """
     plot_base = plt_base.WaveformPlotBase(station_id=station_id,
@@ -225,7 +231,7 @@ def plot_wf_mesh_mesh_vert_example(
         mesh_panel_cbar_units=mesh_panel_c_cbar_units,
         mesh_panel_ytick_style=mesh_panel_c_ytick_style)
     fig = plt_tpl.plot_n_mesh_wf_vert(mesh_base, [mesh_panel_c, mesh_panel_b], plot_base, wf_panel,
-                                      use_default_size=False)
+                                      use_default_size=False, share_x_axis=share_x_axis)
 
     return fig
 

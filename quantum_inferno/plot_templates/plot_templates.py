@@ -175,7 +175,8 @@ def plot_n_mesh_wf_vert(
         wf_base: plt_base.WaveformPlotBase,
         wf_panel: plt_base.WaveformPanel,
         sanitize_times: bool = True,
-        use_default_size: bool = True
+        use_default_size: bool = True,
+        share_x_axis: bool = True
 ) -> plt.Figure:
     """
     Plot 1 or more mesh panels above the base waveform panel in a vertical layout.
@@ -186,6 +187,8 @@ def plot_n_mesh_wf_vert(
     :param wf_panel: WaveformPanel required for figure
     :param sanitize_times: if True, sanitize timestamps.  Default True
     :param use_default_size: if True, use the default size for the plots, otherwise size dynamically.  Default True
+    :param share_x_axis: if True, uses larger of the waveform or frequency end timestamp for all charts' x-axis upper
+                        limit.  Default True.
     :return: figure to display
     """
     num_panels: int = len(panels) + 1
@@ -203,8 +206,8 @@ def plot_n_mesh_wf_vert(
                                   frequency_scaling=mesh_base.frequency_scaling)
 
     wf_panel_n_time_zero = sanitize_timestamps(wf_panel.time, epoch_start)
-    time_xmin = wf_panel_n_time_zero[0]
-    time_xmax = t_edge[-1]
+    # set maximum value of x-axis; if not sharing x-axis, each chart will have its own limits
+    x_max = np.max([wf_panel_n_time_zero[-1], t_edge[-1]]) if share_x_axis else wf_panel_n_time_zero[-1]
 
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
     mesh_x, mesh_y, shading = mesh_base.get_colormesh_params()
@@ -231,7 +234,7 @@ def plot_n_mesh_wf_vert(
         num_panels,
         1,
         figsize=(fig_params.figure_size_x, adj_fig_height),
-        sharex=True,
+        sharex=share_x_axis,
     )
 
     panel_index = 0
@@ -262,7 +265,7 @@ def plot_n_mesh_wf_vert(
         panel_index += 1
 
     axes[-1].plot(wf_panel_n_time_zero, wf_panel.sig, color=wf_base.waveform_color)
-    axes[-1].set_xlim(time_xmin, time_xmax)
+    axes[-1].set_xlim(wf_panel_n_time_zero[0], x_max)
     wf_panel.set_y_lims(axes[-1])
     setup_plot(axes[-1], wf_panel.units, fig_params.text_size, True, True, wf_panel.ytick_style)
     ax_div: AxesDivider = make_axes_locatable(axes[-1])
@@ -297,7 +300,8 @@ def plot_mesh_wf_vert(
         wf_base: plt_base.WaveformPlotBase,
         wf_panel: plt_base.WaveformPanel,
         sanitize_times: bool = True,
-        use_default_size: bool = True
+        use_default_size: bool = True,
+        share_x_axis: bool = True,
 ) -> plt.Figure:
     """
     Specifically plot one mesh and one waveform, vertically
@@ -308,9 +312,12 @@ def plot_mesh_wf_vert(
     :param wf_panel: waveform to display
     :param sanitize_times: if True, sanitize timestamps.  Default True
     :param use_default_size: if True, use the default size for the plots, otherwise size dynamically.  Default True
+    :param share_x_axis: if True, uses larger of the waveform or frequency end timestamp for all charts' x-axis upper
+                        limit.  Default True.
     :return: Figure to plot
     """
-    return plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel, sanitize_times, use_default_size)
+    return plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel, sanitize_times, use_default_size,
+                               share_x_axis)
 
 
 def plot_wf_3_vert(

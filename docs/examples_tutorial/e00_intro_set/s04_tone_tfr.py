@@ -68,7 +68,7 @@ if __name__ == "__main__":
         average="mean",
     )
 
-    frequency_stft_hz, time_stft_s, stft_complex = stft.get_stft_tukey_mag(
+    frequency_stft_hz, time_stft_s, stft_complex = stft.get_stft_tukey(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     wf_panel = ptb.WaveformPanel(mic_sig, time_s)
     mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
     mesh_panel = ptb.MeshPanel(mic_stft_bits, colormap_scaling="range", cbar_units="log$_2$(Power)")
-    stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
+    stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
 
     # Plot the CWT
     wf_base.figure_title = f"CWT for {EVENT_NAME}, {ORDER_NUM}"

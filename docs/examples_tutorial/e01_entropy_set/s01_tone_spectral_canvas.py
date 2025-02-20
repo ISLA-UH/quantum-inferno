@@ -12,6 +12,7 @@ from quantum_inferno import styx_fft, scales_dyadic
 import quantum_inferno.plot_templates.plot_base as ptb
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.utilities.calculations import get_num_points
+from quantum_inferno.utilities.short_time_fft import stft_complex_pow2
 
 
 print(__doc__)
@@ -110,8 +111,8 @@ if __name__ == "__main__":
     mic_sig_imag_var = np.var(mic_sig_imag)
 
     # Theoretical variance TODO: construct function
-    mic_sig_real_var_nominal = 1 / 2
-    mic_sig_imag_var_nominal = 1 / 2
+    # mic_sig_real_var_nominal = .5
+    # mic_sig_imag_var_nominal = .5
 
     # Mathematical integral ~ computed Variance * Number of Samples. The dictionary type = "norm" returns 1/2.
     mic_sig_real_integral = np.var(mic_sig_real) * len(mic_sig_real)
@@ -119,9 +120,9 @@ if __name__ == "__main__":
 
     print("\nAtom Variance")
     print("mic_sig_real_variance:", mic_sig_real_var)
-    print("real_variance_nominal:", mic_sig_real_var_nominal)
+    print("real_variance_nominal:", .5)
     print("mic_sig_imag_variance:", mic_sig_imag_var)
-    print("imag_variance_nominal:", mic_sig_imag_var_nominal)
+    print("imag_variance_nominal:", .5)
 
     # # Choose the real component as the test signal
     # mic_sig = np.copy(mic_sig_real)
@@ -137,7 +138,8 @@ if __name__ == "__main__":
     # In principle, could highpass/bandpass
 
     mic_sig_var = mic_sig_imag_var
-    mic_sig_var_nominal = mic_sig_imag_var_nominal
+    # mic_sig_var_nominal = mic_sig_imag_var_nominal
+    mic_sig_var_nominal = .5
     print("\nChoose imaginary part as signal:")
     print("var/nominal var:", mic_sig_var / mic_sig_var_nominal)
 
@@ -154,12 +156,20 @@ if __name__ == "__main__":
     )
 
     # STFT with Tukey window
-    frequency_stft_hz, time_stft_s, stft_complex = styx_fft.stft_complex_pow2(
+    # frequency_stft_hz, time_stft_s, stft_complex = styx_fft.stft_complex_pow2(
+    #     sig_wf=mic_sig,
+    #     frequency_sample_rate_hz=frequency_sample_rate_hz,
+    #     segment_points=time_fft_nd,
+    #     overlap_points=overlap_pts,
+    #     alpha=tukey_alpha
+    # )
+
+    frequency_stft_hz, time_stft_s, stft_complex = stft_complex_pow2(
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         segment_points=time_fft_nd,
         overlap_points=overlap_pts,
-        alpha=tukey_alpha,
+        alpha=tukey_alpha
     )
 
     # # STFT with Gaussian window
@@ -213,6 +223,6 @@ if __name__ == "__main__":
                              frequency_hz_ymin=fmin, frequency_hz_ymax=fmax, colormap="inferno")
     mesh_panel = ptb.MeshPanel(np.log2(stft_power + scales_dyadic.EPSILON16),
                                colormap_scaling="auto", ytick_style="plain")
-    tukey = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
+    tukey = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
 
     plt.show()

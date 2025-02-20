@@ -13,74 +13,130 @@ from quantum_inferno.scales_dyadic import cycles_from_order
 from quantum_inferno.utilities.calculations import get_num_points, round_value
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 
+# STFT window types allowed
+stft_window_type = ["tukey", "gaussian"]
 # Create dictionaries for the types to avoid having to use Literal when running the functions
 scaling_type = ["magnitude", "psd", None]
 padding_type = ["zeros", "edge", "even", "odd"]
 
 
-# todo: allow any number of points for the fft window, or just use nearest pow 2?
-# return the Short-Time Fourier Transform (STFT) object with default parameters
-def get_stft_object_tukey(
-    sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = "magnitude"
+def get_stft_object(
+        window_type: str,
+        window_args: Tuple,
+        sample_rate_hz: float,
+        segment_length: int,
+        overlap_length: Optional[int] = None,
+        scaling: str = "magnitude",
+        fft_points: Optional[int] = None
 ) -> signal.ShortTimeFFT:
     """
-    Return the Short-Time Fourier Transform (STFT) object with a Tukey window using ShortTimeFFT class
-    Calculates the number of fft points based on the segment length using ceil_power_of_two rounding method
+    Return an STFT object with the given parameters, using the specified window.
+    Allowed window types are: "tukey", "gaussian".
+
+    * Tukey window requires alpha value as the window_args.  Example: (.25)
+    * Gaussian window requires sigma value as the window_args.  Example: (4)
+
+    :param window_type: type of window to use.  Refer to list above for valid types.  Invalid types defaults to "tukey"
+    :param window_args: arguments for the window function.  See above for details.
+    :param sample_rate_hz: sample rate in hz
+    :param segment_length: length of window segment
+    :param overlap_length: Optional length of overlap segment.  If None, defaults to half of segment_length
+    :param scaling: scaling type of window.  Defaults to "magnitude"
+    :param fft_points: Optional number of points in the fft.  If None, uses nearest power of two of segment_length.
+    :return: STFT object
+    """
+    if scaling not in scaling_type:
+        qi_debugger.add_message(
+            f"Warning: scaling {scaling} must be one of {scaling_type}, using 'magnitude' as the default value"
+        )
+        scaling = "magnitude"
+    if overlap_length is None:
+        overlap_length = segment_length // 2
+    elif segment_length < overlap_length:
+        qi_debugger.add_message(
+            f"Warning: overlap length {overlap_length} must be smaller than segment length {segment_length}"
+            " using half of the segment length as the overlap length"
+        )
+        overlap_length = segment_length // 2
+
+    # calculate the values to be used in the ShortTimeFFT object
+    if window_type.lower() == "gaussian":
+        if len(window_args) != 1 or window_args[0] is None:
+            gaussian_sigma = segment_length // 4
+            qi_debugger.add_message(
+                f"Warning: Gaussian window requires one argument, using {gaussian_sigma} as the default value"
+            )
+        else:
+            gaussian_sigma = window_args[0]
+        window = signal.windows.gaussian(segment_length, std=gaussian_sigma)
+    # this catches anything that's not "gaussian".  Uses tukey window.
+    else:
+        if len(window_args) != 1:
+            tukey_alpha = 0.25
+            qi_debugger.add_message(
+                f"Warning: Tukey window requires one argument, using {tukey_alpha} as the default value"
+            )
+        elif window_args[0] < 0 or window_args[0] > 1 or window_args[0] is None:
+            qi_debugger.add_message(
+                f"Warning: Tukey alpha {window_args[0]} must be between 0 and 1, using 0.25 as the default value"
+            )
+            tukey_alpha = 0.25
+        else:
+            tukey_alpha = window_args[0]
+        window = signal.windows.tukey(segment_length, alpha=tukey_alpha)
+
+    if fft_points is None:
+        fft_points = round_value(segment_length, "ceil_power_of_two")
+    hop_length = segment_length - overlap_length
+
+    # create the ShortTimeFFT object
+    return signal.ShortTimeFFT(
+        win=window, hop=hop_length, fs=sample_rate_hz, mfft=fft_points, fft_mode="onesided", scale_to=scaling
+    )
+
+
+def get_stft_object_tukey(
+    sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int,
+        scaling: str = "magnitude", fft_points: Optional[int] = None
+) -> signal.ShortTimeFFT:
+    """
+    Return the Short-Time Fourier Transform (STFT) object with a Tukey window using ShortTimeFFT class.
+    If fft_points not given, calculates the number of fft points based on the segment length using ceil_power_of_two
+    rounding method
 
     :param sample_rate_hz: sample rate of the signal
     :param tukey_alpha: shape parameter of the Tukey window
     :param segment_length: length of the segment
     :param overlap_length: length of the overlap
     :param scaling: scaling of the STFT (default is "magnitude", other options are "psd" and None)
+    :param fft_points: Optional number of points in the fft.  If None, uses nearest power of two of segment_length.
+                        Default None
     :return: ShortTimeFFT object
     """
-    # checks
-    if segment_length < overlap_length:
-        qi_debugger.add_message(
-            f"overlap length {overlap_length} must be smaller than segment length {segment_length}"
-            " using half of the segment length as the overlap length"
-        )
-        # print(
-        #     f"overlap length {overlap_length} must be smaller than segment length {segment_length}"
-        #     " using half of the segment length as the overlap length"
-        # )
-        overlap_length = segment_length // 2
-
-    if tukey_alpha < 0 or tukey_alpha > 1:
-        qi_debugger.add_message(
-            f"Warning: Tukey alpha {tukey_alpha} must be between 0 and 1, using 0.25 as the default value"
-        )
-        # print(f"Warning: Tukey alpha {tukey_alpha} must be between 0 and 1, using 0.25 as the default value")
-        tukey_alpha = 0.25
-
-    if scaling not in scaling_type:
-        qi_debugger.add_message(
-            f"Warning: scaling {scaling} must be one of {scaling_type}, using 'magnitude' as the default value"
-        )
-        # print(f"Warning: scaling {scaling} must be one of {scaling_type}, using 'magnitude' as the default value")
-        scaling = "magnitude"
-
-    # calculate the values to be used in the ShortTimeFFT object
-    tukey_window = signal.windows.tukey(segment_length, alpha=tukey_alpha)
-    fft_points = round_value(segment_length, "ceil_power_of_two")
-    hop_length = segment_length - overlap_length
-
-    # create the ShortTimeFFT object
-    stft_obj = signal.ShortTimeFFT(
-        win=tukey_window, hop=hop_length, fs=sample_rate_hz, mfft=fft_points, fft_mode="onesided", scale_to=scaling
-    )
-
-    return stft_obj
+    return get_stft_object("tukey", (tukey_alpha,), sample_rate_hz, segment_length, overlap_length, scaling, fft_points)
 
 
-def get_stft_tukey_mag(
+def get_freq_time_bins(stft_obj: signal.ShortTimeFFT, stop_scalar: int) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    :param stft_obj: calculated stft object
+    :param stop_scalar: length of the time bins
+    :return: frequency and time bin ndarrays
+    """
+    time_bins = np.arange(start=0, stop=stft_obj.delta_t * stop_scalar, step=stft_obj.delta_t)
+    frequency_bins = stft_obj.f
+
+    return frequency_bins, time_bins
+
+
+def get_stft_tukey(
         timeseries:np.ndarray,
         sample_rate_hz: Union[float, int],
         tukey_alpha: float,
         segment_length: int,
-        overlap_length: Optional[int] = None,
+        overlap_length: int,
         scaling: str = "magnitude",
-        padding: str = "zeros"
+        padding: str = "zeros",
+        fft_points: Optional[int] = None
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculates the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
@@ -91,9 +147,11 @@ def get_stft_tukey_mag(
     :param sample_rate_hz: sample rate of the signal
     :param tukey_alpha: shape parameter of the Tukey window
     :param segment_length: length of the segment
-    :param overlap_length: length of the overlap, if not supplied, it is half of the segment_length
+    :param overlap_length: length of the overlap
     :param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
     :param padding: padding method for the STFT (default is 'zeros', other options are 'edge', 'even', and 'odd')
+    :param fft_points: Optional number of points in the fft.  If None, uses nearest power of two of segment_length.
+                        Default None
     :return: frequency, time bins, and magnitude of the detrended STFT
     """
     # check if padding is valid
@@ -104,19 +162,14 @@ def get_stft_tukey_mag(
         # print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
         padding = "zeros"
 
-    # todo: check segment length and overlap length compared to timeseries length?
-    if overlap_length is None:
-        overlap_length = int(segment_length / 2)
-
     # create the ShortTimeFFT object
-    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling)
+    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling, fft_points)
 
     # calculate the STFT with detrending
     stft_magnitude = stft_obj.stft_detrend(x=timeseries, detr="constant", padding=padding)
 
     # calculate the time and frequency bins
-    time_bins = np.arange(start=0, stop=stft_obj.delta_t * np.shape(stft_magnitude)[1], step=stft_obj.delta_t)
-    frequency_bins = stft_obj.f
+    frequency_bins, time_bins = get_freq_time_bins(stft_obj, np.shape(stft_magnitude)[1])
 
     return frequency_bins, time_bins, stft_magnitude
 
@@ -191,8 +244,7 @@ def spectrogram_tukey(
     spectrogram = stft_obj.spectrogram(x=timeseries, padding=padding)
 
     # calculate the time and frequency bins
-    time_bins = np.arange(start=0, stop=stft_obj.delta_t * np.shape(spectrogram)[1], step=stft_obj.delta_t)
-    frequency_bins = stft_obj.f
+    frequency_bins, time_bins = get_freq_time_bins(stft_obj, np.shape(spectrogram)[1])
 
     return frequency_bins, time_bins, spectrogram
 
@@ -231,7 +283,7 @@ def stft_from_sig(
         )
     stft_scaling = 2 * np.sqrt(np.pi) / time_fft_nd
 
-    frequency_stft_hz, time_stft_s, stft_complex = get_stft_tukey_mag(
+    frequency_stft_hz, time_stft_s, stft_complex = get_stft_tukey(
         timeseries=sig_wf,
         sample_rate_hz=frequency_sample_rate_hz,
         segment_length=time_fft_nd,
@@ -250,6 +302,7 @@ def stft_complex_pow2(
         segment_points: int,
         overlap_points: int = None,
         alpha: float = 0.25,
+        fft_points: Optional[int] = None
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Simplest, with 50% overlap and built-in defaults.  Uses nfft length of nearest power of two of segment_points.
@@ -258,21 +311,24 @@ def stft_complex_pow2(
     :param frequency_sample_rate_hz: frequency sample rate in Hz
     :param segment_points: number of points in a segment
     :param overlap_points: number of points in overlap, if not given, equal to half the segment_points
-    :param alpha: Tukey window alpha
+    :param alpha: Tukey window alpha.  Default 0.25
+    :param fft_points: Optional number of points in the fft.  If None, uses nearest power of two of segment_points.
+                        Default None
     :return: frequency_stft_hz, time_stft_s, stft_complex
     """
     if overlap_points is None:
         overlap_points = int(segment_points / 2)
-    return get_stft_tukey_mag(sig_wf, frequency_sample_rate_hz, alpha, segment_points, overlap_points)
+    return get_stft_tukey(sig_wf, frequency_sample_rate_hz, alpha, segment_points, overlap_points,
+                          fft_points=fft_points)
 
 
 def gtx_complex_pow2(
         sig_wf: np.ndarray,
         frequency_sample_rate_hz: float,
         segment_points: int,
-        gaussian_sigma: int = None,
-        overlap_points: int = None,
-        fft_points: int = None,
+        overlap_points: Optional[int] = None,
+        gaussian_sigma: Optional[int] = None,
+        fft_points: Optional[int] = None,
         padding: str = "zeros",
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
@@ -294,27 +350,15 @@ def gtx_complex_pow2(
         )
         # print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
         padding = "zeros"
-    if overlap_points is None:
-        overlap_points = int(segment_points / 2)
-    if gaussian_sigma is None:
-        gaussian_sigma = int(segment_points / 4)
-    # calculate the values to be used in the ShortTimeFFT object
-    gaussian_window = signal.windows.gaussian(segment_points, std=gaussian_sigma)
-    if fft_points is None:
-        fft_points = round_value(segment_points, "ceil_power_of_two")
-    hop_length = segment_points - overlap_points
 
     # create the ShortTimeFFT object
-    stft_obj = signal.ShortTimeFFT(
-        win=gaussian_window, hop=hop_length, fs=frequency_sample_rate_hz, mfft=fft_points, fft_mode="onesided",
-        scale_to="magnitude"
-    )
+    stft_obj = get_stft_object("gaussian", (gaussian_sigma,), frequency_sample_rate_hz, segment_points,
+                               overlap_points, "magnitude", fft_points)
 
     # calculate the STFT with detrending
     stft_magnitude = np.abs(stft_obj.stft_detrend(x=sig_wf, detr="constant", padding=padding))
 
     # calculate the time and frequency bins
-    time_bins = np.arange(start=0, stop=stft_obj.delta_t * np.shape(stft_magnitude)[1], step=stft_obj.delta_t)
-    frequency_bins = stft_obj.f
+    frequency_bins, time_bins = get_freq_time_bins(stft_obj, np.shape(stft_magnitude)[1])
 
     return frequency_bins, time_bins, stft_magnitude

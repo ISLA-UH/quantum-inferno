@@ -1,14 +1,16 @@
 """
 Quantum inferno example: s00_vertical_wf_mesh_plots.py
 Tutorial on the quantum-inferno vertical waveform and spectrogram plotting functions and their parameters.
+Due to updated STFT functions, all charts require the x-axis of each chart to be independent, so share_x_axis=False.
 """
 import numpy as np
 import matplotlib.pyplot as plt
 
 import quantum_inferno.plot_templates.plot_base as ptb
 import quantum_inferno.utilities.short_time_fft as stft
-from quantum_inferno.plot_templates.plot_templates import plot_n_mesh_wf_vert
-from quantum_inferno.plot_templates.plot_templates_examples import plot_wf_mesh_mesh_vert_example, plot_wf_mesh_vert_example
+from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert, plot_n_mesh_wf_vert
+from quantum_inferno.plot_templates.plot_templates_examples import (plot_wf_mesh_mesh_vert_example,
+                                                                    plot_wf_mesh_vert_example)
 from quantum_inferno.plot_templates.figure_attributes import AudioParams, AspectRatioType
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
@@ -39,7 +41,7 @@ def calculate_t_domain_example_values():
 
 def calculate_tf_domain_example_values(mic_sig, time_fft_nd, frequency_sample_rate_hz, frequency_resolution_fft_hz,
                                        alpha=0.25):
-    frequency_stft_hz, time_stft_s, stft_complex = stft.get_stft_tukey_mag(
+    frequency_stft_hz, time_stft_s, stft_complex = stft.get_stft_tukey(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
@@ -82,7 +84,8 @@ def main():
     print("plot the example data. Close the figure when you're ready to continue.")
     # plot the example data
     print("\n\t\t\t PLOTTING EXAMPLE FIGURE: DEFAULT PARAMETERS")
-    stft = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel, share_x_axis=False)
+    # We'll use the simplified version in the code from now on.
     plt.show()
     # # # CUSTOMIZED BASE AND PANEL PARAMETERS # # #
     print("\nFor a more customized figure, we can specify additional parameters in the Base and Panel objects.")
@@ -132,8 +135,8 @@ def main():
     mesh_panel.color_range = 15.
     mesh_panel.cbar_units = "log$_2$(Power)"
     print("\nLet's plot the customized figure now to see the changes. Close the figure when you're ready to continue.")
-    # plot example figure
-    stft = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    # plot example figure, using the simplified method
+    stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     print("\n\t\t\t PLOTTING EXAMPLE FIGURE: CUSTOMIZED BASE AND PANEL PARAMETERS")
     plt.show()
     print("\nSince we changed the mesh colormap and the color scaling, we've created a new problem for ourselves: the")
@@ -142,7 +145,7 @@ def main():
     # set mesh_panel optional parameters
     mesh_panel.panel_label_color = "white"
     print("Let's plot the figure with the updated parameters. Close the figure when you're ready to continue.")
-    stft = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     print("\n\t\t\t PLOTTING EXAMPLE FIGURE: CUSTOMIZED BASE AND PANEL PARAMETERS (UPDATED)")
     plt.show()
     # # # EXAMPLE: ADDING MORE MESH PANELS # # #
@@ -164,20 +167,21 @@ def main():
                                  color_range=15., panel_label_color="white")
     # update the figure title
     wf_base.figure_title = "2-panel plot with default function parameters"
-    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel, share_x_axis=False)
     wf_base.figure_title = "3-panel plot with default function parameters"
-    stft_3panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel, mesh_panel_2], wf_base, wf_panel)
+    stft_3panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel, mesh_panel_2], wf_base, wf_panel, share_x_axis=False)
     print("\n\t\t\t PLOTTING EXAMPLE FIGURES: ADDING MORE MESH PANELS\n")
     plt.show()
     print("By default, the figure size is maintained between plots. If instead, we'd like to maintain the panel size,")
     print("we can set use_default_size to False. Let's see what that looks like. Close the figures when you're ready to"
           " continue.")
     wf_base.figure_title = "2-panel plot with use_default_size = True"
-    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft_2panel = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     wf_base.figure_title = "3-panel plot with use_default_size = True"
-    stft_3panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel, mesh_panel_2], wf_base, wf_panel)
+    stft_3panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel, mesh_panel_2], wf_base, wf_panel, share_x_axis=False)
     wf_base.figure_title = "3-panel plot with use_default_size = False"
-    stft_3panel2 = plot_n_mesh_wf_vert(mesh_base, [mesh_panel, mesh_panel_2], wf_base, wf_panel, use_default_size=False)
+    stft_3panel2 = plot_n_mesh_wf_vert(mesh_base, [mesh_panel, mesh_panel_2], wf_base, wf_panel,
+                                       use_default_size=False, share_x_axis=False)
     print("\n\t\t\t PLOTTING EXAMPLE FIGURES: ADDING MORE MESH PANELS (MAINTAIN PANEL SIZE)\n")
     plt.show()
     print("Changing the figure size is also possible, if desired. We can set the figure size in the WaveformPlotBase ")
@@ -185,19 +189,19 @@ def main():
     print("5 aspect ratios to see the difference. Close the figures when you're ready to continue.")
     wf_base.params_tfr = AudioParams(AspectRatioType(1))
     wf_base.figure_title = "2-panel plot with use_default_size = True and built-in figure size 1"
-    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft_2panel = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     wf_base.params_tfr = AudioParams(AspectRatioType(2))
     wf_base.figure_title = "2-panel plot with use_default_size = True and built-in figure size 2"
-    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft_2panel = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     wf_base.params_tfr = AudioParams(AspectRatioType(3))
     wf_base.figure_title = "2-panel plot with use_default_size = True and built-in figure size 3"
-    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft_2panel = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     wf_base.params_tfr = AudioParams(AspectRatioType(4))
     wf_base.figure_title = "2-panel plot with use_default_size = True and built-in figure size 4"
-    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft_2panel = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     wf_base.params_tfr = AudioParams(AspectRatioType(5))
     wf_base.figure_title = "2-panel plot with use_default_size = True and built-in figure size 5"
-    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft_2panel = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     print("\n\t\t\t PLOTTING EXAMPLE FIGURES: ADJUSTING DEFAULT FIGURE SIZE\n")
     plt.show()
     print("In some cases, you may want to adjust the font size. This can be done by setting the text_size attribute")
@@ -206,7 +210,7 @@ def main():
     audio_params.text_size = 12
     wf_base.params_tfr = audio_params
     wf_base.figure_title = "2-panel plot with built-in figure size 5 and 12pt font"
-    stft_2panel = plot_n_mesh_wf_vert(mesh_base, [mesh_panel], wf_base, wf_panel)
+    stft_2panel = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
     print("\n\t\t\t PLOTTING EXAMPLE FIGURE: ADJUSTING DEFAULT FIGURE SIZE AND FONT SIZE\n")
     plt.show()
     print("Finally, we'll demonstrate a functionalized version of the vertical plot template that is less customizable")
@@ -222,7 +226,8 @@ def main():
                                             frequency_hz_ymin=fmin,
                                             frequency_hz_ymax=fmax,
                                             mesh_panel_b_cbar_units="log$_2$(Power)",
-                                            figure_title="2-panel plot created by functionalized plot template")
+                                            figure_title="2-panel plot created by functionalized plot template",
+                                            share_x_axis=False)
     stft_3panel = plot_wf_mesh_mesh_vert_example(station_id="",
                                                  wf_panel_a_sig=mic_sig,
                                                  wf_panel_a_time=time_s,
@@ -234,7 +239,8 @@ def main():
                                                  frequency_hz_ymax=fmax,
                                                  mesh_panel_b_cbar_units="log$_2$(Power)",
                                                  mesh_panel_c_cbar_units="log$_2$(Power)",
-                                                 figure_title="3-panel plot created by functionalized plot template")
+                                                 figure_title="3-panel plot created by functionalized plot template",
+                                                 share_x_axis=False)
     print("\n\t\t\t PLOTTING EXAMPLE FIGURE: FUNCTIONALIZED PLOT TEMPLATES\n")
     plt.show()
     print("This concludes the tutorial on the quantum-inferno vertical waveform and spectrogram plotting functions.")

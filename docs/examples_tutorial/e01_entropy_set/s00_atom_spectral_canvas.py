@@ -4,6 +4,7 @@ Define the cyberspectral canvas from a knowledge of the signal center frequency 
 Compute a periodogram and a spectrogram of a Gabor wavelet (logon, grain) over sliding windows.
 The Welch method is equivalent to averaging the spectrogram over the columns.
 """
+from math import floor
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -181,6 +182,7 @@ if __name__ == "__main__":
         segment_points=time_fft_nd,
         overlap_points=overlap_pts,
         alpha=tukey_alpha,
+        fft_points=time_fft_nd
     )
 
     # STFT with sliding Gaussian window will have same time and frequency specs
@@ -259,12 +261,12 @@ if __name__ == "__main__":
     mesh_base.time = time_stft_s2
     mesh_base.frequency = frequency_stft_hz2
     mesh_panel.tfr = np.log2(stft_power2 + scales_dyadic.EPSILON16)
-    tukey2 = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
+    tukey2 = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
 
     wf_base.figure_title = f"STFT Gaussian Taper2"
     mesh_base.time = gauss_time
     mesh_base.frequency = gauss_freq
     mesh_panel.tfr = np.log2(stft_power_gauss2 + scales_dyadic.EPSILON16)
-    gauss2 = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
+    gauss2 = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel, share_x_axis=False)
 
     plt.show()

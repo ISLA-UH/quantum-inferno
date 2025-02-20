@@ -9,7 +9,7 @@ Sinusoid input with unit amplitude
 Nominal (untapered) tone variance = 1/2
 Validate:
 Nominal spectral power at tone frequency and averaged over the signal duration is ~1/2
-
+NOTE: imaginary components are removed from stft_mag and stft_psd due to warnings while running
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     )
 
     # STFT
-    _, _, stft_mag = stft.get_stft_tukey_mag(
+    _, _, stft_mag = stft.get_stft_tukey(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         padding="zeros",
     )
 
-    _, _, stft_psd = stft.get_stft_tukey_mag(
+    _, _, stft_psd = stft.get_stft_tukey(
         timeseries=mic_sig,
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
@@ -135,7 +135,8 @@ if __name__ == "__main__":
     # Scales with the signal variance
     plt.plot(mic_spect_frequency_hz, np.average(2 * spec_mag, axis=1) / mic_sig_var, label="spec, mag")
     plt.plot(welch_frequency_hz, Pxx_spec / mic_sig_var, "-.", label="Welch, spec")
-    plt.plot(mic_spect_frequency_hz, np.average(2 * stft_mag ** 2, axis=1) / mic_sig_var, ".-", label="stft, mag")
+    plt.plot(mic_spect_frequency_hz, np.average(2 * np.real(stft_mag) ** 2, axis=1) / mic_sig_var, ".-",
+             label="stft, mag")
     plt.title("Spectrum scaling returns near-unity at peak: preferred forms")
     plt.xlim(frequency_center_fft_hz - 10, frequency_center_fft_hz + 10)
     plt.xlabel("Frequency, Hz")
@@ -154,7 +155,7 @@ if __name__ == "__main__":
     plt.plot(welch_frequency_hz, frequency_resolution_fft_hz * Pxx / mic_sig_var, "-.", label="Welch, psd")
     plt.plot(
         mic_spect_frequency_hz,
-        frequency_resolution_fft_hz * np.average(2 * stft_psd ** 2, axis=1) / mic_sig_var,
+        frequency_resolution_fft_hz * np.average(2 * np.real(stft_psd) ** 2, axis=1) / mic_sig_var,
         ".-",
         label="density, mag",
     )

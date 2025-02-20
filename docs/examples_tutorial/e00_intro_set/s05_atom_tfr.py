@@ -123,6 +123,7 @@ if __name__ == "__main__":
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         segment_points=time_fft_nd,  # nfft must be greater than or equal to nperseg.
         # overlap_points=time_fft_nd // 2,  # 50% overlap
+        fft_points=time_fft_nd
     )
 
     stft_power = 2 * np.abs(stft_complex) ** 2
