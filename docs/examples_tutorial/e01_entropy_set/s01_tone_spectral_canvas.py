@@ -92,7 +92,7 @@ if __name__ == "__main__":
     frequency_resolution_cwt_hz = frequency_sample_rate_hz / time_nd
     # STFT
     stft_fft_index = np.argmin(np.abs(frequency_stft_pos_hz - frequency_center_hz))
-    frequency_center_stft_hz = frequency_stft_pos_hz[stft_fft_index]
+    frequency_center_stft_hz = float(frequency_stft_pos_hz[stft_fft_index])
     frequency_resolution_stft_hz = frequency_sample_rate_hz / time_fft_nd
 
     # Compare:
@@ -111,8 +111,8 @@ if __name__ == "__main__":
     mic_sig_imag_var = np.var(mic_sig_imag)
 
     # Theoretical variance TODO: construct function
-    # mic_sig_real_var_nominal = .5
-    # mic_sig_imag_var_nominal = .5
+    mic_sig_real_var_nominal = .5
+    mic_sig_imag_var_nominal = .5
 
     # Mathematical integral ~ computed Variance * Number of Samples. The dictionary type = "norm" returns 1/2.
     mic_sig_real_integral = np.var(mic_sig_real) * len(mic_sig_real)
@@ -120,9 +120,9 @@ if __name__ == "__main__":
 
     print("\nAtom Variance")
     print("mic_sig_real_variance:", mic_sig_real_var)
-    print("real_variance_nominal:", .5)
+    print("real_variance_nominal:", mic_sig_real_var_nominal)
     print("mic_sig_imag_variance:", mic_sig_imag_var)
-    print("imag_variance_nominal:", .5)
+    print("imag_variance_nominal:", mic_sig_imag_var_nominal)
 
     # # Choose the real component as the test signal
     # mic_sig = np.copy(mic_sig_real)
@@ -138,8 +138,7 @@ if __name__ == "__main__":
     # In principle, could highpass/bandpass
 
     mic_sig_var = mic_sig_imag_var
-    # mic_sig_var_nominal = mic_sig_imag_var_nominal
-    mic_sig_var_nominal = .5
+    mic_sig_var_nominal = mic_sig_imag_var_nominal
     print("\nChoose imaginary part as signal:")
     print("var/nominal var:", mic_sig_var / mic_sig_var_nominal)
 
