@@ -102,7 +102,7 @@ def butter_highpass(
     tukey_alpha: float = 0.5,
 ) -> np.ndarray:
     """
-    Butterworth bandpass filter
+    Butterworth high bandpass filter
 
     :param sig_wf: signal waveform as numpy array
     :param frequency_sample_rate_hz: frequency sample rate in Hz
@@ -132,7 +132,7 @@ def butter_lowpass(
     tukey_alpha: float = 0.5,
 ) -> np.ndarray:
     """
-    Butterworth bandpass filter
+    Butterworth low bandpass filter
 
     :param sig_wf: signal waveform as numpy array
     :param frequency_sample_rate_hz: frequency sample rate in Hz

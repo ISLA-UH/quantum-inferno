@@ -46,7 +46,7 @@ Full examples can be found in the [examples documentation](https://github.com/IS
 Check the [API Documentation](https://ISLA-UH.github.io/quantum-inferno).
 
 ### Troubleshooting
-Enable the debugging module if you encounter issues for more information.
+If you encounter errors, enable the debugging module for more information.
 ```python
 from quantum_inferno import enable_debugger
 

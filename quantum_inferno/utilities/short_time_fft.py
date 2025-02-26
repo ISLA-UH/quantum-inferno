@@ -1,6 +1,7 @@
 """
 Methods for calculating frequency and time-frequency representations of signals.
 Try to match all the defaults...
+Historical note: Scipy added signal.ShortTimeFFT in version 1.12.0
 """
 
 from typing import Optional, Tuple, Union
