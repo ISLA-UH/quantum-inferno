@@ -32,10 +32,13 @@ def get_epsilon() -> float:
     Return epsilon for float64, float32, float16 by detecting current interpreter's max size
     """
     if sys.maxsize > 2 ** 32:
+        # noinspection PyTypeChecker
         return EPSILON64
     elif sys.maxsize > 2 ** 16:
+        # noinspection PyTypeChecker
         return EPSILON32
     else:
+        # noinspection PyTypeChecker
         return EPSILON16
 
 
@@ -121,11 +124,6 @@ def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER, show_warning: bo
             qi_debugger.add_message_with_print(error_msg)
         else:
             qi_debugger.add_message(error_msg)
-        # if show_warning:
-        #     print(
-        #         f"** Warning from scales_dyadic.scale_order_check:\n"
-        #         f"N < {DEFAULT_SCALE_ORDER_MIN} specified, overriding using N = {DEFAULT_SCALE_ORDER_MIN}"
-        #     )
         scale_order = DEFAULT_SCALE_ORDER_MIN
     return scale_order
 
@@ -287,13 +285,9 @@ def band_intervals_periods(
             qi_debugger.add_message_with_print(err_msg)
         else:
             qi_debugger.add_message(err_msg)
-        # if show_warnings:
-        #     print("\nWARNING: Base must be greater than unity. Overriding to G = 2")
         scale_base = Slice.G2
     elif show_warnings:
         qi_debugger.add_message_with_print(err_msg)
-        # print("\nWARNING: Base is not ISO3 or ANSI S1.11 compliant")
-        # print(f"Continuing With Non-standard base = {scale_base}...")
     else:
         qi_debugger.add_message(err_msg)
 
@@ -307,14 +301,11 @@ def band_intervals_periods(
         err_msg = "Order must be greater than 0.75. Overriding to Order 1"
         if show_warnings:
             qi_debugger.add_message_with_print(err_msg)
-            # print("Order must be greater than 0.75. Overriding to Order 1")
         else:
             qi_debugger.add_message(err_msg)
         scale_order = 1
     elif show_warnings:
         qi_debugger.add_message_with_print(err_msg)
-        # print(f"\nWARNING: Recommend Orders {VALID_SCALE_ORDERS}")
-        # print(f"Continuing With Non-standard Order = {scale_order}...")
     else:
         qi_debugger.add_message(err_msg)
 
@@ -328,8 +319,6 @@ def band_intervals_periods(
         err_msg = "WARNING: Upper scale must be larger than the lowest scale\nOverriding to min = max/G\n"
         if show_warnings:
             qi_debugger.add_message_with_print(err_msg)
-            # print("\nWARNING: Upper scale must be larger than the lowest scale")
-            # print("Overriding to min = max/G\n")
         else:
             qi_debugger.add_message(err_msg)
         scale_low = scale_high / scale_base
@@ -337,7 +326,6 @@ def band_intervals_periods(
         err_msg = "WARNING: Upper scale = lowest scale, returning closest band edges"
         if show_warnings:
             qi_debugger.add_message_with_print(err_msg)
-            # print("\nWARNING: Upper scale = lowest scale, returning closest band edges")
         else:
             qi_debugger.add_message(err_msg)
         scale_high *= scale_edge
@@ -359,10 +347,6 @@ def band_intervals_periods(
                   "\nCorrect scale High/Low input parameters\nApply one order"
         if show_warnings:
             qi_debugger.add_message_with_print(err_msg)
-            # print("\nSPECMOD: Insufficient bandwidth for Nth band specification")
-            # print(f"Minimum scaled bandwidth (scale_high - scale_low)/scale_center = {scale_width}")
-            # print("Correct scale High/Low input parameters")
-            # print("Apply one order")
         else:
             qi_debugger.add_message(err_msg)
         n_max = np.floor(np.log10(scale_high) / np.log10(scale_base))

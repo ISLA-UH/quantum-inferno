@@ -13,6 +13,7 @@ from quantum_inferno import qi_debugger
 SUBSAMPLE_METHODS = ["average", "median", "max", "min", "nth"]
 
 
+# noinspection PyTypeChecker
 def subsample(
     timeseries: np.ndarray, sample_rate_hz: float, subsample_factor: int, method: str = "nth"
 ) -> Tuple[np.ndarray, float]:
@@ -29,14 +30,12 @@ def subsample(
     """
     if subsample_factor < 2:
         qi_debugger.add_message("Warning: subsample factor is less than 2, returning the original signal")
-        # print(f"Warning: subsample factor is less than 2, returning the original signal")
         return timeseries, sample_rate_hz
 
     new_sample_rate = sample_rate_hz / subsample_factor
 
     if method not in SUBSAMPLE_METHODS:
         qi_debugger.add_message(f"Warning: method {method} not recognized, using 'nth' method")
-        # print(f"Warning: method {method} not recognized, using 'nth' method")
         method = "nth"
 
     if method != "nth" and len(timeseries) % subsample_factor != 0:
@@ -88,6 +87,7 @@ def resample_with_sample_rate(
 
 
 # subsample a 2d array along the second axis
+# noinspection PyTypeChecker
 def subsample_2d(array: np.ndarray, subsample_factor: int, method: str = "nth") -> np.ndarray:
     """
     Subsample a 2D array along the second axis.
@@ -101,12 +101,10 @@ def subsample_2d(array: np.ndarray, subsample_factor: int, method: str = "nth") 
     """
     if subsample_factor < 2:
         qi_debugger.add_message("Warning: subsample factor is less than 2, returning the original signal")
-        # print(f"Warning: subsample factor is less than 2, returning the original signal")
         return array
 
     if method not in SUBSAMPLE_METHODS:
         qi_debugger.add_message(f"Warning: method {method} not recognized, using 'nth' method")
-        # print(f"Warning: method {method} not recognized, using 'nth' method")
         method = "nth"
 
     if method != "nth":

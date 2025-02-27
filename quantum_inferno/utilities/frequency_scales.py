@@ -3,6 +3,7 @@ Utilities for calculating frequencies for both linear and logarithmic scales.
 
 """
 from typing import Optional
+
 import numpy as np
 
 from quantum_inferno import qi_debugger
@@ -30,19 +31,16 @@ def get_linear_frequency_bins_range(
     # Check values
     if start_hz < 0:
         qi_debugger.add_message(f"Warning: start_hz ({start_hz}) is less than 0, setting to 0")
-        # print(f"Warning: start_hz ({start_hz}) is less than 0, setting to 0")
         start_hz = 0
     if end_hz > sample_rate_hz / 2:
         qi_debugger.add_message(
             f"Warning: end_hz ({end_hz}) is greater than Nyquist frequency, setting to Nyquist frequency"
         )
-        # print(f"Warning: end_hz ({end_hz}) is greater than Nyquist frequency, setting to Nyquist frequency")
         end_hz = sample_rate_hz / 2
     if start_hz > end_hz:
         qi_debugger.add_message(
             f"Warning: start_hz ({start_hz}) is greater than end_hz ({end_hz}), setting to 0 and Nyquist frequency"
         )
-        # print(f"Warning: start_hz ({start_hz}) is greater than end_hz ({end_hz}), setting to 0 and Nyquist frequency")
         start_hz = 0
         end_hz = sample_rate_hz / 2
     if segment_length < 0:
@@ -54,10 +52,6 @@ def get_linear_frequency_bins_range(
             f"Warning: segment_length ({segment_length}) is greater than sample_rate_hz ({sample_rate_hz})"
             f", setting to sample_rate_hz"
         )
-        # print(
-        #     f"Warning: segment_length ({segment_length}) is greater than sample_rate_hz ({sample_rate_hz})"
-        #     f", setting to sample_rate_hz"
-        # )
         segment_length = sample_rate_hz
 
     frequency_step = sample_rate_hz / segment_length
@@ -110,19 +104,16 @@ def get_band_numbers(
         raise ValueError(f"band_order ({band_order}) is less than 0")
     if start_hz < 0:
         qi_debugger.add_message(f"Warning: start_hz ({start_hz}) is less than 0, setting to 1")
-        # print(f"Warning: start_hz ({start_hz}) is less than or equal 0, setting to 1")
         start_hz = 1
     if end_hz > sample_rate_hz / 2:
         qi_debugger.add_message(
             f"Warning: end_hz ({end_hz}) is greater than Nyquist frequency, setting to Nyquist frequency"
         )
-        # print(f"Warning: end_hz ({end_hz}) is greater than Nyquist frequency, setting to Nyquist frequency")
         end_hz = sample_rate_hz / 2
     if start_hz > end_hz:
         qi_debugger.add_message(
             f"Warning: start_hz ({start_hz}) is greater than end_hz ({end_hz}), setting to 1 and Nyquist frequency"
         )
-        # print(f"Warning: start_hz ({start_hz}) is greater than end_hz ({end_hz}), setting to 1 and Nyquist frequency")
         start_hz = 1
         end_hz = sample_rate_hz / 2
 

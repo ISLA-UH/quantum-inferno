@@ -153,6 +153,7 @@ def butter_lowpass(
     return signal.filtfilt(b, a, sig_taper)
 
 
+# todo: replaced in utilities/short_time_fft
 def stft_complex_pow2(
     sig_wf: np.ndarray,
     frequency_sample_rate_hz: float,
@@ -191,6 +192,7 @@ def stft_complex_pow2(
     )
 
 
+# todo: replaced in utilities/short_time_fft
 def gtx_complex_pow2(
     sig_wf: np.ndarray,
     frequency_sample_rate_hz: float,

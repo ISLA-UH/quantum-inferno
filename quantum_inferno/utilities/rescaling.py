@@ -78,7 +78,6 @@ def to_decibel_with_epsilon(
     """
     if input_scaling not in DATA_SCALE_TYPE:
         qi_debugger.add_message("Invalid input scaling type.  Defaulting to amplitude.")
-        # print("Invalid input scaling type.  Defaulting to amplitude.")
         input_scaling = "amplitude"
     scale_val = 10 if input_scaling == "power" else 20
 

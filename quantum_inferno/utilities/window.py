@@ -31,7 +31,6 @@ def get_tukey_by_buffer_num(array: np.ndarray, taper_num: int, alpha: float = 0.
         qi_debugger.add_message(
             f"Warning: array length {len(array)} is less than taper_num {taper_num * 2}. Using full array length."
         )
-        # print(f"Warning: array length {len(array)} is less than taper_num {taper_num * 2}. Using full array length.")
         return get_tukey(array, alpha=alpha)
 
     tukey = windows.tukey(taper_num * 2, alpha=alpha, sym=True)

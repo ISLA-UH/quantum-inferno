@@ -37,7 +37,6 @@ def n_tile_array(array: np.ndarray, n: int, axis: MatrixAxis) -> np.ndarray:
     """
     if n < 1:
         qi_debugger.add_message("Warning: n must be greater than 1. Returning original array.")
-        # print("Warning: n must be greater than 1. Returning original array.")
         return array
 
     if axis == MatrixAxis.ROW:
@@ -62,13 +61,11 @@ def tile_array_to_shape(array: np.ndarray, shape: tuple, axis: MatrixAxis = None
     """
     if shape[0] == 1 or shape[1] == 1:
         qi_debugger.add_message("Warning: shape must be greater than 1. Returning original array.")
-        # print("Warning: shape must be greater than 1. Returning original array.")
         return array
 
     if axis is None:
         if shape[0] == shape[1] and shape[0] == array.shape[0]:
             qi_debugger.add_message("If shape is square, defaulting to row direction.")
-            # print("If shape is square, defaulting to row direction.")
             axis = MatrixAxis.ROW
         elif shape[0] == array.shape[0]:
             axis = MatrixAxis.ROW
@@ -76,7 +73,6 @@ def tile_array_to_shape(array: np.ndarray, shape: tuple, axis: MatrixAxis = None
             axis = MatrixAxis.COLUMN
         elif array.ndim == 1:
             qi_debugger.add_message("Input array is 1D, Defaulting to row direction.")
-            # print("Input array is 1D, Defaulting to row direction.")
             axis = MatrixAxis.ROW
         else:
             raise ValueError("Invalid shape. Must be a multiple of the input array.")

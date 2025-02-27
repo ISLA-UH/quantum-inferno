@@ -86,7 +86,6 @@ def set_datetime_to_utc(datetime_obj: datetime, tzinfo_warning: bool = False) ->
     if datetime_obj.tzinfo is None:
         if tzinfo_warning:
             qi_debugger.add_message("Warning: input datetime object is not timezone-aware, assuming UTC...")
-            # print("Warning: input datetime object is not timezone-aware, assuming UTC...")
         return datetime_obj.replace(tzinfo=timezone.utc)
     return datetime_obj.astimezone(timezone.utc)
 

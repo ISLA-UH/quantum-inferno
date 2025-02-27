@@ -91,6 +91,7 @@ def get_stft_object(
     hop_length = segment_length - overlap_length
 
     # create the ShortTimeFFT object
+    # noinspection PyTypeChecker
     return signal.ShortTimeFFT(
         win=window, hop=hop_length, fs=sample_rate_hz, mfft=fft_points, fft_mode="onesided", scale_to=scaling
     )
@@ -160,13 +161,13 @@ def get_stft_tukey(
         qi_debugger.add_message(
             f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
         )
-        # print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
         padding = "zeros"
 
     # create the ShortTimeFFT object
     stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling, fft_points)
 
     # calculate the STFT with detrending
+    # noinspection PyTypeChecker
     stft_magnitude = stft_obj.stft_detrend(x=timeseries, detr="constant", padding=padding)
 
     # calculate the time and frequency bins
@@ -235,13 +236,13 @@ def spectrogram_tukey(
         qi_debugger.add_message(
             f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
         )
-        # print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
         padding = "zeros"
 
     # Make the ShortTimeFFT object
     stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling)
 
     # Calculate the spectrogram
+    # noinspection PyTypeChecker
     spectrogram = stft_obj.spectrogram(x=timeseries, padding=padding)
 
     # calculate the time and frequency bins
@@ -349,7 +350,6 @@ def gtx_complex_pow2(
         qi_debugger.add_message(
             f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
         )
-        # print(f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value")
         padding = "zeros"
 
     # create the ShortTimeFFT object
@@ -357,6 +357,7 @@ def gtx_complex_pow2(
                                overlap_points, "magnitude", fft_points)
 
     # calculate the STFT with detrending
+    # noinspection PyTypeChecker
     stft_magnitude = np.abs(stft_obj.stft_detrend(x=sig_wf, detr="constant", padding=padding))
 
     # calculate the time and frequency bins

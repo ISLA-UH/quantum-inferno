@@ -244,7 +244,6 @@ def plot_n_mesh_wf_vert(
             p.set_color_min_max()
             if not p.is_auto_color_min_max():
                 qi_debugger.add_message(f"Mesh panel {panel_index} color scaling with user inputs")
-                # print(f"Mesh panel {panel_index} color scaling with user inputs")
             setup_plot(axes[panel_index], mesh_base.units_frequency, fig_params.text_size, False, False)
             ax_div: AxesDivider = make_axes_locatable(axes[panel_index])
             mesh_panel_cax: plt.Axes = ax_div.append_axes("right", size="1%", pad="0.5%")

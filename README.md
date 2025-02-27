@@ -36,8 +36,7 @@ Recommended background reading in chronological order:
 ```shell script
 pip install quantum-inferno
 ```
-
-More details will be placed in the [Installation guide](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/installation.md).
+Refer to the [Installation guide](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/installation.md) for more info.
 
 ### Examples
 Full examples can be found in the [examples documentation](https://github.com/ISLA-UH/quantum-inferno/blob/main/docs/examples.md#examples-using-quantum-inferno).
@@ -54,6 +53,5 @@ enable_debugger()
 ```
 
 ### Resources
-
 - Found an issue? Submit a [bug report](https://github.com/ISLA-UH/quantum-inferno/issues).
 - [MIT License](https://github.com/ISLA-UH/quantum-inferno/blob/main/LICENSE)

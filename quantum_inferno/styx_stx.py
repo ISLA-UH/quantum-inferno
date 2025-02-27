@@ -108,42 +108,40 @@ def tfr_stx_fft(
     frequency_min_nth = cycles_m / window_longest_time
 
     # Initialize stx frequencies, catch invalid values
-    if frequency_max is None:
+    if frequency_max is None or isinstance(frequency_max, complex) or frequency_max <= 0.:
+        if frequency_max is not None:
+            qi_debugger.add_message(
+                f"WARNING: frequency_max of {frequency_max} is invalid.  Resetting to {frequency_sample_rate / 2.}."
+            )
         frequency_max = frequency_sample_rate / 2.0
-    elif isinstance(frequency_max, complex) or frequency_max <= 0:
-        qi_debugger.add_message(
-            f"WARNING: frequency_max of {frequency_max} is invalid.  Resetting to {frequency_sample_rate / 2.}."
-        )
-        # print(f"WARNING: frequency_max of {frequency_max} is invalid.  Resetting to {frequency_sample_rate / 2.}.")
-        frequency_max = frequency_sample_rate / 2.0
-    if frequency_min is None:
-        frequency_min = frequency_min_nth
-    elif isinstance(frequency_min, complex) or frequency_min <= 0 or frequency_min >= frequency_max:
-        qi_debugger.add_message(
-            f"WARNING: frequency_min of {frequency_min} is invalid.  Resetting to {frequency_min_nth}."
-        )
-        # print(f"WARNING: frequency_min of {frequency_min} is invalid.  Resetting to {frequency_min_nth}.")
+    if (frequency_min is None or
+            isinstance(frequency_min, complex) or frequency_min <= 0. or frequency_min >= frequency_max):
+        if frequency_min is not None:
+            qi_debugger.add_message(
+                f"WARNING: frequency_min of {frequency_min} is invalid.  Resetting to {frequency_min_nth}."
+            )
         frequency_min = frequency_min_nth
     if frequency_max <= frequency_min:
         qi_debugger.add_message(
             f"WARNING: frequency_max of {frequency_max} is too small. Resetting to {frequency_sample_rate / 2.}."
         )
-        # print(f"WARNING: frequency_max of {frequency_max} is too small. Resetting to {frequency_sample_rate / 2.}.")
         frequency_max = frequency_sample_rate / 2.0
 
     # Computing nearest frequency later on anyway, and then using that to compute the fft.
     start_f_idx = np.abs(frequency_fft - frequency_min).argmin()
     stop_f_idx = np.abs(frequency_fft - frequency_max).argmin()
+    # noinspection PyUnresolvedReferences
     f_start = frequency_fft[start_f_idx]
+    # noinspection PyUnresolvedReferences
     f_stop = frequency_fft[stop_f_idx]
 
     # Linear scale
-    if frequency_step is None:
+    if (frequency_step is None or
+            isinstance(frequency_step, complex) or frequency_step <= 0 or frequency_step > (f_stop - f_start)):
+        if frequency_step is not None:
+            qi_debugger.add_message(f"WARNING: frequency_step of {frequency_step} is invalid. Using default.")
         # Reduce the fft resolution by a factor of lin_fft_decimate
-        frequency_step = (frequency_max - frequency_min) * lin_fft_decimate / len(frequency_fft)
-    elif isinstance(frequency_step, complex) or frequency_step <= 0 or frequency_step > (f_stop - f_start):
-        qi_debugger.add_message(f"WARNING: frequency_step of {frequency_step} is invalid. Using default.")
-        # print(f"WARNING: frequency_step of {frequency_step} is invalid. Using default.")
+        # noinspection PyTypeChecker
         frequency_step = (frequency_max - frequency_min) * lin_fft_decimate / len(frequency_fft)
     frequency_stx = np.arange(f_start, f_stop, frequency_step)
 

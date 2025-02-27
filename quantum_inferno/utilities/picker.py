@@ -39,6 +39,7 @@ def find_sample_rate_hz_from_timestamps(timestamps: np.ndarray, time_unit: str =
     return 1.0 / np.mean(np.diff(timestamps_seconds))
 
 
+# noinspection PyTypeChecker
 def scale_signal_by_extraction_type(in_signal: np.ndarray, extraction_type: str = "sigmax") -> np.ndarray:
     """
     Normalize the signal based on the extraction type
@@ -49,7 +50,6 @@ def scale_signal_by_extraction_type(in_signal: np.ndarray, extraction_type: str 
     """
     if extraction_type not in EXTRACTION_TYPE:
         qi_debugger.add_message("Invalid extraction type.  Defaulting to sigmax.")
-        # print("Invalid extraction type.  Defaulting to sigmax.")
         extraction_type = "sigmax"
 
     if extraction_type == "sigmax":
@@ -196,11 +196,9 @@ def extract_signal_with_buffer_seconds(
 
     if intro_index < 0:
         qi_debugger.add_message(f"Warning: intro buffer exceeds the signal length, intro_index: {intro_index}")
-        # print(f"Warning: intro buffer exceeds the signal length, intro_index: {intro_index}")
         intro_index = 0
     if outro_index > len(timeseries):
         qi_debugger.add_message(f"Warning: outro buffer exceeds the signal length, outro_index: {outro_index}")
-        # print(f"Warning: outro buffer exceeds the signal length, outro_index: {outro_index}")
         outro_index = len(timeseries)
 
     return timeseries[intro_index:outro_index]

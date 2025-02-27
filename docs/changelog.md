@@ -4,6 +4,8 @@
 - Added debugger class with global usage for debugging statements
 - Added a function to check for nans and another to replace values at given indices with a new value
 - Utilize newer STFT scipy functions
+- Added PyWavelets for better support
+- Python 3.10 or higher is required due to PyWavelets
 
 ## 1.1.3 (2025-01-16)
 - Updated requirements

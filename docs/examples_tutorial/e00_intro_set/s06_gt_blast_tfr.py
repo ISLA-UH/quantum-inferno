@@ -102,7 +102,6 @@ if __name__ == "__main__":
         band_order_nth=order_number_input,
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
-        cwt_type="fft",
         dictionary_type="spect",
     )
 
