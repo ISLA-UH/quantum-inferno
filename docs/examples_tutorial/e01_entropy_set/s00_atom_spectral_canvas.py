@@ -4,7 +4,6 @@ Define the cyberspectral canvas from a knowledge of the signal center frequency 
 Compute a periodogram and a spectrogram of a Gabor wavelet (logon, grain) over sliding windows.
 The Welch method is equivalent to averaging the spectrogram over the columns.
 """
-from math import floor
 
 import numpy as np
 import matplotlib.pyplot as plt
