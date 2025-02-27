@@ -17,7 +17,6 @@ license = {file = "LICENSE"}
 dependencies = [
     "matplotlib>=3.10.0", # Matplotlib is a comprehensive library for visualizations in Python.
     "numpy>=2.2.3", # NumPy is a library for numerical computing in Python.
-    "pywavelets>=1.8.0", # PyWavelets is a library for wavelet transforms in Python.
     "scipy>=1.15.2", # SciPy is a library for scientific computing in Python.
     "setuptools>=75.8.2", # Setuptools is a package development process library.
 ]
