@@ -103,7 +103,7 @@ class CwPanel:
         &#34;&#34;&#34;
         :return: True if no data, False otherwise
         &#34;&#34;&#34;
-        return self.time[0] == self.time[-1]</code></pre>
+        return len(self.time) &lt; 1 or len(self.sig) &lt; 1 or self.time[0] == self.time[-1]</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -248,18 +248,23 @@ class MeshBase:
     def __post_init__(self):
         # Autoscale to mesh frequency range
         if self.frequency_hz_ymax is None:
-            self.frequency_hz_ymax = self.frequency[-1]
+            self.frequency_hz_ymax = float(np.nanmax(self.frequency))
         if self.frequency_hz_ymin is None:
-            self.frequency_hz_ymin = self.frequency[0]
+            self.frequency_hz_ymin = float(np.nanmin(self.frequency))
         if self.frequency_scaling not in AXIS_SCALE_VALS:
             self.frequency_scaling = &#34;log&#34;
         if self.shading not in MESH_SHADING_VALS:
             self.shading = &#34;auto&#34;
+        if self.frequency_scaling == &#34;log&#34; and self.frequency_hz_ymin &lt;= 0:
+            # noinspection PyTypeChecker
+            self.frequency_hz_ymin = self.frequency[1]
 
     def get_shading_as_literal(self) -&gt; Literal[&#34;auto&#34;, &#34;gouraud&#34;, &#34;flat&#34;, &#34;nearest&#34;]:
         &#34;&#34;&#34;
         :return: Literal value of the shading
         &#34;&#34;&#34;
+        if self.shading not in MESH_SHADING_VALS:
+            return cast(Literal, &#34;auto&#34;)
         return cast(Literal, self.shading)
 
     def get_colormesh_params(self) -&gt; Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional[str]]:
@@ -324,7 +329,7 @@ All three could be None</p></div>
 </dd>
 <dt id="quantum_inferno.plot_templates.plot_base.MeshPanel"><code class="flex name class">
 <span>class <span class="ident">MeshPanel</span></span>
-<span>(</span><span>tfr: numpy.ndarray, colormap_scaling: str = 'auto', color_max: float = 15.0, color_range: float = 15.0, color_min: float = 0.0, cbar_units: str = 'bits', ytick_style: str = 'sci')</span>
+<span>(</span><span>tfr: numpy.ndarray, colormap_scaling: str = 'auto', color_max: float = 15.0, color_range: float = 15.0, color_min: float = 0.0, cbar_units: str = 'bits', ytick_style: str = 'sci', panel_label_color: str = 'k')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Panel for Mesh plots</p>
@@ -379,6 +384,7 @@ class MeshPanel:
     color_min: float = 0.
     cbar_units: str = &#34;bits&#34;
     ytick_style: str = &#34;sci&#34;
+    panel_label_color: str = &#34;k&#34;
 
     def __post_init__(self):
         if self.colormap_scaling not in COLORMAP_SCALING_VALS:
@@ -420,6 +426,10 @@ class MeshPanel:
 <div class="desc"></div>
 </dd>
 <dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.colormap_scaling"><code class="name">var <span class="ident">colormap_scaling</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.MeshPanel.panel_label_color"><code class="name">var <span class="ident">panel_label_color</span> : str</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -607,7 +617,8 @@ All values are required</p>
 <dd>np.ndarray, the frequencies to plot.</dd>
 <dt><strong><code>linestyle</code></strong></dt>
 <dd>str, linestyle; all possible values:
-[‘solid’ | ‘dashed’, ‘dashdot’, ‘dotted’ | '-' | '&ndash;' | '-.' | ':' | 'None' | ' ' | ''].</dd>
+[‘solid’ | ‘dashed’, ‘dashdot’, ‘dotted’ | '-' | '&ndash;' | '-.' | ':' | 'None' | ' ' | ''].
+If invalid value given, defaults to 'solid'.</dd>
 <dt><strong><code>linewidth</code></strong></dt>
 <dd>float, linewidth.</dd>
 <dt><strong><code>sig_label</code></strong></dt>
@@ -627,6 +638,7 @@ class PowerPanelData:
         freq: np.ndarray, the frequencies to plot.
         linestyle: str, linestyle; all possible values:
             [‘solid’ | ‘dashed’, ‘dashdot’, ‘dotted’ | &#39;-&#39; | &#39;--&#39; | &#39;-.&#39; | &#39;:&#39; | &#39;None&#39; | &#39; &#39; | &#39;&#39;].
+            If invalid value given, defaults to &#39;solid&#39;.
         linewidth: float, linewidth.
         sig_label: str, label for the signal.
     &#34;&#34;&#34;
@@ -634,7 +646,11 @@ class PowerPanelData:
     freq: np.ndarray
     linestyle: str
     linewidth: float
-    sig_label: str</code></pre>
+    sig_label: str
+
+    def __post_init__(self):
+        if self.linestyle not in LINE_STYLES:
+            self.linestyle = &#34;solid&#34;</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -662,7 +678,7 @@ class PowerPanelData:
 </dd>
 <dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel"><code class="flex name class">
 <span>class <span class="ident">WaveformPanel</span></span>
-<span>(</span><span>sig: numpy.ndarray, time: numpy.ndarray, units: str = 'Norm', label: str = '(wf)', yscaling: str = 'auto', ytick_style: str = 'plain')</span>
+<span>(</span><span>sig: numpy.ndarray, time: numpy.ndarray, units: str = 'Norm', label: str = '(wf)', panel_label_color: str = 'k', yscaling: str = 'auto', ytick_style: str = 'plain')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Panel for Waveform plots</p>
@@ -683,7 +699,7 @@ Default "(wf)"</dd>
 <dt><strong><code>yscaling</code></strong></dt>
 <dd>str, scaling for y-axis.
 options: "auto", "symmetric", "positive", "else".
-Default "auto"mesh_</dd>
+Default "auto"</dd>
 <dt><strong><code>ytick_style</code></strong></dt>
 <dd>str, style for yticks.
 options: "sci", "scientific", "plain".
@@ -703,13 +719,14 @@ class WaveformPanel:
         time: np.ndarray, the timestamps of the data.  Required
         units: str, units of the signal.  Default &#34;Norm&#34;
         label: str, label for the data.  Default &#34;(wf)&#34;
-        yscaling: str, scaling for y-axis.  options: &#34;auto&#34;, &#34;symmetric&#34;, &#34;positive&#34;, &#34;else&#34;.  Default &#34;auto&#34;mesh_
+        yscaling: str, scaling for y-axis.  options: &#34;auto&#34;, &#34;symmetric&#34;, &#34;positive&#34;, &#34;else&#34;.  Default &#34;auto&#34;
         ytick_style: str, style for yticks.  options: &#34;sci&#34;, &#34;scientific&#34;, &#34;plain&#34;.  Default &#34;plain&#34;
     &#34;&#34;&#34;
     sig: np.ndarray
     time: np.ndarray
     units: str = &#34;Norm&#34;
     label: str = &#34;(wf)&#34;
+    panel_label_color: str = &#34;k&#34;
     yscaling: str = &#34;auto&#34;
     ytick_style: str = &#34;plain&#34;
 
@@ -721,22 +738,29 @@ class WaveformPanel:
 
     def set_y_lims(self, axis: plt.Axes):
         &#34;&#34;&#34;
+        sets the given axis with new y limits
         :param axis: the axis to update y limits for
-        :return: updated axis with new y limits
         &#34;&#34;&#34;
+        non_nan_sig = self.sig[~np.isnan(self.sig)]
+        if len(non_nan_sig) == 0:
+            raise ValueError(&#34;Waveform has no valid data to plot&#34;)
         if self.yscaling == &#34;auto&#34;:
-            axis.set_ylim(np.min(self.sig), np.max(self.sig))
+            axis.set_ylim(np.min(non_nan_sig), np.max(non_nan_sig))
             self.ytick_style = &#34;plain&#34;
         elif self.yscaling == &#34;symmetric&#34;:
-            axis.set_ylim(-np.max(np.abs(self.sig)), np.max(np.abs(self.sig)))
+            axis.set_ylim(-np.max(np.abs(non_nan_sig)), np.max(np.abs(non_nan_sig)))
         elif self.yscaling == &#34;positive&#34;:
-            axis.set_ylim(0, np.max(np.abs(self.sig)))
+            axis.set_ylim(0, np.max(np.abs(non_nan_sig)))
         else:
             axis.set_ylim(-10, 10)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
 <dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.label"><code class="name">var <span class="ident">label</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quantum_inferno.plot_templates.plot_base.WaveformPanel.panel_label_color"><code class="name">var <span class="ident">panel_label_color</span> : str</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -767,14 +791,14 @@ class WaveformPanel:
 <span>def <span class="ident">set_y_lims</span></span>(<span>self, axis: matplotlib.axes._axes.Axes)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:param axis: the axis to update y limits for
-:return: updated axis with new y limits</p></div>
+<div class="desc"><p>sets the given axis with new y limits
+:param axis: the axis to update y limits for</p></div>
 </dd>
 </dl>
 </dd>
 <dt id="quantum_inferno.plot_templates.plot_base.WaveformPlotBase"><code class="flex name class">
 <span>class <span class="ident">WaveformPlotBase</span></span>
-<span>(</span><span>station_id: str, figure_title: str, figure_title_show: bool = True, start_time_epoch: float = 0.0, params_tfr: <a title="quantum_inferno.plot_templates.figure_attributes.AudioParams" href="figure_attributes.html#quantum_inferno.plot_templates.figure_attributes.AudioParams">AudioParams</a> = &lt;quantum_inferno.plot_templates.figure_attributes.AudioParams object&gt;, units_time: str = 's', label_panel_show: bool = False, labels_fontweight: Optional[str] = None, waveform_color: Optional[str] = None)</span>
+<span>(</span><span>station_id: str, figure_title: str, figure_title_show: bool = True, start_time_epoch: float = 0.0, params_tfr: <a title="quantum_inferno.plot_templates.figure_attributes.AudioParams" href="figure_attributes.html#quantum_inferno.plot_templates.figure_attributes.AudioParams">AudioParams</a> = &lt;quantum_inferno.plot_templates.figure_attributes.AudioParams object&gt;, units_time: str = 's', label_panel_show: bool = False, labels_fontweight: Optional[str] = 'bold', waveform_color: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base class for Waveform plots.
@@ -786,7 +810,7 @@ Extends PlotBase; refer to PlotBase for additional attributes</p>
 Default False</dd>
 <dt><strong><code>labels_fontweight</code></strong></dt>
 <dd>optional str, font weight of the labels.
-Default None</dd>
+Default "bold"</dd>
 <dt><strong><code>waveform_color</code></strong></dt>
 <dd>optional str, color of the waveform.
 Default None</dd>
@@ -802,11 +826,11 @@ class WaveformPlotBase(PlotBase):
 
     Attributes:
         label_panel_show: bool, if True, show the label.  Default False
-        labels_fontweight: optional str, font weight of the labels.  Default None
+        labels_fontweight: optional str, font weight of the labels.  Default &#34;bold&#34;
         waveform_color: optional str, color of the waveform.  Default None
     &#34;&#34;&#34;
     label_panel_show: bool = False
-    labels_fontweight: Optional[str] = None
+    labels_fontweight: Optional[str] = &#34;bold&#34;
     waveform_color: Optional[str] = None</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -891,6 +915,7 @@ class WaveformPlotBase(PlotBase):
 <li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.color_range" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.color_range">color_range</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.colormap_scaling" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.colormap_scaling">colormap_scaling</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.is_auto_color_min_max" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.is_auto_color_min_max">is_auto_color_min_max</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.panel_label_color" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.panel_label_color">panel_label_color</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.set_color_min_max" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.set_color_min_max">set_color_min_max</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.tfr" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.tfr">tfr</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_base.MeshPanel.ytick_style" href="#quantum_inferno.plot_templates.plot_base.MeshPanel.ytick_style">ytick_style</a></code></li>
@@ -930,6 +955,7 @@ class WaveformPlotBase(PlotBase):
 <h4><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a></code></h4>
 <ul class="two-column">
 <li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.label" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.label">label</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.panel_label_color" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.panel_label_color">panel_label_color</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.set_y_lims" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.set_y_lims">set_y_lims</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.sig" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.sig">sig</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_base.WaveformPanel.time" href="#quantum_inferno.plot_templates.plot_base.WaveformPanel.time">time</a></code></li>

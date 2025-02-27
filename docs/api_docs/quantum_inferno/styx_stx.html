@@ -30,7 +30,7 @@ hljs.highlightAll();
 <p>"
 Standardized Stockwell transform (stx) with optimization parameters
 After Moukadem et al., 2022, A new optimized Stockwell transform applied on synthetic and real non-stationary signals
-Rederivation in preparation, Garces et al. 2022; last updated 9 May 2022</p>
+Rederivation in preparation, last updated in Garces et al. 2023</p>
 </section>
 <section>
 </section>
@@ -60,7 +60,7 @@ Rederivation in preparation, Garces et al. 2022; last updated 9 May 2022</p>
 :return: frequency_stx_hz, time_stx_s, tfr_stx</p></div>
 </dd>
 <dt id="quantum_inferno.styx_stx.tfr_stx_fft"><code class="name flex">
-<span>def <span class="ident">tfr_stx_fft</span></span>(<span>sig_wf: numpy.ndarray, time_sample_interval: float, scale_order_input: float = 8.0, n_fft_in: int = None, frequency_min: float = None, frequency_max: float = None, frequency_step: float = None, factor_q: float = 0.0, power_p: float = 0.0, power_r: float = 1.0, is_geometric: bool = False, is_inferno: bool = False, scale_base_input: float = 1.9952623149688795, scale_ref_input: float = 1.0) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+<span>def <span class="ident">tfr_stx_fft</span></span>(<span>sig_wf: numpy.ndarray, time_sample_interval: float, scale_order_input: float = 8.0, n_fft_in: Optional[int] = None, frequency_min: Optional[float] = None, frequency_max: Optional[float] = None, frequency_step: Optional[float] = None, factor_q: float = 0.0, power_p: float = 0.0, power_r: float = 1.0, is_geometric: bool = False, is_inferno: bool = False, scale_base_input: float = 1.9952623149688795, scale_ref_input: float = 1.0) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Stockwell transform, fft implementation.
@@ -69,8 +69,8 @@ Optimized version has more free variables in sigma_scaling; testing in progress<
 :param time_sample_interval: sample interval, inverse of sample rate
 :param scale_order_input: fractional octave band order; 12 is the musical standard
 :param n_fft_in: requested nfft, should be greater or equal to the signal length. Method zero pads up.
-:param frequency_min: lowest stx frequency of interest
-:param frequency_max: highest stx frequency of interest
+:param frequency_min: lowest stx frequency of interest, must be positive and real
+:param frequency_max: highest stx frequency of interest, must be positive and real
 :param frequency_step: stx frequency of interest if linearly sampled
 :param factor_q: sigma_scaling adjustment, under evaluation
 :param power_p: sigma_scaling adjustment, under evaluation

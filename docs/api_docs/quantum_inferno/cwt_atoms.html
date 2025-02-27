@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
 <title>quantum_inferno.cwt_atoms API documentation</title>
-<meta name="description" content="This module contains functions to construct quantized, standardized information packets using binary metrics.">
+<meta name="description" content="This module contains functions to construct quantized, standardized information packets using binary metrics.
+No-chirp/sweep (index_shift=0, variable …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -25,7 +26,8 @@ hljs.highlightAll();
 <h1 class="title">Module <code>quantum_inferno.cwt_atoms</code></h1>
 </header>
 <section id="section-intro">
-<p>This module contains functions to construct quantized, standardized information packets using binary metrics.</p>
+<p>This module contains functions to construct quantized, standardized information packets using binary metrics.
+No-chirp/sweep (index_shift=0, variable removed), simplified for the base stockwell transform.</p>
 </section>
 <section>
 </section>
@@ -150,7 +152,7 @@ N is THE quantization parameter for the binary constant Q wavelet filters.</p>
 <p>:param frequency_hz: frequency range below Nyquist
 :param offset_time_s: time of wavelet centroid
 :param band_order_nth: Nth order of constant Q bands
-:param frequency_center_hz: band center frequency in Hz
+:param frequency_center_hz: the band center frequency in Hz
 :param frequency_sample_rate_hz: sample rate on Hz
 :param index_shift: index of shift. Default is 0.0
 :param scale_base: positive reference Base G &gt; 1. Default is G2
@@ -189,39 +191,6 @@ N is THE quantization parameter for the binary constant Q wavelet filters.</p>
 :param index_shift: index of shift
 :return: time std in seconds, frequency std in Hz, angular frequency std in Hz</p></div>
 </dd>
-<dt id="quantum_inferno.cwt_atoms.cwt_chirp_complex"><code class="name flex">
-<span>def <span class="ident">cwt_chirp_complex</span></span>(<span>band_order_nth: float, sig_wf: numpy.ndarray, frequency_low_hz: float, frequency_sample_rate_hz: float, frequency_high_hz: float = 1e+42, cwt_type: str = 'fft', index_shift: float = 0, frequency_ref: float = 1.0, scale_base: float = 2.0, dictionary_type: str = 'norm') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate CWT for chirp</p>
-<p>:param band_order_nth: Nth order of constant Q bands
-:param sig_wf: array with input signal
-:param frequency_low_hz: lowest frequency in Hz
-:param frequency_sample_rate_hz: sample rate in Hz
-:param frequency_high_hz: highest frequency in Hz
-:param cwt_type: one of "conv", "fft", or "morlet2". Default is "fft"
-Address ghost folding in "fft", compared to "conv"
-:param index_shift: index of shift. Default is 0.0
-:param frequency_ref: reference frequency in Hz. Default is F1HZ
-:param scale_base: G2 or G3. Default is G2
-:param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
-:return: cwt, cwt_bits, time_s, frequency_cwt_hz</p></div>
-</dd>
-<dt id="quantum_inferno.cwt_atoms.cwt_chirp_from_sig"><code class="name flex">
-<span>def <span class="ident">cwt_chirp_from_sig</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, band_order_nth: float = 3, cwt_type: str = 'fft', index_shift: float = 0, frequency_ref: float = 1.0, scale_base: float = 2.0, dictionary_type: str = 'norm') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate CWT for chirp</p>
-<p>:param sig_wf: array with input signal
-:param frequency_sample_rate_hz: sample rate in Hz
-:param band_order_nth: Nth order of constant Q bands
-:param cwt_type: one of "conv", "fft", or "morlet2". Default is "fft"
-:param index_shift: index of shift. Default is 0.0
-:param frequency_ref: reference frequency in Hz. Default is F1HZ
-:param scale_base: G2 or G3. Default is G2
-:param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
-:return: cwt, cwt_bits, time_s, frequency_cwt_hz</p></div>
-</dd>
 </dl>
 </section>
 <section>
@@ -252,8 +221,6 @@ Address ghost folding in "fft", compared to "conv"
 <li><code><a title="quantum_inferno.cwt_atoms.chirp_spectrum_centered" href="#quantum_inferno.cwt_atoms.chirp_spectrum_centered">chirp_spectrum_centered</a></code></li>
 <li><code><a title="quantum_inferno.cwt_atoms.chirp_time" href="#quantum_inferno.cwt_atoms.chirp_time">chirp_time</a></code></li>
 <li><code><a title="quantum_inferno.cwt_atoms.chirp_uncertainty" href="#quantum_inferno.cwt_atoms.chirp_uncertainty">chirp_uncertainty</a></code></li>
-<li><code><a title="quantum_inferno.cwt_atoms.cwt_chirp_complex" href="#quantum_inferno.cwt_atoms.cwt_chirp_complex">cwt_chirp_complex</a></code></li>
-<li><code><a title="quantum_inferno.cwt_atoms.cwt_chirp_from_sig" href="#quantum_inferno.cwt_atoms.cwt_chirp_from_sig">cwt_chirp_from_sig</a></code></li>
 </ul>
 </li>
 </ul>

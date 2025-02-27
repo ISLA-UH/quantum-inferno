@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>quantum_inferno.synth API documentation</title>
-<meta name="description" content="">
+<title>quantum_inferno.utilities.errors API documentation</title>
+<meta name="description" content="This module contains custom error definitions and error checking functions for Quantum Inferno">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -22,43 +22,133 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>quantum_inferno.synth</code></h1>
+<h1 class="title">Module <code>quantum_inferno.utilities.errors</code></h1>
 </header>
 <section id="section-intro">
+<p>This module contains custom error definitions and error checking functions for Quantum Inferno</p>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt><code class="name"><a title="quantum_inferno.synth.benchmark_signal_demo" href="benchmark_signal_demo.html">quantum_inferno.synth.benchmark_signal_demo</a></code></dt>
+<dt id="quantum_inferno.utilities.errors.QuantumInfernoDebugger"><code class="flex name class">
+<span>class <span class="ident">QuantumInfernoDebugger</span></span>
+<span>(</span><span>debug_mode: bool = False)</span>
+</code></dt>
 <dd>
-<div class="desc"><p>Demonstrate selected synthetic benchmark signals.</p></div>
+<div class="desc"><p>This class contains all the messages produced by Quantum Inferno error checking</p>
+<h2 id="properties">Properties</h2>
+<p>messages: List[str], list of messages
+debug_mode: bool, flag to enable or disable printing new messages.
+Default False</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class QuantumInfernoDebugger:
+    &#34;&#34;&#34;
+    This class contains all the messages produced by Quantum Inferno error checking
+
+    Properties:
+        messages: List[str], list of messages
+        debug_mode: bool, flag to enable or disable printing new messages.  Default False
+    &#34;&#34;&#34;
+    def __init__(self, debug_mode: bool = False):
+        self.messages: List[str] = []
+        self.debug_mode = debug_mode
+
+    def get_num_messages(self) -&gt; int:
+        &#34;&#34;&#34;
+        Get the number of messages in the debugger
+        :return: number of messages
+        &#34;&#34;&#34;
+        return len(self.messages)
+
+    def print_messages(self):
+        &#34;&#34;&#34;
+        Print all the messages in the debugger
+        &#34;&#34;&#34;
+        for message in self.messages:
+            print(message)
+
+    def add_message(self, message: str):
+        &#34;&#34;&#34;
+        Add a message to the debugger, printing it if debug mode is enabled
+        :param message: message to add
+        &#34;&#34;&#34;
+        self.messages.append(message)
+        if self.debug_mode:
+            print(message)
+
+    def add_message_with_print(self, message: str):
+        &#34;&#34;&#34;
+        Add a message to the debugger and print it
+        :param message: message to add
+        &#34;&#34;&#34;
+        self.add_message(message)
+        print(message)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="quantum_inferno.utilities.errors.QuantumInfernoDebugger.add_message"><code class="name flex">
+<span>def <span class="ident">add_message</span></span>(<span>self, message: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a message to the debugger, printing it if debug mode is enabled
+:param message: message to add</p></div>
 </dd>
-<dt><code class="name"><a title="quantum_inferno.synth.benchmark_signals" href="benchmark_signals.html">quantum_inferno.synth.benchmark_signals</a></code></dt>
+<dt id="quantum_inferno.utilities.errors.QuantumInfernoDebugger.add_message_with_print"><code class="name flex">
+<span>def <span class="ident">add_message_with_print</span></span>(<span>self, message: str)</span>
+</code></dt>
 <dd>
-<div class="desc"><p>This module provides benchmark synthetic functions</p></div>
+<div class="desc"><p>Add a message to the debugger and print it
+:param message: message to add</p></div>
 </dd>
-<dt><code class="name"><a title="quantum_inferno.synth.blast_gt_pulse" href="blast_gt_pulse.html">quantum_inferno.synth.blast_gt_pulse</a></code></dt>
+<dt id="quantum_inferno.utilities.errors.QuantumInfernoDebugger.get_num_messages"><code class="name flex">
+<span>def <span class="ident">get_num_messages</span></span>(<span>self) ‑> int</span>
+</code></dt>
 <dd>
-<div class="desc"><p>This module facilitates the rapid construction of the GT blast pulse synthetic,
-its integral and derivatives, and its spectrum
-References:
-- Garcés, …</p></div>
+<div class="desc"><p>Get the number of messages in the debugger
+:return: number of messages</p></div>
 </dd>
-<dt><code class="name"><a title="quantum_inferno.synth.doppler" href="doppler.html">quantum_inferno.synth.doppler</a></code></dt>
+<dt id="quantum_inferno.utilities.errors.QuantumInfernoDebugger.print_messages"><code class="name flex">
+<span>def <span class="ident">print_messages</span></span>(<span>self)</span>
+</code></dt>
 <dd>
-<div class="desc"><p>This module contains functions for constructing and examining doppler shift in signals</p></div>
-</dd>
-<dt><code class="name"><a title="quantum_inferno.synth.synthetic_signals" href="synthetic_signals.html">quantum_inferno.synth.synthetic_signals</a></code></dt>
-<dd>
-<div class="desc"><p>This module constructs synthetic signals</p></div>
+<div class="desc"><p>Print all the messages in the debugger</p></div>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
+</dd>
+<dt id="quantum_inferno.utilities.errors.QuantumInfernoError"><code class="flex name class">
+<span>class <span class="ident">QuantumInfernoError</span></span>
+<span>(</span><span>message: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for Quantum Inferno errors</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class QuantumInfernoError(Exception):
+    &#34;&#34;&#34;
+    Base class for Quantum Inferno errors
+    &#34;&#34;&#34;
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -68,16 +158,23 @@ References:
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="quantum_inferno" href="../index.html">quantum_inferno</a></code></li>
+<li><code><a title="quantum_inferno.utilities" href="index.html">quantum_inferno.utilities</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
-<li><code><a title="quantum_inferno.synth.benchmark_signal_demo" href="benchmark_signal_demo.html">quantum_inferno.synth.benchmark_signal_demo</a></code></li>
-<li><code><a title="quantum_inferno.synth.benchmark_signals" href="benchmark_signals.html">quantum_inferno.synth.benchmark_signals</a></code></li>
-<li><code><a title="quantum_inferno.synth.blast_gt_pulse" href="blast_gt_pulse.html">quantum_inferno.synth.blast_gt_pulse</a></code></li>
-<li><code><a title="quantum_inferno.synth.doppler" href="doppler.html">quantum_inferno.synth.doppler</a></code></li>
-<li><code><a title="quantum_inferno.synth.synthetic_signals" href="synthetic_signals.html">quantum_inferno.synth.synthetic_signals</a></code></li>
+<li>
+<h4><code><a title="quantum_inferno.utilities.errors.QuantumInfernoDebugger" href="#quantum_inferno.utilities.errors.QuantumInfernoDebugger">QuantumInfernoDebugger</a></code></h4>
+<ul class="">
+<li><code><a title="quantum_inferno.utilities.errors.QuantumInfernoDebugger.add_message" href="#quantum_inferno.utilities.errors.QuantumInfernoDebugger.add_message">add_message</a></code></li>
+<li><code><a title="quantum_inferno.utilities.errors.QuantumInfernoDebugger.add_message_with_print" href="#quantum_inferno.utilities.errors.QuantumInfernoDebugger.add_message_with_print">add_message_with_print</a></code></li>
+<li><code><a title="quantum_inferno.utilities.errors.QuantumInfernoDebugger.get_num_messages" href="#quantum_inferno.utilities.errors.QuantumInfernoDebugger.get_num_messages">get_num_messages</a></code></li>
+<li><code><a title="quantum_inferno.utilities.errors.QuantumInfernoDebugger.print_messages" href="#quantum_inferno.utilities.errors.QuantumInfernoDebugger.print_messages">print_messages</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quantum_inferno.utilities.errors.QuantumInfernoError" href="#quantum_inferno.utilities.errors.QuantumInfernoError">QuantumInfernoError</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

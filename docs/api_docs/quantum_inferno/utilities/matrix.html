@@ -50,7 +50,7 @@ hljs.highlightAll();
 <div class="desc"><p>Create array of repeated values with dimensions that match those of energy array
 Useful to multiply frequency-dependent values to frequency-time matrices</p>
 <p>:param d0: 1D input vector, nominally column frequency/scale multipliers
-:param d0d1: 2D array, first dimension should be that same as d1
+:param d0d1: 2D array, first dimension should be the same length as d0
 :return: array with matching values</p></div>
 </dd>
 <dt id="quantum_inferno.utilities.matrix.d1tile_x_d0d1"><code class="name flex">
@@ -60,7 +60,7 @@ Useful to multiply frequency-dependent values to frequency-time matrices</p>
 <div class="desc"><p>Create array of repeated values with dimensions that match those of energy array
 Useful to multiply time-dependent values to frequency-time matrices</p>
 <p>:param d1: 1D input vector, nominally row time multipliers
-:param d0d1: 2D array, second dimension should be that same as d1
+:param d0d1: 2D array, second dimension should be the same length as d1
 :return: array with matching values</p></div>
 </dd>
 <dt id="quantum_inferno.utilities.matrix.just_tile_d1"><code class="name flex">
@@ -70,7 +70,7 @@ Useful to multiply time-dependent values to frequency-time matrices</p>
 <div class="desc"><p>Create array of repeated values with dimensions that match those of energy array
 Useful to multiply time-dependent values to frequency-time matrices</p>
 <p>:param d1_array1d_in: 1D input vector, nominally row time multipliers
-:param d0d1_shape: 2D array, second dimension should be that same as d1
+:param d0d1_shape: 2D array, second dimension should be the same length as d1_array1d_in
 :return: array with matching values</p></div>
 </dd>
 <dt id="quantum_inferno.utilities.matrix.n_tile_array"><code class="name flex">

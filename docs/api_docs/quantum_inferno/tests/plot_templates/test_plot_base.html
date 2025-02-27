@@ -82,6 +82,10 @@ not have a method with the specified name.</p></div>
         self.assertEqual(test_mesh_base.frequency_hz_ymax, 3)
         self.assertIsNone(test_mesh_base.colormap)
         self.assertEqual(test_mesh_base.units_frequency, &#34;Hz&#34;)
+        self.assertEqual(test_mesh_base.shading, &#34;auto&#34;)
+        test_mesh_base = pb.MeshBase(time=np.array([0, 1, 2, 3]), frequency=np.array([0, 1, 2, 3]))
+        self.assertEqual(test_mesh_base.frequency_hz_ymin, 1)
+        self.assertEqual(test_mesh_base.frequency_hz_ymax, 3)
 
     def test_mesh_base_freq_scal(self):
         test_mesh_base = pb.MeshBase(time=np.array([1, 2, 3]), frequency=np.array([1, 2, 3]),
@@ -254,6 +258,7 @@ not have a method with the specified name.</p></div>
     def test_mesh_panel(self):
         test_mesh_panel = pb.MeshPanel(tfr=np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]))
         self.assertTrue(test_mesh_panel.is_auto_color_min_max())
+        self.assertEqual(test_mesh_panel.panel_label_color, &#34;k&#34;)
 
     def test_mesh_user_panel(self):
         test_mesh_panel = pb.MeshPanel(tfr=np.array([1, 2, 3]), colormap_scaling=&#34;user&#34;, color_min=5, color_max=10)
@@ -392,7 +397,7 @@ not have a method with the specified name.</p></div>
     def test_waveform_base(self):
         test_wf_base = pb.WaveformPlotBase(station_id=&#34;test&#34;, figure_title=&#34;test&#34;)
         self.assertFalse(test_wf_base.label_panel_show)
-        self.assertIsNone(test_wf_base.labels_fontweight)
+        self.assertEqual(test_wf_base.labels_fontweight, &#34;bold&#34;)
         self.assertIsNone(test_wf_base.waveform_color)</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -453,6 +458,7 @@ not have a method with the specified name.</p></div>
         self.assertEqual(test_wf_panel.label, &#34;(wf)&#34;)
         self.assertEqual(test_wf_panel.yscaling, &#34;auto&#34;)
         self.assertEqual(test_wf_panel.ytick_style, &#34;plain&#34;)
+        self.assertEqual(test_wf_panel.panel_label_color, &#34;k&#34;)
 
     def test_waveform_panel_yscaling(self):
         test_wf_panel = pb.WaveformPanel(sig=np.array([1, 2, 3]), time=np.array([1, 2, 3]), yscaling=&#34;test&#34;)

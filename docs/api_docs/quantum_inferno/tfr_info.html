@@ -42,7 +42,7 @@ hljs.highlightAll();
 :return: info, entropy and ref_entropy of the array, using EPSILON32</p></div>
 </dd>
 <dt id="quantum_inferno.tfr_info.log2_ceil"><code class="name flex">
-<span>def <span class="ident">log2_ceil</span></span>(<span>x: float, epsilon: float = 2.220446049250313e-16) ‑> float</span>
+<span>def <span class="ident">log2_ceil</span></span>(<span>x: float, epsilon: float = np.float64(2.220446049250313e-16)) ‑> float</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Compute ceiling of log2 of a positive input argument.
@@ -52,7 +52,7 @@ Corrects for negative, complex or zero inputs by taking the absolute value and a
 :return: ceiling of log2</p></div>
 </dd>
 <dt id="quantum_inferno.tfr_info.log2_floor"><code class="name flex">
-<span>def <span class="ident">log2_floor</span></span>(<span>x: float, epsilon: float = 2.220446049250313e-16) ‑> float</span>
+<span>def <span class="ident">log2_floor</span></span>(<span>x: float, epsilon: float = np.float64(2.220446049250313e-16)) ‑> float</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Compute floor of log2 of a positive input argument.
@@ -62,7 +62,7 @@ Corrects for negative, complex or zero inputs by taking the absolute value and a
 :return: floor of log2</p></div>
 </dd>
 <dt id="quantum_inferno.tfr_info.log2_round"><code class="name flex">
-<span>def <span class="ident">log2_round</span></span>(<span>x: float, epsilon: float = 2.220446049250313e-16) ‑> float</span>
+<span>def <span class="ident">log2_round</span></span>(<span>x: float, epsilon: float = np.float64(2.220446049250313e-16)) ‑> float</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Compute rounded value of log2 of a positive input argument.

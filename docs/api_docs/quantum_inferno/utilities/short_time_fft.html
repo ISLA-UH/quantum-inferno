@@ -6,7 +6,8 @@
 <meta name="generator" content="pdoc3 0.11.1">
 <title>quantum_inferno.utilities.short_time_fft API documentation</title>
 <meta name="description" content="Methods for calculating frequency and time-frequency representations of signals.
-Try to match all the defaults...">
+Try to match all the defaults...
+Historical note: Scipy added …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -27,7 +28,8 @@ hljs.highlightAll();
 </header>
 <section id="section-intro">
 <p>Methods for calculating frequency and time-frequency representations of signals.
-Try to match all the defaults&hellip;</p>
+Try to match all the defaults&hellip;
+Historical note: Scipy added signal.ShortTimeFFT in version 1.12.0</p>
 </section>
 <section>
 </section>
@@ -36,21 +38,97 @@ Try to match all the defaults&hellip;</p>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="quantum_inferno.utilities.short_time_fft.get_stft_object_tukey"><code class="name flex">
-<span>def <span class="ident">get_stft_object_tukey</span></span>(<span>sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = 'magnitude') ‑> scipy.signal._short_time_fft.ShortTimeFFT</span>
+<dt id="quantum_inferno.utilities.short_time_fft.get_freq_time_bins"><code class="name flex">
+<span>def <span class="ident">get_freq_time_bins</span></span>(<span>stft_obj: scipy.signal._short_time_fft.ShortTimeFFT, stop_scalar: int) ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Return the Short-Time Fourier Transform (STFT) object with a Tukey window using ShortTimeFFT class
-Calculates the number of fft points based on the segment length using ceil_power_of_two rounding method</p>
+<div class="desc"><p>:param stft_obj: calculated stft object
+:param stop_scalar: length of the time bins
+:return: frequency and time bin ndarrays</p></div>
+</dd>
+<dt id="quantum_inferno.utilities.short_time_fft.get_stft_object"><code class="name flex">
+<span>def <span class="ident">get_stft_object</span></span>(<span>window_type: str, window_args: Tuple, sample_rate_hz: float, segment_length: int, overlap_length: Optional[int] = None, scaling: str = 'magnitude', fft_points: Optional[int] = None) ‑> scipy.signal._short_time_fft.ShortTimeFFT</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return an STFT object with the given parameters, using the specified window.
+Allowed window types are: "tukey", "gaussian".</p>
+<ul>
+<li>Tukey window requires alpha value as the window_args.
+Example: (.25)</li>
+<li>Gaussian window requires sigma value as the window_args.
+Example: (4)</li>
+</ul>
+<p>:param window_type: type of window to use.
+Refer to list above for valid types.
+Invalid types defaults to "tukey"
+:param window_args: arguments for the window function.
+See above for details.
+:param sample_rate_hz: sample rate in hz
+:param segment_length: length of window segment
+:param overlap_length: Optional length of overlap segment.
+If None, defaults to half of segment_length
+:param scaling: scaling type of window.
+Defaults to "magnitude"
+:param fft_points: Optional number of points in the fft.
+If None, uses nearest power of two of segment_length.
+:return: STFT object</p></div>
+</dd>
+<dt id="quantum_inferno.utilities.short_time_fft.get_stft_object_tukey"><code class="name flex">
+<span>def <span class="ident">get_stft_object_tukey</span></span>(<span>sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = 'magnitude', fft_points: Optional[int] = None) ‑> scipy.signal._short_time_fft.ShortTimeFFT</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the Short-Time Fourier Transform (STFT) object with a Tukey window using ShortTimeFFT class.
+If fft_points not given, calculates the number of fft points based on the segment length using ceil_power_of_two
+rounding method</p>
 <p>:param sample_rate_hz: sample rate of the signal
 :param tukey_alpha: shape parameter of the Tukey window
 :param segment_length: length of the segment
 :param overlap_length: length of the overlap
-:param scaling: scaling of the STFT (default is magnitude, other options are 'psd' and None)
+:param scaling: scaling of the STFT (default is "magnitude", other options are "psd" and None)
+:param fft_points: Optional number of points in the fft.
+If None, uses nearest power of two of segment_length.
+Default None
 :return: ShortTimeFFT object</p></div>
 </dd>
+<dt id="quantum_inferno.utilities.short_time_fft.get_stft_tukey"><code class="name flex">
+<span>def <span class="ident">get_stft_tukey</span></span>(<span>timeseries: numpy.ndarray, sample_rate_hz: Union[float, int], tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = 'magnitude', padding: str = 'zeros', fft_points: Optional[int] = None) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculates the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
+Returns the frequency, time bins, and magnitude of the detrended STFT similar to legacy scipy.signal.stft
+Note: If you want the STFT object, use get_stft_object_tukey</p>
+<p>:param timeseries: input signal
+:param sample_rate_hz: sample rate of the signal
+:param tukey_alpha: shape parameter of the Tukey window
+:param segment_length: length of the segment
+:param overlap_length: length of the overlap
+:param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
+:param padding: padding method for the STFT (default is 'zeros', other options are 'edge', 'even', and 'odd')
+:param fft_points: Optional number of points in the fft.
+If None, uses nearest power of two of segment_length.
+Default None
+:return: frequency, time bins, and magnitude of the detrended STFT</p></div>
+</dd>
+<dt id="quantum_inferno.utilities.short_time_fft.gtx_complex_pow2"><code class="name flex">
+<span>def <span class="ident">gtx_complex_pow2</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, segment_points: int, overlap_points: Optional[int] = None, gaussian_sigma: Optional[int] = None, fft_points: Optional[int] = None, padding: str = 'zeros') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gaussian taper with 50% overlap and built-in defaults.
+Uses nfft length of nearest power of two for segment_points.</p>
+<p>:param sig_wf: signal waveform as numpy array
+:param frequency_sample_rate_hz: frequency sample rate in Hz
+:param segment_points: number of points in a segment
+:param gaussian_sigma: gaussian window variance.
+Default 1/4 of segment_points
+:param overlap_points: number of points in overlap.
+Default half of segment_points
+:param fft_points: number of points in fft.
+Default nearest greatest power of 2 of segment_points
+:param padding: padding method for the STFT (default is 'zeros', other options are 'edge', 'even', and 'odd')
+:return: frequency_stft_hz, time_stft_s, stft_complex</p></div>
+</dd>
 <dt id="quantum_inferno.utilities.short_time_fft.istft_tukey"><code class="name flex">
-<span>def <span class="ident">istft_tukey</span></span>(<span>stft_to_invert: numpy.ndarray, sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = 'magnitude') ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
+<span>def <span class="ident">istft_tukey</span></span>(<span>stft_to_invert: numpy.ndarray, sample_rate_hz: Union[float, int], tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = 'magnitude') ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class</p>
@@ -59,11 +137,11 @@ Calculates the number of fft points based on the segment length using ceil_power
 :param tukey_alpha: shape parameter of the Tukey window
 :param segment_length: length of the segment
 :param overlap_length: length of the overlap
-:param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
+:param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd')
 :return: timestamps and iSTFT of the signal</p></div>
 </dd>
 <dt id="quantum_inferno.utilities.short_time_fft.spectrogram_tukey"><code class="name flex">
-<span>def <span class="ident">spectrogram_tukey</span></span>(<span>timeseries: numpy.ndarray, sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = 'magnitude', padding: str = 'zeros') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+<span>def <span class="ident">spectrogram_tukey</span></span>(<span>timeseries: numpy.ndarray, sample_rate_hz: Union[float, int], tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = 'magnitude', padding: str = 'zeros') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate the Spectrogram of a signal with a Tukey window using ShortTimeFFT class
@@ -74,23 +152,39 @@ Returns the time, frequency, and spectrogram similar to legacy scipy.signal.spec
 :param segment_length: length of the segment
 :param overlap_length: length of the overlap
 :param scaling: scaling of the spectrogram (default is 'magnitude', other options are 'psd' and None)
-:param padding: padding of the signal (default is 'zeros', other options are 'periodic' and 'constant')
+:param padding: padding of the signal (default is 'zeros', other options are 'edge', 'even', and 'odd')
 :return: time, frequency, and magnitude of the STFT</p></div>
 </dd>
-<dt id="quantum_inferno.utilities.short_time_fft.stft_tukey"><code class="name flex">
-<span>def <span class="ident">stft_tukey</span></span>(<span>timeseries: numpy.ndarray, sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int, scaling: str = 'magnitude', padding: str = 'zeros') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+<dt id="quantum_inferno.utilities.short_time_fft.stft_complex_pow2"><code class="name flex">
+<span>def <span class="ident">stft_complex_pow2</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, segment_points: int, overlap_points: int = None, alpha: float = 0.25, fft_points: Optional[int] = None) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Calculate the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
-Returns the time, frequency, and magnitude of the STFT similar to legacy scipy.signal.stft</p>
-<p>:param timeseries: input signal
-:param sample_rate_hz: sample rate of the signal
-:param tukey_alpha: shape parameter of the Tukey window
-:param segment_length: length of the segment
-:param overlap_length: length of the overlap
-:param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
-:param padding: padding method for the STFT (default is 'zeros', other options are 'edge', 'even', and 'odd')
-:return: time, frequency, and magnitude of the STFT</p></div>
+<div class="desc"><p>Simplest, with 50% overlap and built-in defaults.
+Uses nfft length of nearest power of two of segment_points.</p>
+<p>:param sig_wf: signal waveform as numpy array
+:param frequency_sample_rate_hz: frequency sample rate in Hz
+:param segment_points: number of points in a segment
+:param overlap_points: number of points in overlap, if not given, equal to half the segment_points
+:param alpha: Tukey window alpha.
+Default 0.25
+:param fft_points: Optional number of points in the fft.
+If None, uses nearest power of two of segment_points.
+Default None
+:return: frequency_stft_hz, time_stft_s, stft_complex</p></div>
+</dd>
+<dt id="quantum_inferno.utilities.short_time_fft.stft_from_sig"><code class="name flex">
+<span>def <span class="ident">stft_from_sig</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, band_order_nth: float, center_frequency_hz: Optional[float] = None, octaves_below_center: int = 4) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stft from signal</p>
+<p>:param sig_wf: array with input signal
+:param frequency_sample_rate_hz: sample rate of frequency in Hz
+:param band_order_nth: Nth order of constant Q bands
+:param center_frequency_hz: optional center frequency of the signal in Hz.
+Default 3/20 of Nyquist
+:param octaves_below_center: number of octaves below center frequency to set the averaging frequency.
+Default 4
+:return: numpy arrays of: STFT, STFT_bits, time_stft_s, frequency_stft_hz</p></div>
 </dd>
 </dl>
 </section>
@@ -109,10 +203,15 @@ Returns the time, frequency, and magnitude of the STFT similar to legacy scipy.s
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="quantum_inferno.utilities.short_time_fft.get_freq_time_bins" href="#quantum_inferno.utilities.short_time_fft.get_freq_time_bins">get_freq_time_bins</a></code></li>
+<li><code><a title="quantum_inferno.utilities.short_time_fft.get_stft_object" href="#quantum_inferno.utilities.short_time_fft.get_stft_object">get_stft_object</a></code></li>
 <li><code><a title="quantum_inferno.utilities.short_time_fft.get_stft_object_tukey" href="#quantum_inferno.utilities.short_time_fft.get_stft_object_tukey">get_stft_object_tukey</a></code></li>
+<li><code><a title="quantum_inferno.utilities.short_time_fft.get_stft_tukey" href="#quantum_inferno.utilities.short_time_fft.get_stft_tukey">get_stft_tukey</a></code></li>
+<li><code><a title="quantum_inferno.utilities.short_time_fft.gtx_complex_pow2" href="#quantum_inferno.utilities.short_time_fft.gtx_complex_pow2">gtx_complex_pow2</a></code></li>
 <li><code><a title="quantum_inferno.utilities.short_time_fft.istft_tukey" href="#quantum_inferno.utilities.short_time_fft.istft_tukey">istft_tukey</a></code></li>
 <li><code><a title="quantum_inferno.utilities.short_time_fft.spectrogram_tukey" href="#quantum_inferno.utilities.short_time_fft.spectrogram_tukey">spectrogram_tukey</a></code></li>
-<li><code><a title="quantum_inferno.utilities.short_time_fft.stft_tukey" href="#quantum_inferno.utilities.short_time_fft.stft_tukey">stft_tukey</a></code></li>
+<li><code><a title="quantum_inferno.utilities.short_time_fft.stft_complex_pow2" href="#quantum_inferno.utilities.short_time_fft.stft_complex_pow2">stft_complex_pow2</a></code></li>
+<li><code><a title="quantum_inferno.utilities.short_time_fft.stft_from_sig" href="#quantum_inferno.utilities.short_time_fft.stft_from_sig">stft_from_sig</a></code></li>
 </ul>
 </li>
 </ul>

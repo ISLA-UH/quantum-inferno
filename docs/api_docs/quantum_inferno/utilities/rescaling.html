@@ -41,6 +41,33 @@ hljs.highlightAll();
 <div class="desc"><p>:param n: value to check
 :return True if n is positive and a power of 2, False otherwise</p></div>
 </dd>
+<dt id="quantum_inferno.utilities.rescaling.remove_dc_offset_and_nans"><code class="name flex">
+<span>def <span class="ident">remove_dc_offset_and_nans</span></span>(<span>in_data: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove the DC offset and set NaNs to 0 from the input data.</p>
+<p>:param in_data: data to update
+:return: data with DC offset removed and NaNs replaced with 0</p></div>
+</dd>
+<dt id="quantum_inferno.utilities.rescaling.remove_nanmean"><code class="name flex">
+<span>def <span class="ident">remove_nanmean</span></span>(<span>in_data: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove the mean of the input data.</p>
+<p>:param in_data: data to remove mean
+:return: data with mean removed</p></div>
+</dd>
+<dt id="quantum_inferno.utilities.rescaling.set_vals_to"><code class="name flex">
+<span>def <span class="ident">set_vals_to</span></span>(<span>in_data: numpy.ndarray, target_indices: Union[Iterable, int], new_val: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set all values in the specified indices of the input data to a new value.
+Raises an error if any are encountered.</p>
+<p>:param in_data: data to set values
+:param target_indices: indices to change
+:param new_val: new value to set
+:return: data with all values set to new value</p></div>
+</dd>
 <dt id="quantum_inferno.utilities.rescaling.to_decibel_with_epsilon"><code class="name flex">
 <span>def <span class="ident">to_decibel_with_epsilon</span></span>(<span>x: Union[numpy.ndarray, float, list], reference: float = 1.0, input_scaling: str = 'amplitude') ‑> Union[numpy.ndarray, float]</span>
 </code></dt>
@@ -77,6 +104,9 @@ hljs.highlightAll();
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="quantum_inferno.utilities.rescaling.is_power_of_two" href="#quantum_inferno.utilities.rescaling.is_power_of_two">is_power_of_two</a></code></li>
+<li><code><a title="quantum_inferno.utilities.rescaling.remove_dc_offset_and_nans" href="#quantum_inferno.utilities.rescaling.remove_dc_offset_and_nans">remove_dc_offset_and_nans</a></code></li>
+<li><code><a title="quantum_inferno.utilities.rescaling.remove_nanmean" href="#quantum_inferno.utilities.rescaling.remove_nanmean">remove_nanmean</a></code></li>
+<li><code><a title="quantum_inferno.utilities.rescaling.set_vals_to" href="#quantum_inferno.utilities.rescaling.set_vals_to">set_vals_to</a></code></li>
 <li><code><a title="quantum_inferno.utilities.rescaling.to_decibel_with_epsilon" href="#quantum_inferno.utilities.rescaling.to_decibel_with_epsilon">to_decibel_with_epsilon</a></code></li>
 <li><code><a title="quantum_inferno.utilities.rescaling.to_log2_with_epsilon" href="#quantum_inferno.utilities.rescaling.to_log2_with_epsilon">to_log2_with_epsilon</a></code></li>
 </ul>

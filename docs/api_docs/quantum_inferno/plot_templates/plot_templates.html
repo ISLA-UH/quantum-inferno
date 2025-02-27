@@ -67,6 +67,13 @@ Default 0.13
 :param mesh_panel: MeshPanel to get info from
 :return: Quadmesh for plotting</p></div>
 </dd>
+<dt id="quantum_inferno.plot_templates.plot_templates.get_panel_labels"><code class="name flex">
+<span>def <span class="ident">get_panel_labels</span></span>(<span>n: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get panel labels for a figure with n panels
+:param n: number of panels</p></div>
+</dd>
 <dt id="quantum_inferno.plot_templates.plot_templates.get_time_label"><code class="name flex">
 <span>def <span class="ident">get_time_label</span></span>(<span>start_time_epoch: float, units_time: str, utc_offset_h: float = 0.0) ‑> str</span>
 </code></dt>
@@ -102,7 +109,7 @@ Default to default CwPowerPlotBase values
 :return: Figure to plot</p></div>
 </dd>
 <dt id="quantum_inferno.plot_templates.plot_templates.plot_mesh_wf_vert"><code class="name flex">
-<span>def <span class="ident">plot_mesh_wf_vert</span></span>(<span>mesh_base: <a title="quantum_inferno.plot_templates.plot_base.MeshBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshBase">MeshBase</a>, mesh_panel: <a title="quantum_inferno.plot_templates.plot_base.MeshPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshPanel">MeshPanel</a>, wf_base: <a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a>, wf_panel: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, sanitize_times: bool = True, use_default_size: bool = True) ‑> matplotlib.figure.Figure</span>
+<span>def <span class="ident">plot_mesh_wf_vert</span></span>(<span>mesh_base: <a title="quantum_inferno.plot_templates.plot_base.MeshBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshBase">MeshBase</a>, mesh_panel: <a title="quantum_inferno.plot_templates.plot_base.MeshPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshPanel">MeshPanel</a>, wf_base: <a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a>, wf_panel: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, sanitize_times: bool = True, use_default_size: bool = True, share_x_axis: bool = True) ‑> matplotlib.figure.Figure</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Specifically plot one mesh and one waveform, vertically</p>
@@ -114,10 +121,13 @@ Default to default CwPowerPlotBase values
 Default True
 :param use_default_size: if True, use the default size for the plots, otherwise size dynamically.
 Default True
+:param share_x_axis: if True, uses larger of the waveform or frequency end timestamp for all charts' x-axis upper
+limit.
+Default True.
 :return: Figure to plot</p></div>
 </dd>
 <dt id="quantum_inferno.plot_templates.plot_templates.plot_n_mesh_wf_vert"><code class="name flex">
-<span>def <span class="ident">plot_n_mesh_wf_vert</span></span>(<span>mesh_base: <a title="quantum_inferno.plot_templates.plot_base.MeshBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshBase">MeshBase</a>, panels: List[<a title="quantum_inferno.plot_templates.plot_base.MeshPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshPanel">MeshPanel</a>], wf_base: <a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a>, wf_panel: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, sanitize_times: bool = True, use_default_size: bool = True) ‑> matplotlib.figure.Figure</span>
+<span>def <span class="ident">plot_n_mesh_wf_vert</span></span>(<span>mesh_base: <a title="quantum_inferno.plot_templates.plot_base.MeshBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshBase">MeshBase</a>, panels: List[<a title="quantum_inferno.plot_templates.plot_base.MeshPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.MeshPanel">MeshPanel</a>], wf_base: <a title="quantum_inferno.plot_templates.plot_base.WaveformPlotBase" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPlotBase">WaveformPlotBase</a>, wf_panel: <a title="quantum_inferno.plot_templates.plot_base.WaveformPanel" href="plot_base.html#quantum_inferno.plot_templates.plot_base.WaveformPanel">WaveformPanel</a>, sanitize_times: bool = True, use_default_size: bool = True, share_x_axis: bool = True) ‑> matplotlib.figure.Figure</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot 1 or more mesh panels above the base waveform panel in a vertical layout.</p>
@@ -129,6 +139,9 @@ Default True
 Default True
 :param use_default_size: if True, use the default size for the plots, otherwise size dynamically.
 Default True
+:param share_x_axis: if True, uses larger of the waveform or frequency end timestamp for all charts' x-axis upper
+limit.
+Default True.
 :return: figure to display</p></div>
 </dd>
 <dt id="quantum_inferno.plot_templates.plot_templates.plot_wf_3_vert"><code class="name flex">
@@ -197,6 +210,7 @@ Default "plain"</p></div>
 <ul class="">
 <li><code><a title="quantum_inferno.plot_templates.plot_templates.adjust_figure_height" href="#quantum_inferno.plot_templates.plot_templates.adjust_figure_height">adjust_figure_height</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_templates.get_colormesh" href="#quantum_inferno.plot_templates.plot_templates.get_colormesh">get_colormesh</a></code></li>
+<li><code><a title="quantum_inferno.plot_templates.plot_templates.get_panel_labels" href="#quantum_inferno.plot_templates.plot_templates.get_panel_labels">get_panel_labels</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_templates.get_time_label" href="#quantum_inferno.plot_templates.plot_templates.get_time_label">get_time_label</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_templates.mesh_time_frequency_edges" href="#quantum_inferno.plot_templates.plot_templates.mesh_time_frequency_edges">mesh_time_frequency_edges</a></code></li>
 <li><code><a title="quantum_inferno.plot_templates.plot_templates.plot_cw_and_power" href="#quantum_inferno.plot_templates.plot_templates.plot_cw_and_power">plot_cw_and_power</a></code></li>

@@ -69,6 +69,14 @@ Apparently you need at least 46 values in the timeseries for this to work</p>
 :param outro_buffer_s: outro buffer in seconds
 :return: extracted signal</p></div>
 </dd>
+<dt id="quantum_inferno.utilities.picker.find_nans"><code class="name flex">
+<span>def <span class="ident">find_nans</span></span>(<span>in_signal: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find the locations of NaNs in the input signal</p>
+<p>:param in_signal: input signal
+:return: locations of NaNs in the signal</p></div>
+</dd>
 <dt id="quantum_inferno.utilities.picker.find_peaks_by_extraction_type"><code class="name flex">
 <span>def <span class="ident">find_peaks_by_extraction_type</span></span>(<span>timeseries: numpy.ndarray, extraction_type: str = 'sigmax', height: Optional[float] = 0.7, *args) ‑> numpy.ndarray</span>
 </code></dt>
@@ -154,6 +162,7 @@ Apparently you need at least 46 values in the timeseries for this to work</p>
 <li><code><a title="quantum_inferno.utilities.picker.apply_bandpass" href="#quantum_inferno.utilities.picker.apply_bandpass">apply_bandpass</a></code></li>
 <li><code><a title="quantum_inferno.utilities.picker.extract_signal_index_with_buffer" href="#quantum_inferno.utilities.picker.extract_signal_index_with_buffer">extract_signal_index_with_buffer</a></code></li>
 <li><code><a title="quantum_inferno.utilities.picker.extract_signal_with_buffer_seconds" href="#quantum_inferno.utilities.picker.extract_signal_with_buffer_seconds">extract_signal_with_buffer_seconds</a></code></li>
+<li><code><a title="quantum_inferno.utilities.picker.find_nans" href="#quantum_inferno.utilities.picker.find_nans">find_nans</a></code></li>
 <li><code><a title="quantum_inferno.utilities.picker.find_peaks_by_extraction_type" href="#quantum_inferno.utilities.picker.find_peaks_by_extraction_type">find_peaks_by_extraction_type</a></code></li>
 <li><code><a title="quantum_inferno.utilities.picker.find_peaks_by_extraction_type_with_bandpass" href="#quantum_inferno.utilities.picker.find_peaks_by_extraction_type_with_bandpass">find_peaks_by_extraction_type_with_bandpass</a></code></li>
 <li><code><a title="quantum_inferno.utilities.picker.find_peaks_to_comb_function" href="#quantum_inferno.utilities.picker.find_peaks_to_comb_function">find_peaks_to_comb_function</a></code></li>

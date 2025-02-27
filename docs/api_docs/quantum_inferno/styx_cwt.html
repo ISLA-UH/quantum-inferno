@@ -45,14 +45,13 @@ Based on Garces (2023).</p>
 :return: amp_canonical, amp_unit_spectrum</p></div>
 </dd>
 <dt id="quantum_inferno.styx_cwt.cwt_complex_any_scale_pow2"><code class="name flex">
-<span>def <span class="ident">cwt_complex_any_scale_pow2</span></span>(<span>band_order_nth: float, sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, cwt_type: str = 'fft', dictionary_type: str = 'norm') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+<span>def <span class="ident">cwt_complex_any_scale_pow2</span></span>(<span>band_order_nth: float, sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, dictionary_type: str = 'norm') ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate CWT</p>
 <p>:param band_order_nth: Nth order of constant Q bands
 :param sig_wf: array with input signal
 :param frequency_sample_rate_hz: sample rate in Hz
-:param cwt_type: one of "fft", or "morlet2". Default is "fft"
 :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
 :return: frequency_cwt_hz, time_cwt_s, cwt</p></div>
 </dd>

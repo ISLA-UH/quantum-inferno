@@ -51,7 +51,7 @@ hljs.highlightAll();
 <span>def <span class="ident">butter_highpass</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, frequency_cut_low_hz: Union[float, int], filter_order: int = 4, tukey_alpha: float = 0.5) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Butterworth bandpass filter</p>
+<div class="desc"><p>Butterworth high bandpass filter</p>
 <p>:param sig_wf: signal waveform as numpy array
 :param frequency_sample_rate_hz: frequency sample rate in Hz
 :param frequency_cut_low_hz: frequency low value
@@ -63,7 +63,7 @@ hljs.highlightAll();
 <span>def <span class="ident">butter_lowpass</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, frequency_cut_high_hz: Union[float, int], filter_order: int = 4, tukey_alpha: float = 0.5) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Butterworth bandpass filter</p>
+<div class="desc"><p>Butterworth low bandpass filter</p>
 <p>:param sig_wf: signal waveform as numpy array
 :param frequency_sample_rate_hz: frequency sample rate in Hz
 :param frequency_cut_high_hz: frequency low value
@@ -96,6 +96,20 @@ hljs.highlightAll();
 :param nfft_points: length of FFT
 :param alpha: Tukey window alpha
 :return: frequency_stft_hz, time_stft_s, stft_complex</p></div>
+</dd>
+<dt id="quantum_inferno.styx_fft.stft_from_sig"><code class="name flex">
+<span>def <span class="ident">stft_from_sig</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, band_order_nth: float, center_frequency_hz: float = None, octaves_below_center: int = 4) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stft from signal</p>
+<p>:param sig_wf: array with input signal
+:param frequency_sample_rate_hz: sample rate of frequency in Hz
+:param band_order_nth: Nth order of constant Q bands
+:param center_frequency_hz: optional center frequency of the signal in Hz.
+Default 3/20 of Nyquist
+:param octaves_below_center: number of octaves below center frequency to set the averaging frequency.
+Default 4
+:return: numpy arrays of: STFT, STFT_bits, time_stft_s, frequency_stft_hz</p></div>
 </dd>
 <dt id="quantum_inferno.styx_fft.welch_power_pow2"><code class="name flex">
 <span>def <span class="ident">welch_power_pow2</span></span>(<span>sig_wf: numpy.ndarray, frequency_sample_rate_hz: float, segment_points: int, nfft_points: int = None, overlap_points: int = None, alpha: float = 0.25) ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
@@ -132,6 +146,7 @@ hljs.highlightAll();
 <li><code><a title="quantum_inferno.styx_fft.butter_lowpass" href="#quantum_inferno.styx_fft.butter_lowpass">butter_lowpass</a></code></li>
 <li><code><a title="quantum_inferno.styx_fft.gtx_complex_pow2" href="#quantum_inferno.styx_fft.gtx_complex_pow2">gtx_complex_pow2</a></code></li>
 <li><code><a title="quantum_inferno.styx_fft.stft_complex_pow2" href="#quantum_inferno.styx_fft.stft_complex_pow2">stft_complex_pow2</a></code></li>
+<li><code><a title="quantum_inferno.styx_fft.stft_from_sig" href="#quantum_inferno.styx_fft.stft_from_sig">stft_from_sig</a></code></li>
 <li><code><a title="quantum_inferno.styx_fft.welch_power_pow2" href="#quantum_inferno.styx_fft.welch_power_pow2">welch_power_pow2</a></code></li>
 </ul>
 </li>
