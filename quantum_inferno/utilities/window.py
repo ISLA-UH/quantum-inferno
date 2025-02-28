@@ -7,7 +7,7 @@ from scipy.signal import windows
 
 from quantum_inferno import qi_debugger
 
-def taper_power_correction(taper_window: np.ndarray) -> np.ndarray:
+def taper_power_correction(taper_window: np.ndarray) -> any:
     """
     Correct the spectral power.
     :param taper_window: taper for the amplitude correction
