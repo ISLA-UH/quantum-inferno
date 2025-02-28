@@ -101,8 +101,12 @@ def get_stft_object(
 
 
 def get_stft_object_tukey(
-    sample_rate_hz: float, tukey_alpha: float, segment_length: int, overlap_length: int,
-        scaling: Optional[str] = "magnitude", fft_points: Optional[int] = None
+        sample_rate_hz: float,
+        tukey_alpha: float,
+        segment_length: int,
+        overlap_length: int,
+        scaling: Optional[str] = "magnitude",
+        fft_points: Optional[int] = None
 ) -> signal.ShortTimeFFT:
     """
     Return the Short-Time Fourier Transform (STFT) object with a Tukey window using ShortTimeFFT class.
@@ -122,8 +126,12 @@ def get_stft_object_tukey(
 
 
 def get_stft_object_gaussian(
-        sample_rate_hz: float, gaussian_sigma: float, segment_length: int, overlap_length: int,
-        scaling: Optional[str] = "magnitude", fft_points: Optional[int] = None
+        sample_rate_hz: float,
+        gaussian_sigma: float,
+        segment_length: int,
+        overlap_length: int,
+        scaling: Optional[str] = "magnitude",
+        fft_points: Optional[int] = None
 ) -> signal.ShortTimeFFT:
     """
     Return the Short-Time Fourier Transform (STFT) object with a Gaussian window using ShortTimeFFT class.
@@ -283,8 +291,8 @@ def gtx_complex_pow2(
         sig_wf: np.ndarray,
         frequency_sample_rate_hz: float,
         segment_points: int,
-        overlap_points: int = None,
-        gaussian_sigma: float = None,
+        overlap_points: Optional[int] = None,
+        gaussian_sigma: Optional[int] = None,
         fft_points: Optional[int] = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
