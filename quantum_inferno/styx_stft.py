@@ -3,7 +3,7 @@ Methods for calculating frequency and time-frequency representations of signals.
 Historical note: Scipy added signal.ShortTimeFFT in version 1.12.0
 """
 
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 from scipy import signal
@@ -25,7 +25,7 @@ padding_type = ["zeros", "edge", "even", "odd"]
 
 def get_stft_object(
         window_type: str,
-        window_args: Tuple,
+        window_args: Union[List, Tuple],
         sample_rate_hz: float,
         segment_length: int,
         overlap_length: int,
@@ -33,13 +33,14 @@ def get_stft_object(
         fft_points: Optional[int] = None
 ) -> signal.ShortTimeFFT:
     """
-    Return an STFT object with the given parameters, using the specified window.
+    Return an STFT object with the given parameters, using the specified window.  Designed for future expansion.
     Allowed window types are: "tukey", "gaussian".
+    Window arguments must be given as a list or tuple.
 
-    * Tukey window requires alpha value as the window_args.  Example: (.25)
-    * Gaussian window requires sigma value as the window_args.  Example: (4)
+    * Tukey window requires alpha value as the window_args.  Example: [.25]
+    * Gaussian window requires sigma value as the window_args.  Example: [4]
 
-    :param window_type: type of window to use.  Refer to list above for valid types.  Invalid types defaults to "tukey"
+    :param window_type: type of window to use.  Refer to list above for valid types.  Invalid types default to "tukey"
     :param window_args: arguments for the window function.  See above for details.
     :param sample_rate_hz: sample rate in hz
     :param segment_length: length of window segment
@@ -72,8 +73,8 @@ def get_stft_object(
         window = signal.windows.gaussian(segment_length, std=gaussian_sigma)
     # this catches anything that's not "gaussian".  Uses tukey window.
     else:
+        tukey_alpha = 0.25
         if len(window_args) != 1:
-            tukey_alpha = 0.25
             qi_debugger.add_message(
                 f"Warning: Tukey window requires one argument, using {tukey_alpha} as the default value"
             )
@@ -81,8 +82,8 @@ def get_stft_object(
             qi_debugger.add_message(
                 f"Warning: Tukey alpha {window_args[0]} must be between 0 and 1, using 0.25 as the default value"
             )
-            tukey_alpha = 0.25
         else:
+            # reset tukey alpha to given value
             tukey_alpha = window_args[0]
         window = signal.windows.tukey(segment_length, alpha=tukey_alpha)
 
@@ -116,7 +117,7 @@ def get_stft_object_tukey(
                         Default None
     :return: ShortTimeFFT object
     """
-    return get_stft_object("tukey", (tukey_alpha,), sample_rate_hz, segment_length, overlap_length, scaling, fft_points)
+    return get_stft_object("tukey", [tukey_alpha], sample_rate_hz, segment_length, overlap_length, scaling, fft_points)
 
 
 def get_stft_object_gaussian(
@@ -137,7 +138,7 @@ def get_stft_object_gaussian(
                         Default None
     :return: ShortTimeFFT object
     """
-    return get_stft_object("gaussian", (gaussian_sigma,), sample_rate_hz, segment_length, overlap_length, scaling,
+    return get_stft_object("gaussian", [gaussian_sigma], sample_rate_hz, segment_length, overlap_length, scaling,
                            fft_points)
 
 
