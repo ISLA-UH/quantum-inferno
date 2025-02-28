@@ -265,7 +265,7 @@ def stft_complex_pow2(
         sig_wf: np.ndarray,
         frequency_sample_rate_hz: float,
         segment_points: int,
-        overlap_points: int = None,
+        overlap_points: Optional[int] = None,
         alpha: float = 0.25,
         fft_points: Optional[int] = None
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -304,7 +304,6 @@ def gtx_complex_pow2(
     :param gaussian_sigma: gaussian window variance.  Default 1/4 of segment_points
     :param overlap_points: number of points in overlap.  Default half of segment_points
     :param fft_points: number of points in fft.  Default nearest greatest power of 2 of segment_points
-    :param padding: Padding method for the STFT.  Default is "zeros", other options are "edge", "even", and "odd"
     :return: frequency_stft_hz, time_stft_s, stft_complex
     """
     if overlap_points is None:
