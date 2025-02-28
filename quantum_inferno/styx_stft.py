@@ -71,8 +71,9 @@ def get_stft_object(
         else:
             gaussian_sigma = window_args[0]
         window = signal.windows.gaussian(segment_length, std=gaussian_sigma)
-    # this catches anything that's not "gaussian".  Uses tukey window.
+    # This catches anything that's not "gaussian", redirects to Tukey window.
     else:
+        # Default Tukey alpha value
         tukey_alpha = 0.25
         if len(window_args) != 1:
             qi_debugger.add_message(
@@ -87,7 +88,7 @@ def get_stft_object(
             tukey_alpha = window_args[0]
         window = signal.windows.tukey(segment_length, alpha=tukey_alpha)
 
-    # Compute the number of fft points
+    # Compute the nearest higher power of two number of fft points if not given
     if fft_points is None:
         fft_points = round_value(segment_length, "ceil_power_of_two")
     hop_length = segment_length - overlap_length
@@ -204,38 +205,6 @@ def get_stft_tukey(
     return frequency_bins, time_bins, stft_magnitude
 
 
-# get inverse Short-Time Fourier Transform (iSTFT), must match the get_stft_tukey() input parameters
-def istft_tukey(
-    stft_to_invert: np.ndarray,
-    sample_rate_hz: Union[float, int],
-    tukey_alpha: float,
-    segment_length: int,
-    overlap_length: int,
-    scaling: str = "magnitude",
-) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class
-
-    :param stft_to_invert: The STFT to be inverted
-    :param sample_rate_hz: sample rate of the signal
-    :param tukey_alpha: shape parameter of the Tukey window
-    :param segment_length: length of the segment
-    :param overlap_length: length of the overlap
-    :param scaling: Optional scaling of the STFT.  Default is "magnitude", other options are "psd" and None
-    :return: timestamps and iSTFT of the signal
-    """
-    # create the ShortTimeFFT object
-    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling)
-
-    # The index of the last window where only half of the window contains the signal
-    last_window_index = int((np.shape(stft_to_invert)[1] - 1) * stft_obj.hop)
-
-    # return timestamps for the iSTFT that includes the full signal
-    timestamps = np.arange(start=0, stop=last_window_index / sample_rate_hz, step=1 / sample_rate_hz)
-
-    return timestamps, stft_obj.istft(stft_to_invert, k1=last_window_index)
-
-
 def get_stft_gaussian(
         sig_wf: np.ndarray,
         frequency_sample_rate_hz: float,
@@ -270,10 +239,13 @@ def get_stft_gaussian(
     # create the ShortTimeFFT object
     stft_obj = get_stft_object_gaussian(frequency_sample_rate_hz, gaussian_sigma, segment_points, overlap_points,
                                         "magnitude", fft_points)
+    # TODO: test correction factor
+    # Compute window correction factor
+    window_correction_factor = taper_power_correction(stft_obj.win)
 
     # calculate the STFT with detrending
     # noinspection PyTypeChecker
-    stft_magnitude = np.abs(stft_obj.stft_detrend(x=sig_wf, detr="constant", padding=padding))
+    stft_magnitude = stft_obj.stft_detrend(x=sig_wf, detr="constant", padding=padding)
 
     # calculate the time and frequency bins
     frequency_bins, time_bins = get_freq_time_bins(stft_obj, np.shape(stft_magnitude)[1])
@@ -311,10 +283,9 @@ def gtx_complex_pow2(
         sig_wf: np.ndarray,
         frequency_sample_rate_hz: float,
         segment_points: int,
-        overlap_points: Optional[int] = None,
-        gaussian_sigma: Optional[int] = None,
+        overlap_points: int = None,
+        gaussian_sigma: float = None,
         fft_points: Optional[int] = None,
-        padding: str = "zeros",
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Gaussian taper with built-in defaults.  Uses nfft length of nearest power of two for segment_points.
@@ -332,8 +303,8 @@ def gtx_complex_pow2(
         overlap_points = int(segment_points / 2)
     if gaussian_sigma is None:
         gaussian_sigma = int(segment_points / 4)
-    return get_stft_gaussian(sig_wf, frequency_sample_rate_hz, gaussian_sigma, segment_points, overlap_points, padding,
-                             fft_points)
+    return get_stft_gaussian(sig_wf, frequency_sample_rate_hz, gaussian_sigma, segment_points, overlap_points,
+                             fft_points=fft_points)
 
 
 def welch_from_stft(
@@ -405,3 +376,36 @@ def stft_from_order(
     stft_bits = to_log2_with_epsilon(stft_complex)
 
     return stft_complex, stft_bits, time_stft_s, frequency_stft_hz
+
+
+# TODO: Revisit istft, generalize to ShortTimeFFT object
+# get inverse Short-Time Fourier Transform (iSTFT), must match the get_stft_tukey() input parameters
+def istft_tukey(
+        stft_to_invert: np.ndarray,
+        sample_rate_hz: Union[float, int],
+        tukey_alpha: float,
+        segment_length: int,
+        overlap_length: int,
+        scaling: str = "magnitude",
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class
+    Does not return exact istft if using stft_detrended. Recommend filtering and detrending at signal preprocessing.
+    :param stft_to_invert: The STFT to be inverted
+    :param sample_rate_hz: sample rate of the signal
+    :param tukey_alpha: shape parameter of the Tukey window
+    :param segment_length: length of the segment
+    :param overlap_length: length of the overlap
+    :param scaling: Optional scaling of the STFT.  Default is "magnitude", other options are "psd" and None
+    :return: timestamps and iSTFT of the signal
+    """
+    # create the ShortTimeFFT object
+    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling)
+
+    # The index of the last window where only half of the window contains the signal
+    last_window_index = int((np.shape(stft_to_invert)[1] - 1) * stft_obj.hop)
+
+    # return timestamps for the iSTFT that includes the full signal
+    timestamps = np.arange(start=0, stop=last_window_index / sample_rate_hz, step=1 / sample_rate_hz)
+
+    return timestamps, stft_obj.istft(stft_to_invert, k1=last_window_index)
