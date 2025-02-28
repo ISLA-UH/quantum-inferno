@@ -26,7 +26,7 @@ def get_stft_object(
         window_args: Tuple,
         sample_rate_hz: float,
         segment_length: int,
-        overlap_length: Optional[int] = None,
+        overlap_length: int,
         scaling: str = "magnitude",
         fft_points: Optional[int] = None
 ) -> signal.ShortTimeFFT:
@@ -51,9 +51,7 @@ def get_stft_object(
             f"Warning: scaling {scaling} must be one of {scaling_type}, using 'magnitude' as the default value"
         )
         scaling = "magnitude"
-    if overlap_length is None:
-        overlap_length = segment_length // 2
-    elif segment_length < overlap_length:
+    if segment_length < overlap_length:
         qi_debugger.add_message(
             f"Warning: overlap length {overlap_length} must be smaller than segment length {segment_length}"
             " using half of the segment length as the overlap length"
@@ -116,6 +114,28 @@ def get_stft_object_tukey(
     :return: ShortTimeFFT object
     """
     return get_stft_object("tukey", (tukey_alpha,), sample_rate_hz, segment_length, overlap_length, scaling, fft_points)
+
+
+def get_stft_object_gaussian(
+        sample_rate_hz: float, gaussian_sigma: float, segment_length: int, overlap_length: int,
+        scaling: str = "magnitude", fft_points: Optional[int] = None
+) -> signal.ShortTimeFFT:
+    """
+    Return the Short-Time Fourier Transform (STFT) object with a Gaussian window using ShortTimeFFT class.
+    If fft_points not given, calculates the number of fft points based on the segment length using ceil_power_of_two
+    rounding method
+
+    :param sample_rate_hz: sample rate of the signal
+    :param gaussian_sigma: shape parameter of the Gaussian window
+    :param segment_length: length of the segment
+    :param overlap_length: length of the overlap
+    :param scaling: scaling of the STFT (default is "magnitude", other options are "psd" and None)
+    :param fft_points: Optional number of points in the fft.  If None, uses nearest power of two of segment_length.
+                        Default None
+    :return: ShortTimeFFT object
+    """
+    return get_stft_object("gaussian", (gaussian_sigma,), sample_rate_hz, segment_length, overlap_length, scaling,
+                           fft_points)
 
 
 def get_freq_time_bins(stft_obj: signal.ShortTimeFFT, stop_scalar: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -206,6 +226,53 @@ def istft_tukey(
     timestamps = np.arange(start=0, stop=last_window_index / sample_rate_hz, step=1 / sample_rate_hz)
 
     return timestamps, stft_obj.istft(stft_to_invert, k1=last_window_index)
+
+
+def get_stft_gaussian(
+        timeseries:np.ndarray,
+        sample_rate_hz: Union[float, int],
+        gaussian_sigma: float,
+        segment_length: int,
+        overlap_length: int,
+        scaling: str = "magnitude",
+        padding: str = "zeros",
+        fft_points: Optional[int] = None
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Calculates the Short-Time Fourier Transform (STFT) of a signal with a Gaussian window using ShortTimeFFT class
+    Returns the frequency, time bins, and magnitude of the detrended STFT similar to legacy scipy.signal.stft
+    Note: If you want the STFT object, use get_stft_object_gaussian
+
+    :param timeseries: input signal
+    :param sample_rate_hz: sample rate of the signal
+    :param gaussian_sigma: shape parameter of the Gaussian window
+    :param segment_length: length of the segment
+    :param overlap_length: length of the overlap
+    :param scaling: scaling of the STFT (default is None, other options are 'magnitude' and 'psd)
+    :param padding: padding method for the STFT (default is 'zeros', other options are 'edge', 'even', and 'odd')
+    :param fft_points: Optional number of points in the fft.  If None, uses nearest power of two of segment_length.
+                        Default None
+    :return: frequency, time bins, and magnitude of the detrended STFT
+    """
+    # check if padding is valid
+    if padding not in padding_type:
+        qi_debugger.add_message(
+            f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
+        )
+        padding = "zeros"
+
+    # create the ShortTimeFFT object
+    stft_obj = get_stft_object_gaussian(sample_rate_hz, gaussian_sigma, segment_length, overlap_length, scaling,
+                                        fft_points)
+
+    # calculate the STFT with detrending
+    # noinspection PyTypeChecker
+    stft_magnitude = np.abs(stft_obj.stft_detrend(x=timeseries, detr="constant", padding=padding))
+
+    # calculate the time and frequency bins
+    frequency_bins, time_bins = get_freq_time_bins(stft_obj, np.shape(stft_magnitude)[1])
+
+    return frequency_bins, time_bins, stft_magnitude
 
 
 # get the spectrogram with default parameters
