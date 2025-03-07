@@ -15,7 +15,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 
-from quantum_inferno.styx_stft import padding_type
 from quantum_inferno.synth import benchmark_signals
 import quantum_inferno.styx_stft as stft
 
