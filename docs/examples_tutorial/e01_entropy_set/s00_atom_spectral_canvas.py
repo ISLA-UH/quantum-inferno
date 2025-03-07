@@ -9,10 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from quantum_inferno import styx_fft, styx_cwt, scales_dyadic
+from quantum_inferno.styx_stft import stft_complex_pow2, gtx_complex_pow2, welch_from_stft
 import quantum_inferno.plot_templates.plot_base as ptb
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.utilities.calculations import get_num_points
-from quantum_inferno.utilities.short_time_fft import gtx_complex_pow2, stft_complex_pow2
 
 print(__doc__)
 
@@ -184,6 +184,8 @@ if __name__ == "__main__":
         fft_points=time_fft_nd
     )
 
+    psd_welch_power2 = welch_from_stft(stft_complex2)
+
     # STFT with sliding Gaussian window will have same time and frequency specs
     _, _, stft_complex_gauss = styx_fft.gtx_complex_pow2(
         sig_wf=mic_sig,
@@ -204,14 +206,17 @@ if __name__ == "__main__":
     stft_power2 = 2 * np.abs(stft_complex2) ** 2
     stft_power_gauss = 2 * np.abs(stft_complex_gauss) ** 2
     stft_power_gauss2 = 2 * np.abs(stft_complex_gauss2) ** 2
+    # missing 2 ^ 2 factor when calculating using new function?
 
     # Scale power by variance
-    welch_over_var = psd_welch_power / mic_sig_var
+    welch_over_var = psd_welch_power / mic_sig_var  # this is double the stft_over_var
+    welch_over_var2 = psd_welch_power2 / mic_sig_var  # this is half the stft_over_var2
     stft_over_var = np.average(stft_power, axis=1) / mic_sig_var
     stft_over_var2 = np.average(stft_power2, axis=1) / mic_sig_var
 
     print("\nSum scaled spectral power")
     print("Sum Welch:", np.sum(welch_over_var))
+    print("Sum Welch2:", np.sum(welch_over_var2))
     print("Sum STFT:", np.sum(stft_over_var))
     print("Sum STFT2:", np.sum(stft_over_var2))
 
@@ -227,6 +232,7 @@ if __name__ == "__main__":
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("Norm")
     ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
+    ax2.semilogx(frequency_welch_hz, welch_over_var2, label="Welch2")
     ax2.semilogx(frequency_stft_hz, stft_over_var, ".-", label="STFT")
     ax2.semilogx(frequency_stft_hz2, stft_over_var2, "--", label="STFT2")
 

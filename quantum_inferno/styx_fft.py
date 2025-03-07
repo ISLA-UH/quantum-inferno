@@ -27,7 +27,7 @@ def stft_from_sig(
     :param band_order_nth: Nth order of constant Q bands
     :param center_frequency_hz: optional center frequency of the signal in Hz.  Default 3/20 of Nyquist
     :param octaves_below_center: number of octaves below center frequency to set the averaging frequency.  Default 4
-    :return: numpy arrays of: STFT, STFT_bits, time_stft_s, frequency_stft_hz
+    :return: numpy arrays of: STFT, STFT bits, timestamps of STFT in seconds, STFT frequencies in Hz
     """
     if center_frequency_hz is None:
         center_frequency_hz = frequency_sample_rate_hz * 0.075  # 3/20th of Nyquist
@@ -84,9 +84,6 @@ def butter_bandpass(
         qi_debugger.add_message(
             f"Warning: Frequency cutoff {frequency_cut_high_hz} greater than Nyquist {nyquist} Hz, using half Nyquist"
         )
-        # print(
-        #     f"Warning: Frequency cutoff {frequency_cut_high_hz} greater than Nyquist {nyquist} Hz, using half Nyquist"
-        # )
         edge_high = 0.5  # Half of nyquist
     [b, a] = signal.butter(N=filter_order, Wn=[edge_low, edge_high], btype="bandpass")
     sig_taper = np.copy(sig_wf)
@@ -112,12 +109,10 @@ def butter_highpass(
     :return: filtered signal waveform as numpy array
     """
     edge_low = frequency_cut_low_hz / (0.5 * frequency_sample_rate_hz)
-
     if edge_low >= 1:
         raise ValueError(
             f"Frequency cutoff {frequency_cut_low_hz} is greater than Nyquist {0.5*frequency_sample_rate_hz}"
         )
-
     [b, a] = signal.butter(N=filter_order, Wn=[edge_low], btype="highpass")
     sig_taper = np.copy(sig_wf)
     sig_taper *= signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)

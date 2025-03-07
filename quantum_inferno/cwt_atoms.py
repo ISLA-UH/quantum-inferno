@@ -31,7 +31,7 @@ def chirp_complex(
     :param frequency_sample_rate_hz: sample rate on Hz
     :param index_shift: Redshift = -1, Blueshift = +1, None=0
     :param scale_base: G2 or G3
-    :return: waveform_complex, time_shifted_s, normal_scaling, spectrum_scaling
+    :return: waveform as complex values, shifted timestamps in seconds, normal scaling value, spectrum scaling value
     """
     xtime_shifted = chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
     time_shifted_s = xtime_shifted / frequency_sample_rate_hz
@@ -199,12 +199,10 @@ def chirp_uncertainty(
 
 def chirp_p_complex(scale_atom: float, gamma: float, index_shift: float) -> complex:
     """
-    Fundamental chirp variable
-
     :param scale_atom: from chirp_scale or chirp_scale_from_order
     :param gamma: from index_shift, M/(2Q)
     :param index_shift: index of shift
-    :return: p_complex
+    :return: Fundamental chirp variable as complex value
     """
     return (1 - 1j * index_shift * gamma / np.pi) / (2 * scale_atom ** 2)
 
@@ -216,7 +214,7 @@ def chirp_amplitude(scale_atom: float, gamma: float, index_shift: float) -> Tupl
     :param scale_atom: from chirp_scale or chirp_scale_from_order
     :param gamma: from index_shift, M/(2Q)
     :param index_shift: index of shift
-    :return: normal_scaling, spectrum_scaling
+    :return: normal scaling value, spectrum scaling value
     """
     p_complex = chirp_p_complex(scale_atom, gamma, index_shift)
     normal_scaling = 1 / np.pi ** 0.25 * 1 / np.sqrt(scale_atom)
@@ -267,9 +265,9 @@ def chirp_frequency_bands(
     Calculate frequency bands for chirp
 
     :param scale_order_input: Nth order specification
-    :param frequency_low_input: lowest frequency of interest
+    :param frequency_low_input: the lowest frequency of interest
     :param frequency_sample_rate_input: sample rate
-    :param frequency_high_input: highest frequency of interest
+    :param frequency_high_input: the highest frequency of interest
     :param index_shift: index of shift
     :param frequency_ref: reference frequency
     :param scale_base: positive reference Base G > 1. Default is G2
@@ -316,8 +314,9 @@ def chirp_centered_4cwt(
     :param frequency_sample_rate_hz: sample rate is Hz
     :param index_shift: index of shift
     :param scale_base: G2 or G3
-    :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect")
-    :return: waveform_complex, time_shifted_s
+    :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect").  Defaults to "norm".
+                            Uses "spect" if value is not either option described.
+    :return: waveform as complex values, shifted timestamps in seconds
     """
     duration_points = len(sig_or_time)
     time_s = np.arange(duration_points) / frequency_sample_rate_hz

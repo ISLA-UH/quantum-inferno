@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 import quantum_inferno.plot_templates.plot_base as ptb
-import quantum_inferno.utilities.short_time_fft as stft
 from quantum_inferno.plot_templates.plot_templates import plot_cw_and_power
+import quantum_inferno.styx_stft as stft
 from quantum_inferno.synth import benchmark_signals
 
 print(__doc__)
@@ -49,15 +49,19 @@ def calculate_power_example_values(mic_sig, time_fft_nd, frequency_sample_rate_h
         scaling="spectrum",
         average="mean",
     )
-    frequency_spect_hz, time_spect_s, spec_mag = stft.spectrogram_tukey(
-        timeseries=mic_sig,
+
+    stft_obj = stft.get_stft_object_tukey(
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
         segment_length=time_fft_nd,
         overlap_length=time_fft_nd // 2,  # 50% overlap
         scaling="magnitude",
-        padding="zeros",
     )
+    # get spectrogram from stft object
+    spec_mag = stft_obj.spectrogram(mic_sig)
+
+    frequency_spect_hz = stft_obj.f
+
     # Since one-sided, multiply by 2 to get the full power
     spec_power = 2 * spec_mag
     # Compute the spectrogram with the stft option

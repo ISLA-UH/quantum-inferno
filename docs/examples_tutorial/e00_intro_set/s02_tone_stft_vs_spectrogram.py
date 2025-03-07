@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 import quantum_inferno.plot_templates.plot_base as ptb
-import quantum_inferno.utilities.short_time_fft as stft
+import quantum_inferno.styx_stft as stft
 from quantum_inferno.plot_templates.plot_templates import plot_cw_and_power, plot_mesh_wf_vert
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
@@ -78,21 +78,6 @@ if __name__ == "__main__":
         average="mean",
     )
 
-    frequency_spect_hz, time_spect_s, spec_mag = stft.spectrogram_tukey(
-        timeseries=mic_sig,
-        sample_rate_hz=frequency_sample_rate_hz,
-        tukey_alpha=alpha,
-        segment_length=time_fft_nd,
-        overlap_length=time_fft_nd // 2,  # 50% overlap
-        scaling="magnitude",
-        padding="zeros",
-    )
-    # Since one-sided, multiply by 2 to get the full power
-    spec_power = 2 * spec_mag
-
-    # Shift the time_spect_s to start at the first time point since it returns the center of the window
-    time_spect_s = time_spect_s - time_spect_s[0]
-
     # Compute the spectrogram with the stft option
     stft_obj = stft.get_stft_object_tukey(
         sample_rate_hz=frequency_sample_rate_hz,
@@ -101,12 +86,19 @@ if __name__ == "__main__":
         overlap_length=time_fft_nd // 2,  # 50% overlap
         scaling="magnitude",
     )
+
+    spec_mag = stft_obj.spectrogram(mic_sig)
+    frequency_spect_hz, time_spect_s = stft.get_freq_time_bins(stft_obj, np.shape(spec_mag)[1])
+    # Shift the time_spect_s to start at the first time point since it returns the center of the window
+    time_spect_s = time_spect_s - time_spect_s[0]
+    # Since one-sided, multiply by 2 to get the full power
+    spec_power = 2 * spec_mag
+
     stft_complex = stft_obj.stft(mic_sig, padding="zeros")
 
     stft_magnitude = np.abs(stft_obj.stft_detrend(x=mic_sig, detr="constant", padding="zeros"))
     # calculate the time and frequency bins
-    time_stft_s = np.arange(start=0, stop=stft_obj.delta_t * np.shape(stft_magnitude)[1], step=stft_obj.delta_t)
-    frequency_stft_hz = stft_obj.f
+    frequency_stft_hz, time_stft_s = stft.get_freq_time_bins(stft_obj, np.shape(stft_magnitude)[1])
 
     # Since one-sided, multiply by 2 to get the full power
     stft_power = 2 * np.abs(stft_complex) ** 2

@@ -10,11 +10,11 @@ import scipy.signal as signal
 import quantum_inferno.plot_templates.plot_base as ptb
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.styx_cwt import cwt_complex_any_scale_pow2
+from quantum_inferno.styx_stft import stft_complex_pow2, welch_from_stft
 from quantum_inferno.styx_stx import tfr_stx_fft
 from quantum_inferno.synth import blast_gt_pulse as kaboom
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 from quantum_inferno.utilities.window import get_tukey
-import quantum_inferno.utilities.short_time_fft as stft
 
 print(__doc__)
 
@@ -85,15 +85,15 @@ if __name__ == "__main__":
     )
 
     # Compute the spectrogram with the stft option
-    frequency_stft_hz, time_stft_s, stft_complex = stft.get_stft_tukey(
-        timeseries=mic_sig,
-        sample_rate_hz=frequency_sample_rate_hz,
-        tukey_alpha=alpha,
-        segment_length=time_fft_nd,
-        overlap_length=time_fft_nd // 2,  # 50% overlap
-        scaling="magnitude",
-        padding="zeros",
+    frequency_stft_hz, time_stft_s, stft_complex = stft_complex_pow2(
+        sig_wf=mic_sig,
+        frequency_sample_rate_hz=frequency_sample_rate_hz,
+        alpha=alpha,
+        segment_points=time_fft_nd,
+        overlap_points=time_fft_nd // 2,  # 50% overlap
     )
+
+    psd_welch_power2 = welch_from_stft(stft_complex)
 
     stft_power = 2 * np.abs(stft_complex) ** 2
 
@@ -127,6 +127,7 @@ if __name__ == "__main__":
     # TODO: Reconcile STX frequency with STFT
     # Compute the 'equivalent' fft rms amplitude
     fft_rms_welch = np.sqrt(np.abs(psd_welch_power)) / mic_sig_rms
+    fft_rms_welch2 = np.sqrt(np.abs(psd_welch_power2)) / mic_sig_rms
     fft_rms_stft = np.sqrt(np.average(stft_power, axis=1)) / mic_sig_rms
     fft_rms_cwt = np.sqrt(np.average(cwt_power, axis=1)) / mic_sig_rms
     fft_rms_stx = np.sqrt(np.average(stx_power, axis=1)) / mic_sig_rms
@@ -149,6 +150,7 @@ if __name__ == "__main__":
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("Norm")
     ax2.semilogx(frequency_welch_hz, fft_rms_welch, label="Welch")
+    ax2.semilogx(frequency_welch_hz, fft_rms_welch2, label="Welch2")
     ax2.semilogx(frequency_stft_hz, fft_rms_stft, ".-", label="STFT")
     ax2.semilogx(frequency_cwt_hz, fft_rms_cwt, "-.", label="CWT")
     ax2.semilogx(frequency_stx_hz, fft_rms_stx, "--", label="STX")

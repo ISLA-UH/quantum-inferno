@@ -163,6 +163,42 @@ def get_freq_time_bins(stft_obj: signal.ShortTimeFFT, stop_scalar: int) -> Tuple
     return frequency_bins, time_bins
 
 
+def get_stft_tukey_from_obj(
+        tukey_stft_obj: signal.ShortTimeFFT,
+        timeseries: np.ndarray,
+        padding: str = "zeros"
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Calculates the Short-Time Fourier Transform (STFT) of a signal with a Tukey window using ShortTimeFFT class
+    Returns the frequency, time bins, and magnitude of the detrended STFT similar to legacy scipy.signal.stft
+    Note: If you want the STFT object, use get_stft_object_tukey()
+
+    :param tukey_stft_obj: tukey STFT object from get_stft_object_tukey()
+    :param timeseries: input signal
+    :param padding: Padding method for the STFT.  Default is "zeros", other options are "edge", "even", and "odd"
+    :return: frequency, time bins, and magnitude of the detrended STFT
+    """
+    # check if padding is valid
+    if padding not in padding_type:
+        qi_debugger.add_message(
+            f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
+        )
+        padding = "zeros"
+
+    # TODO: test correction factor
+    # Compute window correction factor
+    window_correction_factor = taper_power_correction(tukey_stft_obj.win)
+
+    # calculate the STFT with detrending
+    # noinspection PyTypeChecker
+    stft_magnitude = tukey_stft_obj.stft_detrend(x=timeseries, detr="constant", padding=padding)
+
+    # calculate the time and frequency bins
+    frequency_bins, time_bins = get_freq_time_bins(tukey_stft_obj, np.shape(stft_magnitude)[1])
+
+    return frequency_bins, time_bins, stft_magnitude
+
+
 def get_stft_tukey(
         timeseries:np.ndarray,
         sample_rate_hz: Union[float, int],
@@ -189,6 +225,27 @@ def get_stft_tukey(
                         Default None
     :return: frequency, time bins, and magnitude of the detrended STFT
     """
+    # create the ShortTimeFFT object
+    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling, fft_points)
+
+    return get_stft_tukey_from_obj(stft_obj, timeseries, padding)
+
+
+def get_stft_gaussian_from_obj(
+        gaussian_stft_obj: signal.ShortTimeFFT,
+        sig_wf: np.ndarray,
+        padding: str = "zeros"
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Calculates the Short-Time Fourier Transform (STFT) of a signal with a Gaussian window using ShortTimeFFT class
+    Returns the frequency, time bins, and magnitude of the detrended STFT similar to legacy scipy.signal.stft
+    Note: If you want the STFT object, use get_stft_object_gaussian()
+
+    :param gaussian_stft_obj: gaussian STFT object from get_stft_object_gaussian()
+    :param sig_wf: signal waveform as numpy array
+    :param padding: Padding method for the STFT.  Default is "zeros", other options are "edge", "even", and "odd"
+    :return: frequency_stft_hz, time_stft_s, stft_complex
+    """
     # check if padding is valid
     if padding not in padding_type:
         qi_debugger.add_message(
@@ -196,21 +253,19 @@ def get_stft_tukey(
         )
         padding = "zeros"
 
-    # create the ShortTimeFFT object
-    stft_obj = get_stft_object_tukey(sample_rate_hz, tukey_alpha, segment_length, overlap_length, scaling, fft_points)
-
     # TODO: test correction factor
     # Compute window correction factor
-    window_correction_factor = taper_power_correction(stft_obj.win)
+    window_correction_factor = taper_power_correction(gaussian_stft_obj.win)
 
     # calculate the STFT with detrending
     # noinspection PyTypeChecker
-    stft_magnitude = stft_obj.stft_detrend(x=timeseries, detr="constant", padding=padding)
+    stft_magnitude = gaussian_stft_obj.stft_detrend(x=sig_wf, detr="constant", padding=padding)
 
     # calculate the time and frequency bins
-    frequency_bins, time_bins = get_freq_time_bins(stft_obj, np.shape(stft_magnitude)[1])
+    frequency_bins, time_bins = get_freq_time_bins(gaussian_stft_obj, np.shape(stft_magnitude)[1])
 
     return frequency_bins, time_bins, stft_magnitude
+
 
 
 def get_stft_gaussian(
@@ -237,28 +292,10 @@ def get_stft_gaussian(
                         segment_points
     :return: frequency_stft_hz, time_stft_s, stft_complex
     """
-    # check if padding is valid
-    if padding not in padding_type:
-        qi_debugger.add_message(
-            f"Warning: padding {padding} must be one of {padding_type}, using 'zeros' as the default value"
-        )
-        padding = "zeros"
-
     # create the ShortTimeFFT object
     stft_obj = get_stft_object_gaussian(frequency_sample_rate_hz, gaussian_sigma, segment_points, overlap_points,
                                         "magnitude", fft_points)
-    # TODO: test correction factor
-    # Compute window correction factor
-    window_correction_factor = taper_power_correction(stft_obj.win)
-
-    # calculate the STFT with detrending
-    # noinspection PyTypeChecker
-    stft_magnitude = stft_obj.stft_detrend(x=sig_wf, detr="constant", padding=padding)
-
-    # calculate the time and frequency bins
-    frequency_bins, time_bins = get_freq_time_bins(stft_obj, np.shape(stft_magnitude)[1])
-
-    return frequency_bins, time_bins, stft_magnitude
+    return get_stft_gaussian_from_obj(stft_obj, sig_wf, padding)
 
 
 def stft_complex_pow2(
@@ -314,6 +351,7 @@ def gtx_complex_pow2(
                              fft_points=fft_points)
 
 
+# todo: give this the stft from the sig_wf and it should produce same output as previous
 def welch_from_stft(
         stft_complex: np.ndarray,
         average: str = "mean",

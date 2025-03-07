@@ -113,7 +113,7 @@ def scale_order_check(scale_order: float = DEFAULT_SCALE_ORDER, show_warning: bo
     Standard orders are one of: 1, 3, 6, 12, 24. If order < 0.75 it reverts to order = 3
 
     :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
-    :param show_warning: if True, prints warning of invalid scale_order.  Default True
+    :param show_warning: if True, prints warning when scale_order is invalid.  Default True
     :return: sanitized scale order
     """
     scale_order = np.abs(scale_order)  # Force to be a real, positive float
@@ -179,7 +179,7 @@ def scale_from_frequency_hz(
     :param scale_order: Band order, preferably one of: 1, 3, 6, 12, 24.  Must be > 0.75 or reverts to N=0.75
     :param scale_frequency_center_hz: scale frequency in hz
     :param frequency_sample_rate_hz: sample rate in hz
-    :return: scale_atom, scaled angular frequency
+    :return: scale atom, scaled angular frequency
     """
     scale_angular_frequency = 2.0 * np.pi * scale_frequency_center_hz / frequency_sample_rate_hz
     scale_atom = cycles_from_order(scale_order) / scale_angular_frequency
@@ -203,8 +203,8 @@ def band_frequency_low_high(
     :param frequency_low_input: the lowest frequency of interest
     :param frequency_high_input: highest frequency of interest
     :param frequency_sample_rate_input: sample rate
-    :return: scale_order, scale_base, scale_band_number, reference frequency value, Algebraic center of frequencies,
-             Geometric center of frequencies, frequency_start, frequency_end
+    :return: scale order, scale base, frequency band number, reference frequency value,
+             Algebraic center of frequencies, Geometric center of frequencies, start of frequencies, end of frequencies
     """
     scale_ref_input = 1 / frequency_ref_input
     scale_nyquist_input = 2 / frequency_sample_rate_input
@@ -265,8 +265,8 @@ def band_intervals_periods(
     :param scale_low_input: Lowest scale. If Nyquist scale, 2 * sample interval in seconds.
     :param scale_high_input: Highest scale of interest in seconds
     :param show_warnings: if True, show any warnings encountered.  Default True
-    :return: scale_order, scale_base, scale_band_number, scale_ref, scale_center_algebraic,
-            scale_center_geometric, scale_start, scale_end
+    :return: scale order, scale base, scale band number, reference scale value, Algebraic center of scale,
+            Geometric center of scale, start of scale, end of scale
     """
     # Initiate error handling, all inputs should be numeric, positive, and real
     # If not real and positive, make them so

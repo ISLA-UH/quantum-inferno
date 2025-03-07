@@ -7,11 +7,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import quantum_inferno.plot_templates.plot_base as ptb
-import quantum_inferno.utilities.short_time_fft as stft
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert, plot_n_mesh_wf_vert
 from quantum_inferno.plot_templates.plot_templates_examples import (plot_wf_mesh_mesh_vert_example,
                                                                     plot_wf_mesh_vert_example)
 from quantum_inferno.plot_templates.figure_attributes import AudioParams, AspectRatioType
+import quantum_inferno.styx_stft as stft
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 

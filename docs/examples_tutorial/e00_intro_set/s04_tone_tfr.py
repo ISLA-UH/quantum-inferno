@@ -10,8 +10,8 @@ import scipy.signal as signal
 
 from quantum_inferno import styx_stx, styx_cwt
 import quantum_inferno.plot_templates.plot_base as ptb
-import quantum_inferno.utilities.short_time_fft as stft
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
+import quantum_inferno.styx_stft as stft
 from quantum_inferno.synth import benchmark_signals
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
 

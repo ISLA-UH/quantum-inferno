@@ -1,7 +1,7 @@
 import unittest
 from quantum_inferno.synth.benchmark_signals import well_tempered_tone
 
-from quantum_inferno.utilities import short_time_fft
+from quantum_inferno import styx_stft
 from quantum_inferno.utilities import frequency_scales
 
 
@@ -12,7 +12,7 @@ class MyTestCase(unittest.TestCase):
         cls.end_hz = 5
         cls.tukey_alpha = 0.25
         cls.signal, cls.timestamps, cls.fft_nd, cls.sample_rate, cls.freq_center, cls.resolution = well_tempered_tone()
-        cls.stft_obj = short_time_fft.get_stft_object_tukey(
+        cls.stft_obj = styx_stft.get_stft_object_tukey(
             sample_rate_hz=cls.sample_rate,
             tukey_alpha=cls.tukey_alpha,
             segment_length=cls.fft_nd,

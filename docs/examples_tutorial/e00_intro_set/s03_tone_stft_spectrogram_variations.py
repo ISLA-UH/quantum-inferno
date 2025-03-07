@@ -14,8 +14,10 @@ NOTE: imaginary components are removed from stft_mag and stft_psd due to warning
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
+
+from quantum_inferno.styx_stft import padding_type
 from quantum_inferno.synth import benchmark_signals
-import quantum_inferno.utilities.short_time_fft as stft
+import quantum_inferno.styx_stft as stft
 
 print(__doc__)
 
@@ -81,45 +83,36 @@ if __name__ == "__main__":
         average="mean",
     )
 
-    # Spectrogram
-    mic_spect_frequency_hz, time_spect_s, spec_psd = stft.spectrogram_tukey(
-        timeseries=mic_sig,
+    psd_obj = stft.get_stft_object_tukey(
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
         segment_length=time_fft_nd,
         overlap_length=time_fft_nd // 2,  # 50% overlap
         scaling="psd",
-        padding="zeros",
     )
+    # get spectrogram from stft object
+    spec_psd = psd_obj.spectrogram(mic_sig)
 
-    _, _, spec_mag = stft.spectrogram_tukey(
-        timeseries=mic_sig,
+    stft_obj = stft.get_stft_object_tukey(
         sample_rate_hz=frequency_sample_rate_hz,
         tukey_alpha=alpha,
         segment_length=time_fft_nd,
         overlap_length=time_fft_nd // 2,  # 50% overlap
         scaling="magnitude",
-        padding="zeros",
     )
+    # get spectrogram from stft object
+    spec_mag = stft_obj.spectrogram(mic_sig)
 
     # STFT
-    _, _, stft_mag = stft.get_stft_tukey(
+    _, _, stft_mag = stft.get_stft_tukey_from_obj(
+        tukey_stft_obj=stft_obj,
         timeseries=mic_sig,
-        sample_rate_hz=frequency_sample_rate_hz,
-        tukey_alpha=alpha,
-        segment_length=time_fft_nd,
-        overlap_length=time_fft_nd // 2,  # 50% overlap
-        scaling="magnitude",
         padding="zeros",
     )
 
-    _, _, stft_psd = stft.get_stft_tukey(
+    mic_spect_frequency_hz, time_spect_s, stft_psd = stft.get_stft_tukey_from_obj(
+        tukey_stft_obj=psd_obj,
         timeseries=mic_sig,
-        sample_rate_hz=frequency_sample_rate_hz,
-        tukey_alpha=alpha,
-        segment_length=time_fft_nd,
-        overlap_length=time_fft_nd // 2,  # 50% overlap
-        scaling="psd",
         padding="zeros",
     )
 

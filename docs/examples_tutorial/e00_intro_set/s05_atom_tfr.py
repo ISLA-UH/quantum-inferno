@@ -7,11 +7,10 @@ TODO: Refine scaling units to assess grain performance
 import numpy as np
 import matplotlib.pyplot as plt
 
-from quantum_inferno import styx_stx, styx_cwt, styx_fft
+from quantum_inferno import styx_stx, styx_cwt, styx_fft, styx_stft
 import quantum_inferno.plot_templates.plot_base as ptb
 from quantum_inferno.plot_templates.plot_templates import plot_mesh_wf_vert
 from quantum_inferno.utilities.rescaling import to_log2_with_epsilon
-from quantum_inferno.utilities.short_time_fft import stft_complex_pow2
 
 print(__doc__)
 
@@ -118,13 +117,16 @@ if __name__ == "__main__":
     )
 
     # STFT2
-    frequency_stft_hz2, time_stft_s2, stft_complex2 = stft_complex_pow2(
+    frequency_stft_hz2, time_stft_s2, stft_complex2 = styx_stft.stft_complex_pow2(
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         segment_points=time_fft_nd,  # nfft must be greater than or equal to nperseg.
         # overlap_points=time_fft_nd // 2,  # 50% overlap
         fft_points=time_fft_nd
     )
+
+    # this is smaller than previous because there's more zero pads
+    psd_welch_power2 = styx_stft.welch_from_stft(stft_complex2)
 
     stft_power = 2 * np.abs(stft_complex) ** 2
     stft_power2 = 2 * np.abs(stft_complex2) ** 2
@@ -147,7 +149,6 @@ if __name__ == "__main__":
     stx_power = 2 * np.abs(stx_complex) ** 2
 
     # Scale power by variance
-    welch_over_var = psd_welch_power
     stft_over_var = np.average(stft_power, axis=1)
     stft_over_var2 = np.average(stft_power2, axis=1)
     cwt_over_var = np.average(cwt_power, axis=1)
@@ -160,7 +161,8 @@ if __name__ == "__main__":
     mic_stx_bits = to_log2_with_epsilon(stx_power)
 
     print("\nSum variance-scaled power spectral density (PSD)")
-    print(f"Welch PSD, Scaled: {np.sum(welch_over_var)}")
+    print(f"Welch PSD, Scaled: {np.sum(psd_welch_power)}")
+    print(f"Welch2 PSD, Scaled: {np.sum(psd_welch_power2)}")
     print(f"STFT PSD, Scaled: {np.sum(stft_over_var)}")
     print(f"STFT2 PSD, Scaled: {np.sum(stft_over_var2)}")
     print(f"CWT PSD, Scaled: {np.sum(cwt_over_var)}")
@@ -168,7 +170,8 @@ if __name__ == "__main__":
 
     print("\nMax variance-scaled spectral power")
     print(f"1/[4 sqrt(2)]: {1 / (4 * np.sqrt(2))}")
-    print(f"Max Scaled Welch PSD: {np.max(welch_over_var)}")
+    print(f"Max Scaled Welch PSD: {np.max(psd_welch_power)}")
+    print(f"Max Scaled Welch2 PSD: {np.max(psd_welch_power2)}")
     print(f"Max Scaled STFT PSD: {np.max(stft_over_var)}")
     print(f"Max Scaled STFT2 PSD: {np.max(stft_over_var2)}")
     print(f"Max Scaled CWT PSD: {np.max(cwt_over_var)}")
@@ -187,7 +190,8 @@ if __name__ == "__main__":
     ax1.set_title("Synthetic CW with taper")
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("sig")
-    ax2.semilogx(frequency_welch_hz, welch_over_var, label="Welch")
+    ax2.semilogx(frequency_welch_hz, psd_welch_power, label="Welch")
+    ax2.semilogx(frequency_welch_hz, psd_welch_power2, label="Welch2")
     ax2.semilogx(frequency_stft_hz, stft_over_var, ".-", label="STFT")
     ax2.semilogx(frequency_stft_hz2, stft_over_var2, ".", label="STFT2")
     ax2.semilogx(frequency_cwt_hz, cwt_over_var, "-.", label="CWT")
