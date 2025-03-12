@@ -118,13 +118,9 @@ if __name__ == "__main__":
     print(f"Max stft bits: {np.max(mic_stft_bits)}")
 
     # Compute the inverse stft (istft)
-    sig_time_istft, sig_wf_istft = stft.istft_tukey(
+    sig_time_istft, sig_wf_istft = stft.istft_tukey_obj(
         stft_to_invert=stft_complex,
-        sample_rate_hz=frequency_sample_rate_hz,
-        tukey_alpha=alpha,
-        segment_length=time_fft_nd,
-        overlap_length=time_fft_nd // 2,  # 50% overlap
-        scaling="magnitude",
+        stft_obj=stft_obj
     )
 
     print("\n*** SUMMARY: STFT Time-Frequency Representation (TFR) estimates for a constant-frequency tone  ***")

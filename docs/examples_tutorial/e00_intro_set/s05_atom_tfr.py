@@ -125,7 +125,7 @@ if __name__ == "__main__":
         fft_points=time_fft_nd
     )
 
-    # this is smaller than previous because there's more zero pads
+    # todo mult this by 2?
     psd_welch_power2 = styx_stft.welch_from_stft(stft_complex2)
 
     stft_power = 2 * np.abs(stft_complex) ** 2

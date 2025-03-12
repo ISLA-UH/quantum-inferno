@@ -375,7 +375,6 @@ def welch_from_stft(
 
 
 # TODO: Modify this function to use the ShortTimeFFT object
-# it kinda does since it invokes get_stft_tukey()
 def stft_from_order(
         sig_wf: np.ndarray,
         frequency_sample_rate_hz: float,
@@ -436,6 +435,7 @@ def istft_tukey(
     """
     Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class
     Does not return exact istft if using stft_detrended. Recommend filtering and detrending at signal preprocessing.
+
     :param stft_to_invert: The STFT to be inverted
     :param sample_rate_hz: sample rate of the signal
     :param tukey_alpha: shape parameter of the Tukey window
@@ -452,5 +452,30 @@ def istft_tukey(
 
     # return timestamps for the iSTFT that includes the full signal
     timestamps = np.arange(start=0, stop=last_window_index / sample_rate_hz, step=1 / sample_rate_hz)
+
+    return timestamps, stft_obj.istft(stft_to_invert, k1=last_window_index)
+
+
+def istft_tukey_obj(
+        stft_to_invert: np.ndarray,
+        stft_obj: signal.ShortTimeFFT,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class
+    Does not return exact istft if using stft_detrended. Recommend filtering and detrending at signal preprocessing.
+
+    :param stft_to_invert: The STFT to be inverted
+    :param stft_obj: ShortTimeFFT object used to calculate the STFT
+    :return: timestamps and iSTFT of the signal
+    """
+    if not stft_obj.invertible:
+        qi_debugger.add_message("STFT object given is not invertible.  Empty arrays will be returned.")
+        return np.empty(0), np.empty(0)
+
+    # The index of the last window where only half of the window contains the signal
+    last_window_index = int((np.shape(stft_to_invert)[1] - 1) * stft_obj.hop)
+
+    # return timestamps for the iSTFT that includes the full signal
+    timestamps = np.arange(start=0, stop=last_window_index * stft_obj.T, step=stft_obj.T)
 
     return timestamps, stft_obj.istft(stft_to_invert, k1=last_window_index)

@@ -53,13 +53,9 @@ class TestPicker(unittest.TestCase):
             scaling="magnitude",
         )
         stfts = stft_obj.stft(self.signal)
-        reconstructed_time, reconstructed_signal = styx_stft.istft_tukey(
+        reconstructed_time, reconstructed_signal = styx_stft.istft_tukey_obj(
             stft_to_invert=stfts,
-            sample_rate_hz=self.sample_rate,
-            tukey_alpha=self.tukey_alpha,
-            segment_length=self.fft_nd,
-            overlap_length=self.fft_nd // 2,
-            scaling="magnitude",
+            stft_obj=stft_obj
         )
         self.assertEqual(len(reconstructed_signal), len(self.signal))
         self.assertTrue(np.allclose(self.signal, reconstructed_signal, atol=1e-14))
