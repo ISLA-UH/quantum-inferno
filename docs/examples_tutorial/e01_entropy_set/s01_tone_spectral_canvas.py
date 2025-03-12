@@ -155,15 +155,7 @@ if __name__ == "__main__":
     )
 
     # STFT with Tukey window
-    # frequency_stft_hz, time_stft_s, stft_complex = styx_fft.stft_complex_pow2(
-    #     sig_wf=mic_sig,
-    #     frequency_sample_rate_hz=frequency_sample_rate_hz,
-    #     segment_points=time_fft_nd,
-    #     overlap_points=overlap_pts,
-    #     alpha=tukey_alpha
-    # )
-
-    frequency_stft_hz, time_stft_s, stft_complex = stft_complex_pow2(
+    frequency_stft_hz, time_stft_s, stft_complex = styx_fft.stft_complex_pow2(
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         segment_points=time_fft_nd,
@@ -171,7 +163,23 @@ if __name__ == "__main__":
         alpha=tukey_alpha
     )
 
-    psd_welch_power2 = welch_from_stft(stft_complex)
+    # frequency_stft_hz, time_stft_s, stft_complex = stft_complex_pow2(
+    #     sig_wf=mic_sig,
+    #     frequency_sample_rate_hz=frequency_sample_rate_hz,
+    #     segment_points=time_fft_nd,
+    #     overlap_points=overlap_pts,
+    #     alpha=tukey_alpha
+    # )
+
+    _, _, stft_complex2 = stft_complex_pow2(
+        sig_wf=mic_sig,
+        frequency_sample_rate_hz=frequency_sample_rate_hz,
+        segment_points=time_fft_nd,
+        overlap_points=overlap_pts,
+        alpha=tukey_alpha
+    )
+
+    psd_welch_power2 = welch_from_stft(stft_complex2)
 
     # # STFT with Gaussian window
     # frequency_stft_hz, time_stft_s, stft_complex = \
@@ -189,7 +197,7 @@ if __name__ == "__main__":
     print("\nSum scaled spectral power")
     print("Sum Welch:", np.sum(welch_over_var))
     print("Sum STFT:", np.sum(stft_over_var))
-    print("Sum welch2:", np.sum(2 * psd_welch_power2))
+    print("Sum welch2:", np.sum(psd_welch_power2 / mic_sig_var))
 
     plt.style.use("dark_background")
     # Show the waveform and the averaged FFT over the whole record:

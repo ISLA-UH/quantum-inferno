@@ -358,6 +358,7 @@ def welch_from_stft(
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate the Welch's method of the STFT
+
     :param stft_complex: complex STFT array
     :param average: type of averaging.  Default is "mean", other option is "median"
     :return: welch_power
@@ -469,7 +470,7 @@ def istft_tukey_obj(
     :return: timestamps and iSTFT of the signal
     """
     if not stft_obj.invertible:
-        qi_debugger.add_message("STFT object given is not invertible.  Empty arrays will be returned.")
+        qi_debugger.add_message("Warning: STFT object given is not invertible.  Empty arrays will be returned.")
         return np.empty(0), np.empty(0)
 
     # The index of the last window where only half of the window contains the signal
