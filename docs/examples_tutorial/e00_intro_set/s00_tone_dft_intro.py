@@ -22,13 +22,13 @@ if __name__ == "__main__":
     # <o - Later examples use a functional version of the synthetic: leave the steps here! - o>
 
     frequency_sample_rate_hz = 800.
-    frequency_design_center_hz = 16.
+    frequency_design_center_hz = 50.
     # The dft does not need to be a power of 2. However, the fft will make it so.
     time_dft_s = 1.  # Nominal value
     dft_design_resolution_hz = 1./time_dft_s  # Nominal value
     # Scale the target fft resolution.
     # Finer (<1) or coarser (>=1) spectral resolution. Consider finer rez.
-    fft_resolution_scale = 1./4.
+    fft_resolution_scale = 2.
     # Design spectral resolution
     fft_design_resolution_hz = fft_resolution_scale*dft_design_resolution_hz
     time_fft_s = 1./fft_design_resolution_hz
@@ -116,16 +116,19 @@ if __name__ == "__main__":
     print('RMS amplitude is sqrt(P**2) = 1/sqrt(2)')
     print('** IMPORTANT NOTE: EXACT RECONSTRUCTION ONLY OCCURS AT FFT FREQUENCY **')
 
-    # Show the waveform and its FFT over the whole record:
+    # Show the waveform, DFT, and FFT
+    # TODO: Labels
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(8, 5))
     ax1.plot(time_nd/frequency_sample_rate_hz, mic_sig)
     ax1.set_title('Synthetic tone, no taper')
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
-    ax2.semilogx(frequency_fft_pos_hz, fft_abs_power)
+    ax2.loglog(frequency_fft_pos_hz, fft_abs_power, '-.', label='fft')
+    ax2.loglog(frequency_dft_pos_hz, dft_abs_power, label='dft')
     ax2.set_title(f"FFT Power, f = {frequency_center_fft_hz:.3f} Hz")
     ax2.set_xlabel('Frequency, Hz')
     ax2.set_ylabel("$2\\cdot\\mid\\frac{RFFT}{N}\\mid ^2$")
+    ax2.legend()
     ax2.grid(True)
 
     plt.show()
