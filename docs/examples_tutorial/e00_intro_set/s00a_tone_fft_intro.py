@@ -1,5 +1,5 @@
 """
-Quantum inferno example: s00_tone_fft_intro.py
+Quantum inferno example: s00a_tone_fft_intro.py
 Introduction to Time-Frequency Representations (TFRs).
 Compute Fast Fourier Transform (FFT) on simple tone to verify averaged signal power.
 The foundation  of efficient TFR computation is the FFT.
