@@ -464,6 +464,7 @@ def istft_tukey_obj(
     """
     Calculate the inverse Short-Time Fourier Transform (iSTFT) of a signal with a Tukey window using ShortTimeFFT class
     Does not return exact istft if using stft_detrended. Recommend filtering and detrending at signal preprocessing.
+    Returns empty arrays if the given stft_obj is not invertible.
 
     :param stft_to_invert: The STFT to be inverted
     :param stft_obj: ShortTimeFFT object used to calculate the STFT
