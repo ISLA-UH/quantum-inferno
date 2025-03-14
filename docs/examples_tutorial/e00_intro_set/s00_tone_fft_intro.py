@@ -1,7 +1,7 @@
 """
 Quantum inferno example: s00_tone_fft_intro.py
 Introduction to Time-Frequency Representations (TFRs).
-Compute Fast Fourier Transform (FFT) on simple tones to verify amplitudes
+Compute Fast Fourier Transform (FFT) on simple tone to verify averaged signal power.
 The foundation  of efficient TFR computation is the FFT.
 For N = number of points, computation scales as N log N instead of N**2
 Case study:
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 print(__doc__)
 
 if __name__ == "__main__":
-    # In practice, our quest begins with a signal within a record of fixed duration.
+    # This first example is a sinusoidal signal within a record of fixed duration and no taper window.
     # Construct a tone of fixed frequency with a constant sample rate
     # <o - Later examples use a functional version of the synthetic: leave the steps here! - o>
 
@@ -51,7 +51,8 @@ if __name__ == "__main__":
     # Dimensionless time (samples):
     time_nd = np.arange(time_duration_nd)
 
-    # Construct synthetic tone with 2^n points and max FFT amplitude at EXACT fft frequency
+    # Construct synthetic tone with 2^n points and max FFT amplitude at EXACT fft frequency.
+    # Note there is no taper (e.g. using default rectangular window).
     mic_sig = np.cos(2*np.pi*frequency_center_fft*time_nd)
     # # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
     # # It does NOT return unit amplitude
