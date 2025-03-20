@@ -22,7 +22,7 @@ print(__doc__)
 
 # List of taper windows to apply to the input signal in this example
 # The default, implicit taper is a rectangular window.
-window_types: list = ['boxcar', 'hann', 'tukey', 'blackman', 'gaussian']
+window_types: list = ['boxcar', 'gaussian', 'hann', 'tukey', 'blackman']
 
 if __name__ == "__main__":
     # This first example is a constant-amplitude sinusoidal signal of fixed duration, no taper window.
@@ -33,10 +33,10 @@ if __name__ == "__main__":
     sig_duration_s = 60.  # Nominal input signal duration in physical (analog) seconds. Accurate to 1/sample_rate.
     # Compute DFT number of digital points. Note int() rounds down.
     dft_samples:int = int(sig_duration_s * frequency_sample_rate_hz)
-    # TODO: OVERRIDE FOR EXAMPLE
-    # dft_samples:int = 128
     # Dimensionless time (cyber time) from input record cyber duration.
     time_cyber = np.arange(dft_samples)
+    # Standard deviation for the Gaussian window
+    gauss_std = (dft_samples - 1) / np.pi / 2
     # Dimensionless center frequency:
     frequency_center = frequency_design_center_hz / frequency_sample_rate_hz
 
@@ -69,8 +69,6 @@ if __name__ == "__main__":
         # Finer spectral resolution, increase the number of points and zero pad
         fft_samples = 2 ** (int(np.ceil(np.log2(fft_design_time_s * frequency_sample_rate_hz))))
 
-    # TODO: OVERRIDE FOR EXAMPLE
-    # fft_samples = 2**14  # 16384
     # The dyadic spectral resolution is modified accordingly
     frequency_resolution_fft = 1. / fft_samples
     frequency_resolution_fft_hz = frequency_sample_rate_hz*frequency_resolution_fft
@@ -96,18 +94,18 @@ if __name__ == "__main__":
     print('FFT samples:', fft_samples)
     print('log2(FFT samples):', np.log2(fft_samples))
 
-    # exit()
+
     """
-    Apply taper windows to the input signal to reduce spectral leakage.
+    Study taper windows to reduce spectral leakage.
     
     """
+    # Create a figure to show the taper windows
     fg1, ax1 = plt.subplots(len(window_types), 1, sharex='all', sharey='all', figsize=(6., 4.))
     for c_, (w_name_, ax_) in enumerate(zip(window_types, ax1)):
         # Select a taper window from the list of available windows
         if w_name_ == 'gaussian':
             # Gaussian window requires a standard deviation parameter
-            sigma = (dft_samples-1)/np.pi/2
-            win_taper = get_window((w_name_, sigma), dft_samples, fftbins=False)
+            win_taper = get_window((w_name_, gauss_std), dft_samples, fftbins=False)
         else:
             win_taper = get_window(w_name_, dft_samples, fftbins=False)
         ax_.plot(win_taper, f'C{c_}-', label=w_name_)
@@ -117,13 +115,37 @@ if __name__ == "__main__":
     ax1[0].set_title("Example Taper Windows")
     fg1.tight_layout(h_pad=0.4)
 
+    # Create a figure to show the spectral leakage of the tapered signal
     fg0, axx = plt.subplots(len(window_types), 1, sharex='all', sharey='all', figsize=(6., 4.))
     for c_, (w_name_, ax_) in enumerate(zip(window_types, axx)):
         # Select a taper window from the list of available windows
         if w_name_ == 'gaussian':
-            # Gaussian window requires a standard deviation parameter
-            sigma = (dft_samples-1)/np.pi/2
-            win_taper = get_window((w_name_, sigma), dft_samples, fftbins=False)
+            win_taper = get_window((w_name_, gauss_std), dft_samples, fftbins=False)
+        else:
+            win_taper = get_window(w_name_, dft_samples, fftbins=False)
+
+        # Compute the fft of the padded taper
+        W_ = scipy.fft.rfft(win_taper / np.abs(np.sum(win_taper)), n=fft_samples)
+        W_dB = 20*np.log10(np.maximum(abs(W_), 1e-250))
+        ax_.plot(frequency_fft_over_df, W_dB, f'C{c_}-', label=w_name_)
+        ax_.text(0.1, -50, w_name_, color=f'C{c_}', verticalalignment='bottom',
+                 horizontalalignment='left', bbox={'color': 'white', 'pad': 0})
+        ax_.set_yticks([-20, -60])
+        # ax_.grid(axis='x')
+        ax_.grid()
+    axx[0].set_title("Spectral Leakage of Example Windows")
+    fg0.supylabel(r"Normalized Magnitude $20\,\log_{10}|W(f)/c^\operatorname{amp}|$ in dB",
+                  x=0.04, y=0.5, fontsize='medium')
+    axx[-1].set(xlabel=r"Normalized frequency $f/\Delta f$ in bins",
+                xlim=(0, 9), ylim=(-75, 3))
+    fg0.tight_layout(h_pad=0.4)
+
+    # Apply tapers to signal
+    fg2, axx = plt.subplots(len(window_types), 1, sharex='all', sharey='all', figsize=(6., 4.))
+    for c_, (w_name_, ax_) in enumerate(zip(window_types, axx)):
+        # Select a taper window from the list of available windows
+        if w_name_ == 'gaussian':
+            win_taper = get_window((w_name_, gauss_std), dft_samples, fftbins=False)
         else:
             win_taper = get_window(w_name_, dft_samples, fftbins=False)
 
@@ -146,21 +168,23 @@ if __name__ == "__main__":
         print(' Taper amplitude correction factor (ACF=1/mean): ', spectral_amplitude_correction_factor)
         print(' Taper energy correction factor (ECF=1/rms): ', spectral_energy_correction_factor)
         # Compute the fft of the padded or truncated tapered signal
-        W_ = scipy.fft.rfft(win_taper / np.abs(np.sum(win_taper)), n=fft_samples)
-        W_dB = 20*np.log10(np.maximum(abs(W_), 1e-250))
-        ax_.plot(frequency_fft_over_df, W_dB, f'C{c_}-', label=w_name_)
-        ax_.text(0.1, -50, w_name_, color=f'C{c_}', verticalalignment='bottom',
+        fft_sig_pos = scipy.fft.rfft(sig_cosine_tapered, n=fft_samples)
+        fft_square = np.abs(fft_sig_pos)**2
+        fft_power = 2. * frequency_resolution_fft * fft_square/dft_samples
+
+        W_dB = 10*np.log10(np.maximum(fft_power*spectral_energy_correction_factor**2, 1e-250))
+        ax_.plot(frequency_fft_pos_hz, W_dB, f'C{c_}-', label=w_name_)
+        ax_.text(frequency_design_center_hz, -160, w_name_, color=f'C{c_}', verticalalignment='bottom',
                  horizontalalignment='left', bbox={'color': 'white', 'pad': 0})
-        ax_.set_yticks([-20, -60])
+        ax_.set_yticks([-140, -80, -6])
         # ax_.grid(axis='x')
         ax_.grid()
     axx[0].set_title("Spectral Leakage of Example Windows")
-    fg0.supylabel(r"Normalized Magnitude $20\,\log_{10}|W(f)/c^\operatorname{amp}|$ in dB",
+    fg2.supylabel(r"$10\,\log_{10}<Power>$ in dB",
                   x=0.04, y=0.5, fontsize='medium')
-    axx[-1].set(xlabel=r"Normalized frequency $f/\Delta f$ in bins",
-                xlim=(0, 9), ylim=(-75, 3))
-
-    fg0.tight_layout(h_pad=0.4)
+    axx[-1].set(xlabel=r"Frequency, Hz",
+                xlim=(58, 62), ylim=(-140, -0))
+    fg2.tight_layout(h_pad=0.4)
 
     plt.show()
     exit()
