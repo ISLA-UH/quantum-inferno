@@ -121,7 +121,7 @@ if __name__ == "__main__":
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         segment_points=time_fft_nd,  # nfft must be greater than or equal to nperseg.
-        # overlap_points=time_fft_nd // 2,  # 50% overlap
+        # overlap_points=fft_samples // 2,  # 50% overlap
         fft_points=time_fft_nd
     )
 

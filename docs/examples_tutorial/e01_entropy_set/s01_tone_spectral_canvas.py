@@ -166,7 +166,7 @@ if __name__ == "__main__":
     # frequency_stft_hz, time_stft_s, stft_complex = stft_complex_pow2(
     #     sig_wf=mic_sig,
     #     frequency_sample_rate_hz=frequency_sample_rate_hz,
-    #     segment_points=time_fft_nd,
+    #     segment_points=fft_samples,
     #     overlap_points=overlap_pts,
     #     alpha=tukey_alpha
     # )
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     # frequency_stft_hz, time_stft_s, stft_complex = \
     #     styx_fft.gtx_complex_pow2(sig_wf=mic_sig,
     #                               frequency_sample_rate_hz=frequency_sample_rate_hz,
-    #                               segment_points=time_fft_nd,
+    #                               segment_points=fft_samples,
     #                               overlap_points=overlap_pts)
 
     stft_power = 2 * np.abs(stft_complex) ** 2
