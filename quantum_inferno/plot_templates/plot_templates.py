@@ -220,7 +220,7 @@ def plot_n_mesh_wf_vert(
     for p in panels:
         all_cbar_ticks_lens.append(max(len(str(math.ceil(p.color_min))), len(str(math.floor(p.color_max)))))
     max_cbar_tick_len: int = sorted(all_cbar_ticks_lens)[-1]
-    cbar_tick_fmt: str = f"%-{max_cbar_tick_len}s"
+    cbar_tick_fmt: str = f"%{max_cbar_tick_len}s"
 
     hspace = 0.13
     if use_default_size:
@@ -253,6 +253,8 @@ def plot_n_mesh_wf_vert(
                 ticks=[math.ceil(p.color_min), math.floor(p.color_max)],
                 format=cbar_tick_fmt)
             mesh_panel_cbar.set_label(p.cbar_units, rotation=270, size=fig_params.text_size)
+            mesh_panel_cbar.ax.set_yticklabels([f"\N{MINUS SIGN}{math.floor(np.abs(p.color_min))}", 
+                                                f"\N{MINUS SIGN}{math.ceil(np.abs(p.color_max))}"])
             mesh_panel_cax.tick_params(labelsize=fig_params.text_size)
             axes[panel_index].set_ylim(frequency_fix_ymin, frequency_fix_ymax)
             axes[panel_index].set_yscale(mesh_base.frequency_scaling)
