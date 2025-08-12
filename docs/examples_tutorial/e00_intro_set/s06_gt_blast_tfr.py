@@ -56,7 +56,7 @@ if __name__ == "__main__":
     mic_sig *= get_tukey(array=time_s, alpha=0.1)  # Add taper
     mic_sig /= np.max(mic_sig)  # Max unit amplitude
 
-    frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
+    frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
     fft_index = np.argmin(np.abs(frequency_fft_pos_hz - frequency_center_hz))
     frequency_center_fft_hz = float(frequency_fft_pos_hz[fft_index])
     frequency_resolution_fft_hz = frequency_sample_rate_hz / time_fft_nd

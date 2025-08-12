@@ -3,7 +3,7 @@ Quantum inferno example: s00b_tone_dft_intro.py
 Introduction to Time-Frequency Representations (TFRs).
 Compute Discrete (DFT) and Fast Fourier Transform (FFT) on simple tone to verify peak and average signal power.
 The foundation of efficient TFR computation is the FFT.
-When N = number of points is a power of 2, computation scales as N log N instead of N**2
+When N = number of points is a power of 2, computation scales as N log(N) instead of N**2
 Case study:
 Sinusoid input with unit amplitude
 Validate:
@@ -37,13 +37,12 @@ if __name__ == "__main__":
     sig_variance = np.var(sig_cosine)
 
     # The DFT spectral resolution is set by the record duration
-    frequency_resolution_dft = 1./time_dft_nd
-    frequency_resolution_dft_hz = frequency_sample_rate_hz*frequency_resolution_dft
+    frequency_resolution_dft = 1. / time_dft_nd
+    frequency_resolution_dft_hz = frequency_sample_rate_hz * frequency_resolution_dft
 
     """ 
     Design the fft performance by specifying its target spectral resolution in physical space
     This is the linear frequency equivalent of specifying the order of log frequency dyadic scales.
-    
     """
     # The dft does not need to be a power of 2. FFT makes it so.
     # This example specifies the desired spectral resolution to compute the FFT duration.
@@ -55,14 +54,14 @@ if __name__ == "__main__":
     # Make the FFT number of points (duration) a power of 2 (dyadic) based on design spectral resolution.
     if fft_design_resolution_hz > frequency_resolution_dft_hz:
         # Coarser spectral resolution, decrease the number of points and truncate
-        time_fft_nd = 2**(int(np.floor(np.log2(fft_design_time_s * frequency_sample_rate_hz))))
+        time_fft_nd = 2 ** (int(np.floor(np.log2(fft_design_time_s * frequency_sample_rate_hz))))
     else:
         # Finer spectral resolution, increase the number of points and zero pad
-        time_fft_nd = 2**(int(np.ceil(np.log2(fft_design_time_s * frequency_sample_rate_hz))))
+        time_fft_nd = 2 ** (int(np.ceil(np.log2(fft_design_time_s * frequency_sample_rate_hz))))
 
     # The dyadic spectral resolution is modified accordingly
-    frequency_resolution_fft = 1./time_fft_nd
-    frequency_resolution_fft_hz = frequency_sample_rate_hz*frequency_resolution_fft
+    frequency_resolution_fft = 1. / time_fft_nd
+    frequency_resolution_fft_hz = frequency_sample_rate_hz * frequency_resolution_fft
 
     # DFT estimation
     # Use only positive frequencies
@@ -77,11 +76,10 @@ if __name__ == "__main__":
     fft_index = np.argmin(np.abs(frequency_fft_pos_hz - frequency_design_center_hz))
     frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
     # Convert to dimensionless frequency
-    frequency_center_fft = frequency_center_fft_hz/frequency_sample_rate_hz
+    frequency_center_fft = frequency_center_fft_hz / frequency_sample_rate_hz
 
     """
     DFT, FFT, and useful metrics
-    
     """
     # Compute the Real DFT of the input record
     dft_sig_pos = np.fft.rfft(sig_cosine, n=time_dft_nd)
@@ -92,7 +90,7 @@ if __name__ == "__main__":
     print(' Signal amplitude, a:', sig_amplitude)
     print(' Signal duration, s:', sig_duration_s)
     print(' Signal variance, a**2:', sig_variance)
-    print(' Nyquist frequency:', frequency_sample_rate_hz/2)
+    print(' Nyquist frequency:', frequency_sample_rate_hz / 2)
     print(' Nominal signal frequency, hz:', frequency_design_center_hz)
     print(' DFT signal frequency, hz:', frequency_center_dft_hz)
     print(' FFT signal frequency, hz:', frequency_center_fft_hz)
@@ -112,21 +110,21 @@ if __name__ == "__main__":
     # Estimate amplitude and power metrics using only positive frequencies
 
     dft_abs = np.abs(dft_sig_pos)
-    dft_square = dft_abs**2
-    dft_abs_pos_over_N = dft_abs/time_dft_nd
-    dft_power = 2 * frequency_resolution_dft * dft_square/time_dft_nd
+    dft_square = dft_abs ** 2
+    dft_abs_pos_over_N = dft_abs / time_dft_nd
+    dft_power = 2 * frequency_resolution_dft * dft_square / time_dft_nd
 
     fft_abs = np.abs(fft_sig_pos)
-    fft_square = fft_abs**2
+    fft_square = fft_abs ** 2
     if time_fft_nd < time_dft_nd:
         fft_abs_pos_over_N = fft_abs/time_fft_nd
-        fft_power = 2. * frequency_resolution_fft * fft_square/time_fft_nd
+        fft_power = 2. * frequency_resolution_fft * fft_square / time_fft_nd
     else:
         fft_abs_pos_over_N = fft_abs/time_dft_nd
-        fft_power = 2. * frequency_resolution_fft * fft_square/time_dft_nd
+        fft_power = 2. * frequency_resolution_fft * fft_square / time_dft_nd
 
     print('\nDFT SUMMARY METRICS')
-    print('|RDFT(dft_fc)/N|:', dft_abs_pos_over_N[dft_index])
+    print('|RDFT(dft_fc) / N|:', dft_abs_pos_over_N[dft_index])
     print('DFT Averaged Power:', np.sum(dft_power))
 
     print('FFT SUMMARY METRICS')
@@ -136,8 +134,8 @@ if __name__ == "__main__":
     print('\n*** SUMMARY: FFT of a constant frequency tone with unit peak amplitude ***')
     print('Primary aim: verify metrics for DFT and FFT with simple tone')
     print('Positive frequency FFT amplitude is 1/2, negative frequency FFT amplitude is 1/2')
-    print('Power averaged over the signal duration is P**2/N = 2 |RFFT/N|**2 = 1/2')
-    print('Variance is 1/2, RMS amplitude is 1/sqrt(2)')
+    print('Power averaged over the signal duration is P**2 / N = 2 * |RFFT / N|**2 = 1/2')
+    print('Variance is 1/2, RMS amplitude is 1 / sqrt(2)')
     print('Averaged power spectral density returns input signal variance')
     print('** IMPORTANT NOTE: EXACT RECONSTRUCTION ONLY OCCURS AT FFT FREQUENCY **\n')
 

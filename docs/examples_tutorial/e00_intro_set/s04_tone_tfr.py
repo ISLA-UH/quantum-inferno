@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
     ax2.set_title(f"Welch and Spect FFT (RMS), f = {frequency_center_fft_hz:.3f} Hz")
     ax2.set_xlabel("Frequency, hz")
-    ax2.set_ylabel("VAR(|FFT|) / VAR(SIG)")
+    ax2.set_ylabel("VAR(|FFT|)/VAR(SIG)")
     ax2.grid(True)
     ax2.legend()
 

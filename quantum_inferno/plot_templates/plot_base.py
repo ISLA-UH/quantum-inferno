@@ -177,9 +177,20 @@ class MeshPanel:
 @dataclass
 class WaveformPlotBase(PlotBase):
     """
-    Base class for Waveform plots.  Extends PlotBase; refer to PlotBase for additional attributes
+    Base class for Waveform plots.  Extends PlotBase; put PlotBase attributes first, followed by WaveformPlotBase
+    attributes.
 
-    Attributes:
+    Ex: wfpb = WaveformPlotBase(station_id="123", figure_title="test", ..., label_panel_show=True, ...)
+
+    PlotBase Attributes:
+        station_id: str, id of the station being plotted.  Required
+        figure_title: str, the title of the plot.  Required
+        figure_title_show: bool, if True, show the figure title.  Default True
+        start_time_epoch: float, the epoch start time of the data.  Default 0.
+        params_tfr: AudioParams, parameters for plotting audio data.  Default AudioParams()
+        units_time: str, label of units for time component.  Default "s"
+
+    WaveformPlotBase Attributes:
         label_panel_show: bool, if True, show the label.  Default False
         labels_fontweight: optional str, font weight of the labels.  Default "bold"
         waveform_color: optional str, color of the waveform.  Default None

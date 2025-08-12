@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # Compute Variance: divides by the number of points
     mic_sig_var = np.var(mic_sig)
     mic_sig_var_nominal = 1 / 2.0
-    print("mic_sig_var/mic_sig_var_nominal", mic_sig_var/mic_sig_var_nominal)
+    print("mic_sig_var / mic_sig_var_nominal", mic_sig_var / mic_sig_var_nominal)
 
     # Compute the Welch PSD: averaged spectrum over sliding windows
     # Use the spectrum scaling and explicit defaults for nfft and noverlap
@@ -87,6 +87,7 @@ if __name__ == "__main__":
     )
 
     print("Welch returns only the positive frequencies")
+    # noinspection PyTypeChecker
     print("len(Pxx):", len(frequency_welch_hz))
 
     # The spectrum option returns the var at the peak, which for a tone will have a var of 1/2
