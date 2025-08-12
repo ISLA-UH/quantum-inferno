@@ -247,14 +247,19 @@ def plot_n_mesh_wf_vert(
             setup_plot(axes[panel_index], mesh_base.units_frequency, fig_params.text_size, False, False)
             ax_div: AxesDivider = make_axes_locatable(axes[panel_index])
             mesh_panel_cax: plt.Axes = ax_div.append_axes("right", size="1%", pad="0.5%")
+            top_cbar_ytick = math.ceil(p.color_min)
+            bot_cbar_ytick = math.floor(p.color_max)
             mesh_panel_cbar: Colorbar = fig.colorbar(
                 get_colormesh(axes[panel_index], mesh_x, mesh_y, shading, mesh_base, p),
                 cax=mesh_panel_cax,
-                ticks=[math.ceil(p.color_min), math.floor(p.color_max)],
+                ticks=[top_cbar_ytick, bot_cbar_ytick],
                 format=cbar_tick_fmt)
             mesh_panel_cbar.set_label(p.cbar_units, rotation=270, size=fig_params.text_size)
-            mesh_panel_cbar.ax.set_yticklabels([f"\N{MINUS SIGN}{math.floor(np.abs(p.color_min))}", 
-                                                f"\N{MINUS SIGN}{math.ceil(np.abs(p.color_max))}"])
+            # format the colorbar tick labels if they're negative
+            if p.color_min < 0 or p.color_max < 0:
+                top_ytick_label = f"\N{MINUS SIGN}{math.floor(np.abs(p.color_min)) if p.color_min < 0 else top_cbar_ytick}"
+                bot_ytick_label = f"\N{MINUS SIGN}{math.ceil(np.abs(p.color_max)) if p.color_max < 0 else bot_cbar_ytick}"
+                mesh_panel_cbar.ax.set_yticklabels([top_ytick_label, bot_ytick_label])
             mesh_panel_cax.tick_params(labelsize=fig_params.text_size)
             axes[panel_index].set_ylim(frequency_fix_ymin, frequency_fix_ymax)
             axes[panel_index].set_yscale(mesh_base.frequency_scaling)
