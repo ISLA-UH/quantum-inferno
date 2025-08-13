@@ -109,15 +109,15 @@ if __name__ == "__main__":
     )
 
     # STFT
-    frequency_stft_hz, time_stft_s, stft_complex = styx_fft.stft_complex_pow2(
-        sig_wf=mic_sig,
-        frequency_sample_rate_hz=frequency_sample_rate_hz,
-        nfft_points=time_fft_nd,
-        segment_points=time_fft_nd,  # nfft must be greater than or equal to nperseg.
-    )
+    # frequency_stft_hz, time_stft_s, stft_complex = styx_fft.stft_complex_pow2(
+    #     sig_wf=mic_sig,
+    #     frequency_sample_rate_hz=frequency_sample_rate_hz,
+    #     nfft_points=time_fft_nd,
+    #     segment_points=time_fft_nd,  # nfft must be greater than or equal to nperseg.
+    # )
 
     # STFT2
-    frequency_stft_hz2, time_stft_s2, stft_complex2 = styx_stft.stft_complex_pow2(
+    frequency_stft_hz, time_stft_s, stft_complex = styx_stft.stft_complex_pow2(
         sig_wf=mic_sig,
         frequency_sample_rate_hz=frequency_sample_rate_hz,
         segment_points=time_fft_nd,  # nfft must be greater than or equal to nperseg.
@@ -125,11 +125,7 @@ if __name__ == "__main__":
         fft_points=time_fft_nd
     )
 
-    # todo mult this by 2?
-    psd_welch_power2 = styx_stft.welch_from_stft(stft_complex2)
-
     stft_power = 2 * np.abs(stft_complex) ** 2
-    stft_power2 = 2 * np.abs(stft_complex2) ** 2
 
     # CWT
     frequency_cwt_hz, time_cwt_s, cwt_complex = styx_cwt.cwt_complex_any_scale_pow2(
@@ -150,37 +146,30 @@ if __name__ == "__main__":
 
     # Scale power by variance
     stft_over_var = np.average(stft_power, axis=1)
-    stft_over_var2 = np.average(stft_power2, axis=1)
     cwt_over_var = np.average(cwt_power, axis=1)
     stx_over_var = np.average(stx_power, axis=1)
 
     # Express variance-scaled TFR in Log2
     mic_stft_bits = to_log2_with_epsilon(stft_power)
-    mic_stft_bits2 = to_log2_with_epsilon(stft_power2)
     mic_cwt_bits = to_log2_with_epsilon(cwt_power)
     mic_stx_bits = to_log2_with_epsilon(stx_power)
 
     print("\nSum variance-scaled power spectral density (PSD)")
     print(f"Welch PSD, Scaled: {np.sum(psd_welch_power)}")
-    print(f"Welch2 PSD, Scaled: {np.sum(psd_welch_power2)}")
     print(f"STFT PSD, Scaled: {np.sum(stft_over_var)}")
-    print(f"STFT2 PSD, Scaled: {np.sum(stft_over_var2)}")
     print(f"CWT PSD, Scaled: {np.sum(cwt_over_var)}")
     print(f"STX PSD, Scaled: {np.sum(stx_over_var)}")
 
     print("\nMax variance-scaled spectral power")
     print(f"1/[4 sqrt(2)]: {1 / (4 * np.sqrt(2))}")
     print(f"Max Scaled Welch PSD: {np.max(psd_welch_power)}")
-    print(f"Max Scaled Welch2 PSD: {np.max(psd_welch_power2)}")
     print(f"Max Scaled STFT PSD: {np.max(stft_over_var)}")
-    print(f"Max Scaled STFT2 PSD: {np.max(stft_over_var2)}")
     print(f"Max Scaled CWT PSD: {np.max(cwt_over_var)}")
     print(f"Max Scaled STX PSD: {np.max(stx_over_var)}")
 
     print("\nMax variance-scaled TFR power")
     print(f"Max Scaled CWT Power: {np.max(cwt_power)}")
     print(f"Max Log2 Scaled STFT: {np.max(mic_stft_bits)}")
-    print(f"Max Log2 Scaled STFT2: {np.max(mic_stft_bits2)}")
     print(f"Max Log2 Scaled CWT: {np.max(mic_cwt_bits)}")
     print(f"Max Log2 Scaled STX: {np.max(mic_stx_bits)}")
 
@@ -191,9 +180,7 @@ if __name__ == "__main__":
     ax1.set_xlabel("Time, s")
     ax1.set_ylabel("sig")
     ax2.semilogx(frequency_welch_hz, psd_welch_power, label="Welch")
-    ax2.semilogx(frequency_welch_hz, psd_welch_power2, label="Welch2")
     ax2.semilogx(frequency_stft_hz, stft_over_var, ".-", label="STFT")
-    ax2.semilogx(frequency_stft_hz2, stft_over_var2, ".", label="STFT2")
     ax2.semilogx(frequency_cwt_hz, cwt_over_var, "-.", label="CWT")
     ax2.semilogx(frequency_stx_hz, stx_over_var, "--", label="STX")
     ax2.set_title(f"Spectral Power, f = {frequency_center_stft_hz:.3f} Hz")
@@ -212,12 +199,6 @@ if __name__ == "__main__":
     mesh_base = ptb.MeshBase(time_stft_s, frequency_stft_hz, frequency_hz_ymin=fmin, frequency_hz_ymax=fmax)
     mesh_panel = ptb.MeshPanel(mic_stft_bits, colormap_scaling="range", cbar_units="log$_2$(Power)")
     stft = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
-
-    wf_base.figure_title = f"STFT2 for {EVENT_NAME}, {ORDER_NUM}"
-    mesh_base.time = time_stft_s2
-    mesh_base.frequency = frequency_stft_hz2
-    mesh_panel.tfr = mic_stft_bits2
-    stft2 = plot_mesh_wf_vert(mesh_base, mesh_panel, wf_base, wf_panel)
 
     # Plot the CWT
     wf_base.figure_title = f"CWT for {EVENT_NAME}, {ORDER_NUM}"
