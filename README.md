@@ -1,9 +1,10 @@
 # quantum-inferno
 ## Quantized Information Entropy, Nth Octave
 
-### Caveat Emptor: Early Release Version
+### Version 1.2.0
 
 ### Description
+INFERNO: Information Entropy, Nth Octave 
 Computes standardized time-frequency representations (TFRs) for power, information, and entropy, 
 built on the Gabor wavelets with minimal time-frequency uncertainty with 
 logarithmic constant-Q base 2 (binary) scales and frequency bands of quantized order N.
@@ -13,7 +14,14 @@ The short-term Fourier transform (STFT) is included as the baseline TFR.
 Algorithms for the Continuous Wavelet Transform (CWT), Discrete Wavelet Transform (DWT), 
 and Stockwell Transform (STX) are provided.
 
-Refer to the open access publications:
+### Intended Audience
+The draft version of this repository was so specialized and esoteric it was nearly useless.
+Starting in Version 1.2, more user-friendly explanations and examples are preseted as Jupyter notebooks.
+The intended audience are scientists and engineers with a general background in digital signal processing and spectral analysis.
+
+Version 1.2 was prepared using Visual Studio Code (VSCode) with GitHub CoPilot assist.
+
+### Core concept publications: Inferno Trilogy (in reverse chronological order)
 
 - [Garcés, M.A. Quantized Information in Spectral Cyberspace. Entropy 2023, 25, 419](https://doi.org/10.3390/e25030419)
 
@@ -23,7 +31,7 @@ Sparse Binary Representations of Cyber-Physical Signatures. Entropy 2020, 22, 93
 - [Garcés, M.A. On Infrasound Standards, Part 1 Time, Frequency, and Energy Scaling. 
 Inframatics 2013, 2, 13-35](https://doi.org/10.4236/inframatics.2013.22002)
  
-Recommended background reading in chronological order:
+ ### Recommended background reading in chronological order:
 - Gabor, D. Theory of Communication, Part 3. Electr. Eng. 1946, 93, 445–457.
 - Shannon, C.E. The Mathematical Theory of Communication; University of Illinois Press: Urbana, IL, USA, 1998; [1949 first ed].
 - Harris, F. J. On the Use of Windows for Harmonic Analysis with the Discrete Fourier Transform, Proceedings of the IEEE, 1978, 66 (1), 51-83.

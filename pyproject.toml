@@ -15,6 +15,9 @@ license = {file = "LICENSE"}
 
 # Please specify dependencies in alphabetical order
 dependencies = [
+    "ipykernel>=7.1.0", # Jupyter notebooks
+    "ipywidgets>=8.1.7", # Jupyter notebook controls
+    "librosa>=0.11.0", # Audio libraries
     "matplotlib>=3.10.0", # Matplotlib is a comprehensive library for visualizations in Python.
     "numpy>=2.2.3", # NumPy is a library for numerical computing in Python.
     "scipy>=1.15.2", # SciPy is a library for scientific computing in Python.
