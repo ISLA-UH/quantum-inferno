@@ -96,8 +96,8 @@ if __name__ == "__main__":
     # The new FFT duration (power of two) defines the actual spectral resolution.
     frequency_fft_pos_hz = scipy.fft.rfftfreq(fft_samples, d=1/frequency_sample_rate_hz)
     # Find the closest frequency to the design frequency.
-    fft_index: int = np.argmin(np.abs(frequency_fft_pos_hz - frequency_design_center_hz))
-    frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
+    fft_peak_index: int = np.argmin(np.abs(frequency_fft_pos_hz - frequency_design_center_hz))
+    frequency_center_fft_hz = frequency_fft_pos_hz[fft_peak_index]
     # Convert to dimensionless frequency
     frequency_center_fft = frequency_center_fft_hz / frequency_sample_rate_hz
 
@@ -172,14 +172,16 @@ if __name__ == "__main__":
         fft_sig_pos = scipy.fft.rfft(sig_cosine_tapered, n=fft_samples)
         fft_square = np.abs(fft_sig_pos) ** 2
         fft_power = 2. * frequency_resolution_fft * fft_square / dft_samples
-
-        W_dB = 10 * np.log10(np.maximum(fft_power * spectral_energy_correction_factor ** 2, 1e-250))
+        fft_power_corrected = np.maximum(fft_power * spectral_energy_correction_factor ** 2, 1e-250)
+        W_dB = 10 * np.log10(fft_power_corrected)
         ax_.plot(frequency_fft_pos_hz, W_dB, f'C{c_}-', label=w_name_)
         ax_.text(frequency_design_center_hz, -160, w_name_, color=f'C{c_}', verticalalignment='bottom',
                  horizontalalignment='left', bbox={'color': 'white', 'pad': 0})
         ax_.set_yticks([-140, -80, -6])
         # ax_.grid(axis='x')
         ax_.grid()
+        print(f' FFT peak power at {frequency_center_fft_hz} Hz: {fft_power_corrected[fft_peak_index]}, {W_dB[fft_peak_index]} dB   ')
+        print(' Expected power (amplitude^2/2): ', (sig_amplitude ** 2) / 2)
     axx[0].set_title("Spectral Leakage of Example Windows")
     fg2.supylabel(r"$10\,\log_{10}<Power>$ in dB",
                   x=0.04, y=0.5, fontsize='medium')
