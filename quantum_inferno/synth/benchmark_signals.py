@@ -19,7 +19,13 @@ DEFAULT_OVERSAMPLE_SCALE = 2
 """ Signal conditioning  """
 
 
-def signal_gate(wf: np.ndarray, t: np.ndarray, tmin: float, tmax: float, fraction_cosine: float = 0) -> np.ndarray:
+def signal_gate(
+    wf: np.ndarray,
+    t: np.ndarray,
+    tmin: float,
+    tmax: float,
+    fraction_cosine: float = 0,
+) -> np.ndarray:
     """
     Time gate and apply Tukey window, rectangular is the default
 

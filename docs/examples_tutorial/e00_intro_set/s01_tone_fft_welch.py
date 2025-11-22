@@ -17,14 +17,16 @@ print(__doc__)
 
 if __name__ == "__main__":
     """
-    Average the Fast Fourier Transform (FFT) over sliding windows using the Welch method
-    Inspect and verify amplitude corrections for different scalings (density, spectrum)
+    Average the Fast Fourier Transform (FFT) over sliding windows using the 
+    Welch method Inspect and verify amplitude corrections for 
+    different scalings (density, spectrum)
     """
 
     # Construct a tone of fixed frequency with a constant sample rate
     # For this example, no noise, taper, or antialiasing filters are added.
     # In the first example (FFT), the nominal signal duration was 1s.
-    # In this example the nominal signal duration is 16s, with averaging (fft) window duration of 1s.
+    # In this example the nominal signal duration is 16s, 
+    # with averaging (fft) window duration of 1s.
     frequency_tone_hz = 60
     [
         mic_sig,
@@ -43,8 +45,8 @@ if __name__ == "__main__":
         output_desc=False
     )
 
-    # alpha: Shape parameter of the Welch Tukey window, representing the fraction of the window inside the cosine
-    #        tapered region.
+    # alpha: Shape parameter of the Welch Tukey window, representing
+    # the fraction of the window inside the cosine tapered region.
     # If zero [0], the Tukey window is equivalent to a rectangular window.
     # If one [1], the Tukey window is equivalent to a Hann window.
     alpha = 0
