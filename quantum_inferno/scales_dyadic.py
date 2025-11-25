@@ -33,13 +33,13 @@ def get_epsilon() -> float:
     """
     if sys.maxsize > 2 ** 32:
         # noinspection PyTypeChecker
-        return EPSILON64
+        return float(EPSILON64)
     elif sys.maxsize > 2 ** 16:
         # noinspection PyTypeChecker
-        return EPSILON32
+        return float(EPSILON32)
     else:
         # noinspection PyTypeChecker
-        return EPSILON16
+        return float(EPSILON16)
 
 
 class Slice:
@@ -90,7 +90,7 @@ DEFAULT_SCALE_BASE = Slice.G3
 DEFAULT_SCALE_ORDER = Slice.ORD3
 DEFAULT_REF_FREQUENCY_HZ = Slice.F1HZ
 
-# compute maximum size for FFT calculations
+# compute maximum power of two for FFT calculations
 __SIZE_MAX = get_epsilon()
 if __SIZE_MAX == EPSILON64:
     __MAX_FFT_LIMIT_BY_SYSTEM = 63
@@ -101,7 +101,7 @@ else:
 
 DEFAULT_SCALE_ORDER_MIN: float = 0.75  # Garces (2022)
 DEFAULT_FFT_POW2_POINTS_MAX: int = 2 ** __MAX_FFT_LIMIT_BY_SYSTEM  # Computational FFT limit, tuned to computing system
-DEFAULT_FFT_POW2_POINTS_MIN: int = 2 ** 8  # For a tolerable display
+DEFAULT_FFT_POW2_POINTS_MIN: int = 2 ** 8  # For a tolerable display, min for 24th octaves
 DEFAULT_MESH_POW2_PIXELS: int = 2 ** 19  # Total of pixels per mesh, tune to plotting engine
 DEFAULT_TIME_DISPLAY_S: float = 60.0  # Physical time to display; sets display truncation
 VALID_SCALE_ORDERS: List[float] = [0.75, 1, 1.5, 3, 6, 12, 24, 48]  # list of valid scale orders
@@ -218,7 +218,7 @@ def band_frequency_low_high(
         scale_base,
         scale_band_number,
         scale_ref,
-        scale_center_algebraic,
+        _,
         scale_center_geometric,
         scale_start,
         scale_end,
