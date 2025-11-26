@@ -68,6 +68,7 @@ class Slice:
     TU = 2.0 ** 58  # Estimated age of the known universe in seconds
     # Frequency
     F1HZ = 1.0  # 1 Hz
+    F440HZ = 440.0  # 440 Hz Concert A, present-day 12 equal temperament system
     F1KHZ = 1_000.0  # 1 kHz
     F0HZ = 1.0e42  # 1/Universal Scale
     FU = 2.0 ** -58  # 1/Estimated age of the known universe in s
