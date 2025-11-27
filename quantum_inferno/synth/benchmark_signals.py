@@ -319,7 +319,7 @@ def well_tempered_tone(
     # The fft frequencies are set by the duration of the fft
     # In this example we only need the positive frequencies
     frequency_fft_pos_hz = fft.rfftfreq(time_fft_nd, d=1 / frequency_sample_rate_hz)
-    fft_index: int = np.argmin(np.abs(frequency_fft_pos_hz - frequency_center_hz))
+    fft_index: int = int(np.argmin(np.abs(frequency_fft_pos_hz - frequency_center_hz)))
     frequency_center_fft_hz: float = float(frequency_fft_pos_hz[fft_index])
     frequency_resolution_fft_hz = frequency_sample_rate_hz / time_fft_nd
 

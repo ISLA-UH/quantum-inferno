@@ -112,7 +112,7 @@ def gt_blast_center_noise(
 
 
 def gt_blast_center_noise_uneven(
-    sensor_epoch_s: np.array, noise_std_loss_bits: float = 2., frequency_center_hz: Optional[float] = None
+    sensor_epoch_s: np.ndarray, noise_std_loss_bits: float = 2., frequency_center_hz: Optional[float] = None
 ) -> np.ndarray:
     """
     Construct the GT explosion pulse of Garces (2019) for even or uneven sensor time
